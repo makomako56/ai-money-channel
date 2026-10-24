@@ -1,0 +1,5 @@
+.env
+output/
+**/_old/
+__pycache__/
+_repo.zip

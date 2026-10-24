@@ -1,0 +1,30 @@
+# キャラ設定（Claudeの台本とCodexのパイプラインの共通定義）
+mirai:
+  display_name: ミライ
+  full_name: 天野 ミライ
+  role: 先生（解説役）
+  position: left
+  color: "#24345c"
+  accent: "#c9a14a"
+  voice: { engine: voicevox, speaker_id: null, speed: 1.1, pitch: -0.02 }  # T002で決定
+  fixed_traits: [黒髪ロングの低い一つ結び, 細いフレームの眼鏡, グレーの瞳, ネイビーに金のふちのジャケット, 白いブラウス]
+  expressions:
+    通常: mirai_01_normal_closed.png
+    笑顔: mirai_03_smile.png
+    驚き: null
+    困り顔: null
+    ドヤ顔: null
+  mouth: { closed: mirai_01_normal_closed.png, half: null, open: mirai_02_normal_open.png }
+  blink: null
+hinata:
+  display_name: ひなた
+  full_name: 春野 ひなた
+  role: 生徒（質問役）
+  position: right
+  color: "#f08a3c"
+  accent: "#fff1dc"
+  voice: { engine: voicevox, speaker_id: null, speed: 1.2, pitch: 0.02 }
+  fixed_traits: [明るい茶髪のボブ, オレンジのヘアピン, 茶色の瞳, 紺のブレザー制服, オレンジのリボン, 眼鏡なし]
+  expressions: { 通常: null, 笑顔: null, 驚き: null, 困り顔: null, 納得顔: null }
+  mouth: { closed: null, half: null, open: null }
+  blink: null
