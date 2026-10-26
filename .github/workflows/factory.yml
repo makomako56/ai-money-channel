@@ -62,7 +62,7 @@ jobs:
             'https://raw.githubusercontent.com/google/fonts/main/ofl/notosansjp/NotoSansJP[wght].ttf' \
             --output "$HOME/.local/share/fonts/NotoSansJP.ttf"
           fc-cache -f
-          fc-match --format '%{family}\n' 'Noto Sans JP' | grep -Fx 'Noto Sans JP'
+          fc-match --format '%{family}\n' 'Noto Sans JP' | grep -F 'Noto Sans JP'
           python -m pip install -r requirements.txt
       - name: Unit tests
         run: python -m unittest discover -s pipeline/tests -v
