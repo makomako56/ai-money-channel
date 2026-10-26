@@ -60,17 +60,19 @@ h1{position:absolute;top:84px;width:100%;text-align:center;font-size:84px;font-w
  <div class=line data-step=5>みんな一斉に質問すると <span class="hl" data-step=6>レジの大行列！</span></div>
 </div>
 <img class="ch mirai bob" id=mirai src=m_closed.png>
-<img class="ch hinata bob" id=hinata src=h_open.png>
+<img class="ch hinata bob" id=hinata src=hinata_01_normal_closed.png>
 <div class=sub id=sub style="--c:#f08a3c"><div class=face><img id=faceimg src=h_open.png></div><div class=txt id=txt></div></div>
 <script>
 document.querySelectorAll('[data-step]').forEach(e=>{e.classList.add(e.classList.contains('arr')?'draw':(e.classList.contains('box')?'pop':(e.classList.contains('hl')?'x':'up')))});
+const HX={'通常':'hinata_01_normal_closed.png','驚き':'hinata_06_surprise.png','疑問':'hinata_09_question.png','笑顔':'hinata_05_smile.png','困り顔':'hinata_07_troubled.png','衝撃':'hinata_11_shock.png'};
+let hExp='通常';
 const lines=[
- {who:'h',t:'AIって、どこで\n考えてるんですか？',step:1,dur:2600},
+ {who:'h',t:'AIって、どこで\n考えてるんですか？',step:1,dur:2600,ex:'疑問'},
  {who:'m',t:'あなたが質問すると…',step:2,dur:2000},
  {who:'m',t:'遠くの「計算センター」に\n届きます',step:3,dur:2600},
  {who:'m',t:'そこで計算して、\n答えを返すんです',step:4,dur:2400},
- {who:'h',t:'みんなが一度に\n質問したら…？',step:5,dur:2300},
- {who:'m',t:'そう、レジの\n大行列になります',step:6,dur:2600},
+ {who:'h',t:'みんなが一度に\n質問したら…？',step:5,dur:2300,ex:'困り顔'},
+ {who:'m',t:'そう、レジの\n大行列になります',step:6,dur:2600,hx:'衝撃'},
 ];
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 let cur=0;
@@ -82,11 +84,18 @@ for(const L of lines){
   sp.classList.remove('dim');other.classList.add('dim');
   sp.classList.remove('hop');void sp.offsetWidth;sp.classList.add('hop');
   sub.style.setProperty('--c',L.who=='m'?'#2f4a8a':'#f08a3c');
-  faceimg.src=L.who=='m'?'m_closed.png':'h_open.png';
+  if(L.who=='h') hExp=L.ex||'通常'; else if(L.hx) hExp=L.hx; else hExp='通常';
+  hinata.src=HX[hExp];
+  faceimg.src=L.who=='m'?'m_closed.png':HX[hExp];
   txt.innerHTML=L.t.replace('\n','<br>');
   const end=Date.now()+L.dur;let o=false;
-  while(Date.now()<end){ if(L.who=='m'){mirai.src=(o=!o)?'m_open.png':'m_closed.png'} await sleep(140)}
+  while(Date.now()<end){ o=!o;
+    if(L.who=='m'){mirai.src=o?'m_open.png':'m_closed.png'}
+    else if(hExp=='通常'){hinata.src=o?'hinata_02_normal_open.png':HX['通常']}
+    await sleep(140)}
+  if(L.who=='h') hinata.src=HX[hExp];
   mirai.src='m_closed.png'; await sleep(250);
 }
 document.title='done';})();
+(async()=>{while(true){await sleep(2600+Math.random()*1500); if(hExp=='通常'&&hinata.src.includes('01_normal')){hinata.src='hinata_04_blink.png';await sleep(120);if(hinata.src.includes('04_blink'))hinata.src=HX[hExp]}}})();
 </script>

@@ -25,6 +25,16 @@ hinata:
   accent: "#fff1dc"
   voice: { engine: voicevox, name: null, speaker_id: null, speed: 1.2, pitch: 0.02 }
   fixed_traits: [明るい茶髪のボブ, オレンジのヘアピン, 茶色の瞳, 紺のブレザー制服, オレンジのリボン, 眼鏡なし]
-  expressions: { 通常: null, 笑顔: null, 驚き: null, 困り顔: null, 納得顔: null }
-  mouth: { closed: null, half: null, open: null }
-  blink: null
+  expressions:
+    通常: hinata_01_normal_closed.png
+    笑顔: hinata_05_smile.png
+    驚き: hinata_06_surprise.png
+    困り顔: hinata_07_troubled.png
+    納得顔: hinata_10_happy.png
+    ドヤ顔: hinata_08_smug.png
+    疑問: hinata_09_question.png
+    衝撃: hinata_11_shock.png
+    ムッ: hinata_12_pout.png
+    怒り: hinata_13_angry.png
+  mouth: { closed: hinata_01_normal_closed.png, half: null, open: hinata_02_normal_open.png }
+  blink: hinata_04_blink.png
