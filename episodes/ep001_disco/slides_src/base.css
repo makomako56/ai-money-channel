@@ -1,0 +1,17 @@
+*{margin:0;box-sizing:border-box}
+html,body{width:1920px;height:1080px;font-family:"Noto Sans CJK JP",sans-serif;background:#f6f4ef;color:#1d2433;overflow:hidden}
+.top{height:150px;background:#24345c;display:flex;align-items:center;padding:0 90px;gap:28px}
+.no{background:#f08a3c;color:#fff;font-weight:900;font-size:40px;min-width:84px;height:84px;border-radius:14px;display:flex;align-items:center;justify-content:center;padding:0 14px}
+.ttl{color:#fff;font-size:62px;font-weight:900;letter-spacing:2px}
+.body{height:930px;padding:56px 110px 120px;position:relative;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:40px}
+.src{position:absolute;left:0;right:0;bottom:30px;text-align:center;font-size:24px;color:#7a7f8c}
+.hl{background:linear-gradient(transparent 62%,#ffd08f 62%)}
+.card{background:#fff;border-radius:28px;border:4px solid #e3ddd2;padding:36px 40px}
+.org{border-color:#f08a3c;background:#fff6ee}
+.arrow{font-size:80px;color:#c9a14a;font-weight:900}
+.row{display:flex;align-items:center;justify-content:center;gap:36px}
+.lab{font-size:48px;font-weight:900}
+.sub{font-size:34px;color:#5a6070}
+.big{font-size:96px;font-weight:900;line-height:1.25;text-align:center}
+.kpi{font-size:88px;font-weight:900;color:#24345c}
+.up{font-size:44px;font-weight:900;color:#d9702a}
