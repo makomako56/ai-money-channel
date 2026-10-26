@@ -25,4 +25,5 @@
 | T022 | 共通 | 作業依頼03：サムネ生成 | Codex | 未着手 | Claude | 02の後 |
 | T023 | 共通 | 作業依頼04：YouTube予約投稿 | Codex | 未着手 | Claude | 03の後 |
 | T024 | 共通 | 作業依頼05：一括実行 | Codex | 未着手 | Claude | 04の後 |
-| T025 | ep000 | サンプル用スライド3枚 | Claude | 未着手 | Codex | 02までに |
+| T025 | ep000 | サンプル用スライド3枚 | Claude | 完了 | Codex | episodes/ep000_sample/slides/ |
+| T026 | 共通 | 声の聴き比べ（7人分のサンプル送付済み） | 人 | 承認待ち | Claude | output/声サンプル/ |
