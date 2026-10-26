@@ -12,7 +12,7 @@
 | T002 | 共通 | VOICEVOX導入、2人の声を決定 | 人 | 未着手 | Claude | 候補は設定書の「声」 |
 | T003 | 共通 | GeminiのAPIキー・YouTube API認証を .env に設定 | 人 | 未着手 | Codex | .env.example を参照 |
 | T004 | 共通 | 声・Gemini画像・BGMの利用規約確認 → config/licenses.md | Claude | 作業中 | Claude | 全体とGeminiは確認済み。キャラ別は声の決定（T002）後 |
-| T005 | 共通 | pipeline/ 構築（make_character〜run_episode） | Codex | 未着手 | Codex | AGENTS.md の要件どおり |
+| T005 | 共通 | （作業依頼01〜05に置き換え） | - | 完了 | | |
 | T006 | 共通 | ミライ先生の残り差分を生成（口少し開き・目閉じ・驚き・困り顔・ドヤ顔） | Codex | 未着手 | Claude | make_character.py で |
 | T007 | 共通 | ひなたの基本画像と差分を生成（リボンはオレンジ） | Codex | 未着手 | Claude | 基本画像は人が1度だけ確認 |
 | T008 | ep000 | 30秒サンプル台本 | Claude | 完了 | Codex | episodes/ep000_sample/script.txt |
@@ -20,3 +20,9 @@
 | T010 | ep000 | CP0：キャラ・声・画面構成を承認 | 人 | 未着手 | Claude | ここを越えたら毎日制作へ |
 | T011 | ep001 | テーマ3案 | Claude | 完了 | 人(CP1) | tasks/ep001_テーマ案.md |
 | T012 | ep001 | CP1：テーマを1つ選ぶ | 人 | 承認待ち | Claude | 推奨は案A（ディスコ） |
+| T020 | 共通 | 作業依頼01：Actions土台と音声生成 | Codex | 未着手 | Claude | docs/作業依頼/01 |
+| T021 | 共通 | 作業依頼02：動画の組み立て | Codex | 未着手 | Claude | 01の後 |
+| T022 | 共通 | 作業依頼03：サムネ生成 | Codex | 未着手 | Claude | 02の後 |
+| T023 | 共通 | 作業依頼04：YouTube予約投稿 | Codex | 未着手 | Claude | 03の後 |
+| T024 | 共通 | 作業依頼05：一括実行 | Codex | 未着手 | Claude | 04の後 |
+| T025 | ep000 | サンプル用スライド3枚 | Claude | 未着手 | Codex | 02までに |

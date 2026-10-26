@@ -6,7 +6,7 @@ mirai:
   position: left
   color: "#24345c"
   accent: "#c9a14a"
-  voice: { engine: voicevox, speaker_id: null, speed: 1.1, pitch: -0.02 }  # T002で決定
+  voice: { engine: voicevox, name: null, speaker_id: null, speed: 1.1, pitch: -0.02 }  # 声の聴き比べ後に決定
   fixed_traits: [黒髪ロングの低い一つ結び, 細いフレームの眼鏡, グレーの瞳, ネイビーに金のふちのジャケット, 白いブラウス]
   expressions:
     通常: mirai_01_normal_closed.png
@@ -23,7 +23,7 @@ hinata:
   position: right
   color: "#f08a3c"
   accent: "#fff1dc"
-  voice: { engine: voicevox, speaker_id: null, speed: 1.2, pitch: 0.02 }
+  voice: { engine: voicevox, name: null, speaker_id: null, speed: 1.2, pitch: 0.02 }
   fixed_traits: [明るい茶髪のボブ, オレンジのヘアピン, 茶色の瞳, 紺のブレザー制服, オレンジのリボン, 眼鏡なし]
   expressions: { 通常: null, 笑顔: null, 驚き: null, 困り顔: null, 納得顔: null }
   mouth: { closed: null, half: null, open: null }
