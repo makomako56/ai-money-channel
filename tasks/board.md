@@ -6,7 +6,9 @@
 |---|---|---|---|---|---|---|
 | T001 | 共通 | GitHubリポジトリ作成 | 人 | 完了 | Codex | makomako56/ai-money-channel（Private） |
 | T001b | 共通 | GitHubのClaude許可に ai-money-channel を追加 | 人 | 完了 | | Claudeから読み書き可能を確認（2026-10-24） |
-| T001c | 共通 | 初回push（Claude済み）→ デスクトップのフォルダをリポジトリにつなぐ | Codex | 未着手 | | docs/Codexへの最初の指示.md の手順1 |
+| T001c | 共通 | （不要）クラウドのCodexを使う方式に変更 | - | 完了 | | 2026-10-26 |
+| T001d | 共通 | Codexのクラウド環境を作成・公開、コードレビューを有効化 | 人 | 未着手 | Claude | 仕組みの資料を参照 |
+| T001e | 共通 | テストIssueで @codex 連携を確認 | Claude | 未着手 | Claude | T001dの後 |
 | T002 | 共通 | VOICEVOX導入、2人の声を決定 | 人 | 未着手 | Claude | 候補は設定書の「声」 |
 | T003 | 共通 | GeminiのAPIキー・YouTube API認証を .env に設定 | 人 | 未着手 | Codex | .env.example を参照 |
 | T004 | 共通 | 声・Gemini画像・BGMの利用規約確認 → config/licenses.md | Claude | 作業中 | Claude | 全体とGeminiは確認済み。キャラ別は声の決定（T002）後 |
