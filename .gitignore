@@ -3,3 +3,12 @@ output/
 **/_old/
 __pycache__/
 _repo.zip
+
+# 動画工場の生成物とローカル開発環境
+/output/
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.env.*
+!.env.example

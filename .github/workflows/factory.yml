@@ -1,0 +1,95 @@
+name: 動画工場（音声）
+run-name: 音声生成 / ${{ inputs.episode || 'ep000_sample' }} / ${{ inputs.stage || '両ステージ検証' }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      episode:
+        description: エピソードのフォルダ名
+        required: true
+        default: ep000_sample
+        type: string
+      stage:
+        description: 生成する成果物
+        required: true
+        default: voice
+        type: choice
+        options: [voice, voice_samples]
+  # 新規workflowをmainへマージする前に、同じ処理を実際のActionsで検証する。
+  push:
+    branches: [codex/issue-1-voice]
+    paths:
+      - .github/workflows/factory.yml
+      - pipeline/**
+      - config/**
+      - requirements.txt
+
+permissions:
+  contents: read
+
+jobs:
+  voice:
+    name: ${{ matrix.stage }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        stage: ${{ fromJSON(github.event_name == 'workflow_dispatch' && format('["{0}"]', inputs.stage) || '["voice","voice_samples"]') }}
+    env:
+      EPISODE: ${{ inputs.episode || 'ep000_sample' }}
+      STAGE: ${{ matrix.stage }}
+    services:
+      voicevox:
+        image: voicevox/voicevox_engine:cpu-latest
+        ports:
+          - 50021:50021
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg fonts-noto-cjk
+          fc-match 'Noto Sans CJK JP'
+          python -m pip install -r requirements.txt
+      - name: Unit tests
+        run: python -m unittest discover -s pipeline/tests -v
+      - name: Wait for VOICEVOX
+        run: |
+          for attempt in $(seq 1 90); do
+            if curl --fail --silent --show-error --max-time 5 http://127.0.0.1:50021/version; then
+              echo
+              exit 0
+            fi
+            sleep 2
+          done
+          echo '::error::VOICEVOX did not become ready'
+          exit 1
+      - name: Generate audio
+        run: |
+          args=()
+          if [[ "$EPISODE" == ep000_sample && ! -d "episodes/$EPISODE/slides" ]]; then
+            echo '::warning::ep000_sampleのスライド未配置のため画像確認を省略します（依頼01の補足）'
+            args+=(--no-slide-check)
+          fi
+          python -m pipeline.make_voice --episode "$EPISODE" --stage "$STAGE" "${args[@]}"
+      - name: Verify generated artifacts
+        run: python -m pipeline.verify_output --episode "$EPISODE" --stage "$STAGE"
+      - name: Upload audio
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.EPISODE }}-${{ matrix.stage }}
+          path: output/${{ env.EPISODE }}/${{ matrix.stage }}/
+          if-no-files-found: error
+          retention-days: 7
+      - name: Engine logs on failure
+        if: failure()
+        env:
+          ENGINE_CONTAINER: ${{ job.services.voicevox.id }}
+        run: docker logs --tail 100 "$ENGINE_CONTAINER"
