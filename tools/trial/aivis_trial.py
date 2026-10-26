@@ -15,33 +15,39 @@ for s in speakers:
 open(os.path.join(OUT, "voices.txt"), "w").write("\n".join(lines_out))
 print("\n".join(lines_out))
 
-def style(name_part):
+def sid(spk, sty):
     for s in speakers:
-        for st in s["styles"]:
-            if name_part in st["name"]:
-                return st["id"], f"{s['name']}_{st['name']}"
-    st = speakers[0]["styles"][0]
-    return st["id"], f"{speakers[0]['name']}_{st['name']}"
+        if s["name"] == spk:
+            for st in s["styles"]:
+                if st["name"] == sty:
+                    return st["id"]
+    raise SystemExit(f"not found: {spk} {sty}")
 
-calm, calm_name = style("落ち着き")
-high, high_name = style("テンション")
-dialogue = [
-    (high, "先生っ！AIって、結局…だれが一番儲かってるんですか？"),
-    (calm, "ふふ、いい質問ですね。じゃあ、お金の流れで考えてみましょうか。"),
-    (high, "うっ…出た、お金の流れ…。"),
-    (calm, "ゴールドラッシュで、一番儲かったのは…金を掘った人じゃなくて、スコップを売った人なんです。"),
+TEXT = [
+    ("h", "先生っ！AIって、結局…だれが一番儲かってるんですか？"),
+    ("m", "ふふ、いい質問ですね。じゃあ、お金の流れで考えてみましょうか。"),
+    ("h", "うっ…出た、お金の流れ…。"),
+    ("m", "ゴールドラッシュで、一番儲かったのは…金を掘った人じゃなくて、スコップを売った人なんです。"),
 ]
-parts = []
-for i, (sid, text) in enumerate(dialogue):
-    q = json.loads(call("/audio_query?" + urllib.parse.urlencode({"text": text, "speaker": sid}), method="POST"))
-    wav = call(f"/synthesis?speaker={sid}", json.dumps(q).encode(), "POST")
-    p = os.path.join(OUT, f"part{i}.wav"); open(p, "wb").write(wav); parts.append(p)
+PAIRS = [
+    ("比較3_AivisSpeech_ひなた=まお_ミライ=まお(おちつき)", ("まお", "ノーマル"), ("まお", "おちつき")),
+    ("比較4_AivisSpeech_ひなた=まお_ミライ=コハク", ("まお", "ノーマル"), ("コハク", "ノーマル")),
+    ("比較5_AivisSpeech_ひなた=コハク_ミライ=まお(おちつき)", ("コハク", "ノーマル"), ("まお", "おちつき")),
+]
 sil = os.path.join(OUT, "sil.wav")
 subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "lavfi", "-t", "0.35", "-i", "anullsrc=r=44100:cl=mono", sil], check=True)
-lst = os.path.join(OUT, "list.txt")
-with open(lst, "w") as f:
-    for p in parts: f.write(f"file '{os.path.abspath(p)}'\nfile '{os.path.abspath(sil)}'\n")
-name = f"比較3_AivisSpeech_ひなた={high_name}_ミライ={calm_name}.mp3"
-subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", lst, "-ar", "44100", "-ac", "1", "-b:a", "160k", os.path.join(OUT, name)], check=True)
-for p in parts + [sil, lst]: os.remove(p)
+for title, h, m in PAIRS:
+    parts = []
+    for i, (who, text) in enumerate(TEXT):
+        s_id = sid(*(h if who == "h" else m))
+        q = json.loads(call("/audio_query?" + urllib.parse.urlencode({"text": text, "speaker": s_id}), method="POST"))
+        wav = call(f"/synthesis?speaker={s_id}", json.dumps(q).encode(), "POST")
+        p = os.path.join(OUT, f"part{i}.wav"); open(p, "wb").write(wav); parts.append(p)
+    lst = os.path.join(OUT, "list.txt")
+    with open(lst, "w") as f:
+        for p in parts: f.write(f"file '{os.path.abspath(p)}'\nfile '{os.path.abspath(sil)}'\n")
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", lst, "-ar", "44100", "-ac", "1", "-b:a", "160k", os.path.join(OUT, title + ".mp3")], check=True)
+    for p in parts + [lst]: os.remove(p)
+    print("done", title)
+os.remove(sil)
 print("done", name)

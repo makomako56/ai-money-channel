@@ -25,5 +25,5 @@ jobs:
           git fetch origin review-outputs || true
           git checkout -B review-outputs origin/review-outputs 2>/dev/null || git checkout --orphan review-outputs
           git rm -rq --cached . 2>/dev/null || true
-          mkdir -p voice_trial && cp out/* voice_trial/
+          rm -rf voice_trial && mkdir -p voice_trial && cp out/* voice_trial/
           git add voice_trial && git commit -m "AivisSpeech 試聴サンプル" && git push origin review-outputs
