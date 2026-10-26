@@ -50,4 +50,3 @@ for title, h, m in PAIRS:
     for p in parts + [lst]: os.remove(p)
     print("done", title)
 os.remove(sil)
-print("done", name)
