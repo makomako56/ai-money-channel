@@ -11,11 +11,18 @@ mirai:
   expressions:
     通常: mirai_01_normal_closed.png
     笑顔: mirai_03_smile.png
-    驚き: null
-    困り顔: null
-    ドヤ顔: null
+    驚き: mirai_06_surprise.png
+    困り顔: mirai_07_troubled.png
+    ドヤ顔: mirai_08_smug.png
+    疑問: mirai_09_question.png
+    納得顔: mirai_10_happy.png
+    ムッ: mirai_12_angry.png
+    怒り: mirai_13_rage.png
+    冷静: mirai_04_calm.png
+    励まし: mirai_14_cheer.png
+    落胆: mirai_15_sigh.png
   mouth: { closed: mirai_01_normal_closed.png, half: null, open: mirai_02_normal_open.png }
-  blink: null
+  blink: mirai_05_blink.png
 hinata:
   display_name: ひなた
   full_name: 春野 ひなた
