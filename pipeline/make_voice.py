@@ -57,7 +57,7 @@ class Voicevox:
 def voice_catalog(speakers):
     return [dict(name=speaker["name"], style=style["name"], id=style["id"])
             for speaker in speakers for style in speaker["styles"]
-            if style.get("type", "talk") == "talk"]
+            if style.get("type", "talk") in ("talk", "streaming_talk")]
 
 
 def normal_voice(catalog, name):

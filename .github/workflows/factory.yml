@@ -41,7 +41,8 @@ jobs:
       STAGE: ${{ matrix.stage }}
     services:
       voicevox:
-        image: voicevox/voicevox_engine:cpu-latest
+        # CPU版 0.26.0。検証したイメージをdigestで固定する。
+        image: voicevox/voicevox_engine:cpu-latest@sha256:6c6c07dfebc34294b432864cfce4387738dfa840d3b1a2859e68486b2bd99807
         ports:
           - 50021:50021
     steps:
@@ -55,8 +56,13 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y ffmpeg fonts-noto-cjk
-          fc-match 'Noto Sans CJK JP'
+          sudo apt-get install -y ffmpeg fontconfig
+          mkdir -p "$HOME/.local/share/fonts"
+          curl --fail --location --retry 3 --globoff \
+            'https://raw.githubusercontent.com/google/fonts/main/ofl/notosansjp/NotoSansJP[wght].ttf' \
+            --output "$HOME/.local/share/fonts/NotoSansJP.ttf"
+          fc-cache -f
+          fc-match --format '%{family}\n' 'Noto Sans JP' | grep -Fx 'Noto Sans JP'
           python -m pip install -r requirements.txt
       - name: Unit tests
         run: python -m unittest discover -s pipeline/tests -v

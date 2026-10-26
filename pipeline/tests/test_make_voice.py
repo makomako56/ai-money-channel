@@ -34,6 +34,14 @@ class VoiceTests(unittest.TestCase):
     def test_voice_id_precedes_name(self):
         self.assertEqual(resolve_voice({"speaker_id": 8, "name": "invalid"}, self.catalog, "ミライ")["id"], 8)
 
+    def test_streaming_talk_is_supported_and_singing_is_excluded(self):
+        catalog = voice_catalog([{"name": "No.7", "styles": [
+            {"name": "ノーマル", "id": 29, "type": "streaming_talk"},
+            {"name": "歌", "id": 3029, "type": "sing"},
+        ]}])
+        self.assertEqual(len(catalog), 1)
+        self.assertEqual(resolve_voice({"speaker_id": 29}, catalog, "ミライ")["id"], 29)
+
     def test_voice_name(self):
         for name in ("No.7（ノーマル）", "No.7(ノーマル)", "No.7 ノーマル", "No.7/ノーマル"):
             self.assertEqual(resolve_voice({"name": name}, self.catalog, "ミライ")["id"], 29)
