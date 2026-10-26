@@ -1,0 +1,4 @@
+# 作業依頼01：音声タイムラインの間。スライド切替時は通常の間を置き換える。
+audio:
+  dialogue_gap_seconds: 0.25
+  slide_gap_seconds: 0.6
