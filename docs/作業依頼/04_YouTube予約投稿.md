@@ -32,3 +32,28 @@
 - `--dry-run` が `ep000_sample` で成功する（テスト用の meta.json・approval.json は自分で作ってよい）
 - `approval.json` なしで止まるテストがある
 - 実際のアップロード確認は、オーナーが Secrets を登録したあとに Claude が行う
+
+## 追記（2026-10-27 夜：Claude と分担して並行作業）
+今夜は **Codex が 04（この依頼）**、**Claude が 05 の「投稿以外」の部分**（`stage=all` で音声→動画→サムネを一括、入力チェック、Summary）を同時に進める。04 の前提（03 マージ済み）は満たしている。
+
+### 読むファイル（これ以外は開かない）
+- このファイル、`AGENTS.md` の「利用上限を節約するための約束」
+- `config/channel.yaml`、`episodes/ep001_disco/meta.json`（実物の形式）、`docs/YouTube_API準備.md`
+- `.github/workflows/factory.yml`（`stage=video` と `stage=thumbnail` の作り）
+
+### 作り方の指定
+- `pipeline/upload.py`（新規）と `pipeline/tests/test_upload.py`（新規）。Google のライブラリを使うなら `requirements.txt` に追加
+- `factory.yml` には、**既存の `generate` ジョブとは別の新しいジョブ `upload`** を足す（Claude が `generate` ジョブを変更中のため、衝突を減らす）
+  - `stage=upload`：入力 `source_run_id`（動画とサムネを作った実行の ID）を受け取り、`actions/download-artifact@v4` の `run-id` と `github-token` でその実行の `<ep>-video` と `<ep>-thumbnail` を取ってからアップロード
+  - `stage=upload_check`：認証とチャンネルIDの一致だけを確認（アップロードしない）
+  - 音声エンジン（services）は upload ジョブでは起動しない
+- 二重投稿の防止：`episodes/<ep>/upload_result.json` は使わず、**YouTube 側で同じタイトルの動画が自分のチャンネルにあれば止める**（`--force` なし）。05 でも使うので、関数 `already_uploaded(youtube, title)` として切り出す
+- テストは API を呼ばない（モックで）。`approval.json` なし・過去の `publish_at`・チャンネルID不一致・二重投稿で止まること、`--dry-run` の送信内容（`privacyStatus=private`、`publishAt` が UTC）を確かめる
+
+### やってはいけないこと
+- **実際のアップロードを実行しない**（`stage=upload` を Actions で動かさない）。`approval.json` を作らない・コミットしない（テスト用は一時フォルダに作る）
+- Secrets を表示しない・ログに出さない
+
+### 完了条件（上の完了条件に追加）
+- 下書きPRでこまめに push。説明に「やったこと・確認方法・確認結果」と `Closes #4`
+- CI と `stage=upload_check` の実行は Claude が行う（Codex は push したら終えてよい）
