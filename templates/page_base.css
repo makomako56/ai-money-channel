@@ -47,4 +47,4 @@ h1{position:absolute;top:84px;width:100%;text-align:center;font-size:84px;font-w
 .room .win{position:absolute;left:170px;top:90px;width:520px;height:380px;background:linear-gradient(#1c2b55,#3b4f86);border:16px solid #f8f0e2;border-radius:10px}
 .room .moon{position:absolute;left:520px;top:140px;width:70px;height:70px;border-radius:50%;box-shadow:-18px 8px 0 0 #ffe9a8}
 .room .desk{position:absolute;right:120px;top:520px;width:640px;height:40px;background:#9b6b42;border-radius:8px}
-.prop-phone{position:absolute;right:300px;top:110px;width:330px;height:470px;border:12px solid #2b2f3d;border-radius:50px;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;padding:24px;text-align:center}
+.prop-phone{position:absolute;right:100px;top:110px;width:330px;height:470px;border:12px solid #2b2f3d;border-radius:50px;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;padding:24px;text-align:center}

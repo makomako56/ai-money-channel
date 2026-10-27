@@ -132,20 +132,14 @@ jobs:
       - name: Prepare review copy
         if: env.STAGE != 'video'
         run: python -m pipeline.prepare_review --episode "$EPISODE" --stage "$STAGE"
-      - name: Prepare low-resolution video review copy
+      - name: Check video review copy
         if: env.STAGE == 'video'
+        # make_video.py writes the 854x480 copy and frames/NN-S.png in the same pass as the master.
         run: |
-          mkdir -p "output/review/$EPISODE/video"
-          ffmpeg -hide_banner -loglevel error -nostdin -y \
-            -i "output/$EPISODE/video/video.mp4" \
-            -vf "scale=854:480:flags=lanczos" -c:v libx264 -preset veryfast \
-            -crf 32 -maxrate 800k -bufsize 1600k -c:a aac -b:a 64k \
-            -movflags +faststart "output/review/$EPISODE/video/video.mp4"
           size=$(stat -c '%s' "output/review/$EPISODE/video/video.mp4")
-          if [ "$size" -ge 100000000 ]; then
-            echo "::error::Review video is 100 MB or larger ($size bytes)"
-            exit 1
-          fi
+          frames=$(find "output/review/$EPISODE/video/frames" -name '*.png' | wc -l)
+          echo "review video: $size bytes, frames: $frames"
+          [ "$size" -lt 100000000 ] && [ "$frames" -gt 0 ]
       - name: Upload review copy for publisher
         uses: actions/upload-artifact@v4
         with:

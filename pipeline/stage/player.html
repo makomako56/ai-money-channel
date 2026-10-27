@@ -5,7 +5,7 @@
 <style>
 @font-face{font-family:Maru;src:url(../../assets/fonts/zen-maru-gothic-japanese-900-normal.woff2);font-weight:900}
 *{box-sizing:border-box}html,body{margin:0;width:1920px;height:1080px;overflow:hidden;background:#000}
-iframe{position:absolute;inset:0;width:1920px;height:1080px;border:0}
+iframe,.slideimg{position:absolute;inset:0;width:1920px;height:1080px;border:0}.slideimg{display:none;object-fit:contain;background:#fff}
 .ch{position:absolute;bottom:0;height:560px;transition:filter .2s}.dim{filter:brightness(.82)}
 .mirai{left:-10px}.hinata{right:0}
 body[data-layout=scene] .mirai{left:560px;height:640px}body[data-layout=scene] .hinata{right:520px;height:640px}
@@ -24,24 +24,33 @@ body[data-layout=scene] .mirai{left:560px;height:640px}body[data-layout=scene] .
 body[data-credit="true"] .credit{display:flex}
 </style>
 <body>
-<iframe id="pg"></iframe>
+<iframe id="pg"></iframe><img class="slideimg" id="slideimg" alt="">
 <img class="ch mirai bob" id="mirai"><img class="ch hinata bob" id="hinata">
 <div class="sub" id="sub"><div class="face"><img id="face"></div><div class="txt" id="txt"></div></div>
 <div class="credit" id="credit"></div>
 <script>
 "use strict";
 const params=new URLSearchParams(location.search),ep=params.get("ep");
-const pg=document.getElementById("pg"),mirai=document.getElementById("mirai"),hinata=document.getElementById("hinata");
+const pg=document.getElementById("pg"),slideimg=document.getElementById("slideimg"),mirai=document.getElementById("mirai"),hinata=document.getElementById("hinata");
 const sub=document.getElementById("sub"),face=document.getElementById("face"),txt=document.getElementById("txt"),credit=document.getElementById("credit");
 if(!/^[a-zA-Z0-9_-]+$/.test(ep||""))throw Error("invalid episode");
 const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 const IMG={ミライ:"../../assets/characters/mirai/transparent/",ひなた:"../../assets/characters/hinata/transparent/"};
 const normalTag=tag=>{const [expression,motion]=String(tag||"通常").split("|");return {expression:expression||"通常",motion:motion||"ぴょん"}};
-let CH,timeline=[],active=null;
+let CH,timeline=[],active=null,origin=null;
+// 確認用の静止画のために、画面・段階が切り替わった時刻（録画の0秒基準）を記録する
+window.__events=[];
+function mark(screen,step){window.__events.push({screen,step,t:(performance.now()-origin)/1000})}
 const chars={ミライ:document.getElementById("mirai"),ひなた:document.getElementById("hinata")};
-function setStep(k){pg.contentDocument.querySelectorAll("[data-step]").forEach(e=>{if(+e.dataset.step<=k&&!e.classList.contains("show"))e.classList.add("show")})}
-async function loadPage(n){pg.src=`../../episodes/${ep}/pages/${n}.html`;await new Promise((resolve,reject)=>{pg.onload=resolve;pg.onerror=()=>reject(Error("page load failed: "+n))});await pg.contentDocument.fonts.ready;document.body.dataset.layout=pg.contentDocument.body.dataset.layout||"slide";setStep(1)}
-function setText(value){txt.replaceChildren();String(value).split("／").forEach((part,index)=>{if(index)txt.append(document.createElement("br"));txt.append(document.createTextNode(part))})}
+function setStep(k){if(pg.style.display==="none")return;pg.contentDocument.querySelectorAll("[data-step]").forEach(e=>{if(+e.dataset.step<=k&&!e.classList.contains("show"))e.classList.add("show")})}
+async function loadPage({kind,n}){
+ if(kind==="スライド"){ // 旧書式：slides/NN.png を全面に表示（段階表示なし）
+  slideimg.src=`../../episodes/${ep}/slides/${n}.png`;await slideimg.decode().catch(()=>{throw Error("slide load failed: "+n)});
+  pg.style.display="none";slideimg.style.display="block";document.body.dataset.layout="slide";mark(n,1);return}
+ pg.src=`../../episodes/${ep}/pages/${n}.html`;await new Promise((resolve,reject)=>{pg.onload=resolve;pg.onerror=()=>reject(Error("page load failed: "+n))});await pg.contentDocument.fonts.ready;
+ slideimg.style.display="none";pg.style.display="block";document.body.dataset.layout=pg.contentDocument.body.dataset.layout||"slide";setStep(1);mark(n,1)}
+function setText(value){value=String(value);if(!value.includes("／")&&value.length>16){const h=Math.ceil(value.length/2);value=value.slice(0,h)+"／"+value.slice(h)} // 旧書式は「／」がないので2行に折る
+ txt.replaceChildren();String(value).split("／").forEach((part,index)=>{if(index)txt.append(document.createElement("br"));txt.append(document.createTextNode(part))})}
 async function waitUntil(seconds,origin){while((performance.now()-origin)/1000<seconds)await sleep(Math.min(25,Math.max(1,(seconds-(performance.now()-origin)/1000)*1000)))}
 function showLine(item,source){
  const match=source.match(/^(ミライ|ひなた)「(.*)」(?:\{(.*)\})?$/);if(!match)throw Error("script line does not match timeline line "+item.line);
@@ -66,14 +75,14 @@ function animate(){if(active){const {item,who,expression,started}=active,elapsed
  if(!timeline.length)throw Error("timeline is empty");
  mirai.src=IMG.ミライ+CH.ミライ.expressions["通常"];hinata.src=IMG.ひなた+CH.ひなた.expressions["通常"];
  requestAnimationFrame(animate);
- let cursor=0,page=null,step=1,origin=performance.now();window.__origin=performance.timeOrigin+origin;
+ let cursor=0,page=null,screen=null,step=1;origin=performance.now();window.__origin=performance.timeOrigin+origin;
  for(const item of timeline){
    const line=Number(item.line),source=script[line-1];if(!Number.isFinite(line)||!source)throw Error("timeline has invalid script line");
    await waitUntil(Number(item.start),origin);
-   let showPending=false;
-   for(;cursor<line-1;cursor++){const marker=script[cursor].trim(),screen=marker.match(/^\[画面:\s*(\d+)\]$/);if(screen)page=screen[1];if(/^\[表示\]$/.test(marker))showPending=true}
-   if(page!==null){await loadPage(page);page=null;step=1}
-   if(showPending){setStep(++step)}
+   let shows=0;
+   for(;cursor<line-1;cursor++){const marker=script[cursor].trim(),m=marker.match(/^\[(画面|スライド):\s*(\d+)\]$/);if(m){page={kind:m[1],n:String(+m[2]).padStart(2,"0")};shows=0}if(/^\[表示\]$/.test(marker))shows++}
+   if(page!==null){await loadPage(page);screen=page;page=null;step=1}
+   if(shows&&screen&&screen.kind==="画面"){step+=shows;setStep(step);mark(screen.n,step)}
    showLine(item,source);
    await waitUntil(Number(item.end),origin);active=null;
  }
