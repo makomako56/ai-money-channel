@@ -16,12 +16,12 @@
 | T006 | 共通 | ミライ先生の残り差分を生成（口少し開き・目閉じ・驚き・困り顔・ドヤ顔） | Codex | 未着手 | Claude | make_character.py で |
 | T007 | 共通 | ひなたの立ち絵 | 人 | 作業中 | Claude | 口開き1枚を透過済み（assets/characters/hinata/transparent/hinata_02_normal_open.png）。口閉じの基本画像を依頼中。characters.yaml への登録は01bのマージ後にClaudeが行う |
 | T008 | ep000 | 30秒サンプル台本 | Claude | 完了 | Codex | episodes/ep000_sample/script.txt |
-| T009 | ep000 | サンプル30秒動画を生成 | Codex | 未着手 | 人(CP0) | |
-| T010 | ep000 | CP0：キャラ・声・画面構成を承認 | 人 | 未着手 | Claude | ここを越えたら毎日制作へ |
+| T009 | ep000 | サンプル30秒動画を生成 | Claude | 完了 | 人(CP0) | stage=all で生成（2026-10-27夜）。review-outputs/ep000_sample/video/video.mp4 |
+| T010 | ep000 | CP0：キャラ・声・画面構成を承認 | 人 | 承認待ち | Claude | ここを越えたら毎日制作へ |
 | T011 | ep001 | テーマ3案 | Claude | 完了 | 人(CP1) | tasks/ep001_テーマ案.md |
 | T012 | ep001 | CP1：テーマを1つ選ぶ | 人 | 完了 | | ディスコに決定（2026-10-26） |
 | T013 | ep001 | リサーチ・台本・スライド11枚・meta・サムネ文言 | Claude | 完了 | 人(CP2) | episodes/ep001_disco/ |
-| T014 | ep001 | CP2：スライドレビュー（OK/NG） | 人 | 未着手 | Claude | v2で作り直してから再提出 |
+| T014 | ep001 | CP2：スライドレビュー（OK/NG） | 人 | 承認待ち | Claude | v2で作り直し済み。動画・静止画59枚・サムネが review-outputs/ep001_disco/ にある（2026-10-27夜） |
 | T020 | 共通 | 作業依頼01：Actions土台と音声生成 | Codex | 完了 | | PR #6 マージ済み（2026-10-26） |
 | T020b | 共通 | 作業依頼01b：音声の追補（Issue #7） | Codex | 完了 | | PR #8 マージ済み（2026-10-27、Claudeレビュー） |
 | T029 | 共通 | Codexのクラウド環境を作成（chatgpt.com/codex/cloud/settings/environments） | 人 | 任意 | | Codexは自分で進めるため必須ではない。作れば GitHub の @codex でも依頼できる |
