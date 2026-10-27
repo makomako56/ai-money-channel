@@ -31,6 +31,8 @@ body[data-credit="true"] .credit{display:flex}
 <script>
 "use strict";
 const params=new URLSearchParams(location.search),ep=params.get("ep");
+const pg=document.getElementById("pg"),mirai=document.getElementById("mirai"),hinata=document.getElementById("hinata");
+const sub=document.getElementById("sub"),face=document.getElementById("face"),txt=document.getElementById("txt"),credit=document.getElementById("credit");
 if(!/^[a-zA-Z0-9_-]+$/.test(ep||""))throw Error("invalid episode");
 const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 const IMG={ミライ:"../../assets/characters/mirai/transparent/",ひなた:"../../assets/characters/hinata/transparent/"};
@@ -76,7 +78,7 @@ function animate(){if(active){const {item,who,expression,started}=active,elapsed
    await waitUntil(Number(item.end),origin);active=null;
  }
  const end=Math.max(...timeline.map(item=>Number(item.end)));
- await waitUntil(end,origin);document.body.dataset.credit="true";credit.textContent=engine.credit||"音声：AivisSpeech（まお・コハク）";
+ await waitUntil(end,origin);document.body.dataset.credit="true";credit.textContent="音声：AivisSpeech（まお・コハク）";
  await waitUntil(end+2,origin);document.title="done";
 })().catch(error=>{document.title="error";document.body.dataset.error=error.message;console.error(error)});
 (async()=>{while(true){await sleep(2800+Math.random()*1600);if(!CH)continue;for(const [who,el] of Object.entries(chars)){if(el.src.endsWith(CH[who].expressions["通常"])){el.src=IMG[who]+CH[who].blink;await sleep(110);if(!active||active.who!==who||active.expression==="通常")el.src=IMG[who]+CH[who].expressions["通常"]}}}})();
