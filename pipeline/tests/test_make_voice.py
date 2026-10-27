@@ -95,7 +95,7 @@ class VoiceTests(unittest.TestCase):
         self.assertAlmostEqual(timeline[-1]["end"], 1.15)
         self.assertEqual(timeline[0]["envelope"], [0.5] * 3)
         self.assertEqual(len(list(self.root.glob("wav/*.wav"))), 3)
-        client.synthesize.assert_called_with("はい", 29, 1.1, -0.02)
+        client.synthesize.assert_called_with("はい", 29, 1.1, -0.02, intonation=1.2, volume=1.0, pre_phoneme=0.05, post_phoneme=0.05, pause_scale=1.4)
 
 
 if __name__ == "__main__":
