@@ -80,7 +80,7 @@ const { chromium } = require("playwright");
   const playerOrigin = await page.evaluate(() => window.__origin);
   const offset = (playerOrigin - pageCreatedAt) / 1000;
   if (!Number.isFinite(offset) || offset < 0) throw new Error("invalid player origin offset: "+offset);
-  process.stdout.write("VIDEO_ORIGIN_OFFSET_SECONDS="+offset.toFixed(6)+"\\n");
+  process.stdout.write("VIDEO_ORIGIN_OFFSET_SECONDS="+offset.toFixed(6)+"\n");
   const video = page.video();
   await context.close();
   await video.saveAs(output);
@@ -93,7 +93,7 @@ const { chromium } = require("playwright");
                                 timeout=max(1200, duration + 300))
         if result.returncode:
             raise RuntimeError("Playwright録画に失敗しました: " + result.stderr[-2000:])
-        match = re.search(r"VIDEO_ORIGIN_OFFSET_SECONDS=([0-9]+(?:\\.[0-9]+)?)", result.stdout)
+        match = re.search(r"VIDEO_ORIGIN_OFFSET_SECONDS=([0-9]+(?:\.[0-9]+)?)", result.stdout)
         if not match:
             raise RuntimeError("Playwrightから録画開始時刻を受け取れませんでした")
         offset = float(match.group(1))
