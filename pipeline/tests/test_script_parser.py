@@ -33,6 +33,24 @@ class ScriptParserTests(unittest.TestCase):
         self.assertEqual([line["slide"] for line in lines], ["01", "01", "03"])
         self.assertEqual([line["line"] for line in lines], [4, 5, 7])
 
+    def test_v2_screen_display_and_motion(self):
+        pages = self.script.parent / "pages"
+        pages.mkdir()
+        (pages / "01.html").touch()
+        lines = self.parse('[画面: 1]\n[表示]\nミライ「はい」{通常|ぴょん}\n'
+                           'ひなた「うん」{通常|うんうん}')
+        self.assertEqual([line["slide"] for line in lines], ["01", "01"])
+        self.assertEqual([line["line"] for line in lines], [3, 4])
+        self.assertEqual([line["expression"] for line in lines], ["通常", "通常"])
+        for motion in ("ぴょん", "びくっ", "うんうん", "かしげ", "ずいっ", "しょんぼり"):
+            with self.subTest(motion=motion):
+                self.assertEqual(self.parse(f'ミライ「はい」{{通常|{motion}}}')[0]["expression"], "通常")
+        with self.assertRaisesRegex(ScriptError, "未定義の動き"):
+            self.parse('ミライ「はい」{通常|回転}')
+        with self.assertRaisesRegex(ScriptError, r"pages/03.html"):
+            self.parse('[画面: 03]\nミライ「はい」')
+        self.assertEqual(self.parse('[画面: 03]\nミライ「はい」', check=False)[0]["slide"], "03")
+
     def test_missing_slide_and_opt_out(self):
         text = '[スライド: 03]\nミライ「はい」'
         with self.assertRaisesRegex(ScriptError, r"script.txt:1:.*03.png"):
