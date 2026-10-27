@@ -3,6 +3,7 @@ import argparse
 import json
 import math
 import os
+import re
 from pathlib import Path
 import socket
 import subprocess
@@ -71,10 +72,15 @@ const { chromium } = require("playwright");
   const browser = await chromium.launch({headless:true});
   const context = await browser.newContext({viewport:{width:1920,height:1080},recordVideo:{dir:require("path").dirname(output),size:{width:1920,height:1080}}});
   const page = await context.newPage();
+  const pageCreatedAt = Date.now();
   page.on("pageerror", error => console.error(error.message));
   await page.goto("http://127.0.0.1:"+port+"/pipeline/stage/player.html?ep="+encodeURIComponent(episode), {waitUntil:"load"});
   await page.waitForFunction(() => document.title === "done" || document.title === "error", null, {timeout:1200000});
   if (await page.title() === "error") throw new Error(await page.evaluate(() => document.body.dataset.error || "player failed"));
+  const playerOrigin = await page.evaluate(() => window.__origin);
+  const offset = (playerOrigin - pageCreatedAt) / 1000;
+  if (!Number.isFinite(offset) || offset < 0) throw new Error("invalid player origin offset: "+offset);
+  process.stdout.write("VIDEO_ORIGIN_OFFSET_SECONDS="+offset.toFixed(6)+"\\n");
   const video = page.video();
   await context.close();
   await video.saveAs(output);
@@ -82,8 +88,18 @@ const { chromium } = require("playwright");
 })().catch(error => { console.error(error.stack || error); process.exit(1); });
 """
     try:
-        subprocess.run(["node", "-e", node_script, str(port), episode, str(webm_path)],
-                       cwd=ROOT, check=True, timeout=max(1200, duration + 300))
+        result = subprocess.run(["node", "-e", node_script, str(port), episode, str(webm_path)],
+                                cwd=ROOT, capture_output=True, text=True,
+                                timeout=max(1200, duration + 300))
+        if result.returncode:
+            raise RuntimeError("Playwright録画に失敗しました: " + result.stderr[-2000:])
+        match = re.search(r"VIDEO_ORIGIN_OFFSET_SECONDS=([0-9]+(?:\\.[0-9]+)?)", result.stdout)
+        if not match:
+            raise RuntimeError("Playwrightから録画開始時刻を受け取れませんでした")
+        offset = float(match.group(1))
+        if not math.isfinite(offset) or offset < 0:
+            raise RuntimeError(f"録画開始時刻が不正です: {offset}")
+        return offset
     finally:
         server.shutdown()
         server.server_close()
@@ -113,10 +129,11 @@ def main():
             audio = temp / "narration.wav"
             webm = temp / "recording.webm"
             duration = build_audio(timeline, voice_dir, audio)
-            render(args.episode, webm, duration)
+            offset = render(args.episode, webm, duration)
+            print(f"映像の先頭待機を同期補正: {offset:.3f}秒", flush=True)
             video = output_dir / "video.mp4"
             subprocess.run(["ffmpeg", "-hide_banner", "-loglevel", "error", "-nostdin", "-y",
-                            "-i", str(webm), "-i", str(audio), "-map", "0:v:0", "-map", "1:a:0",
+                            "-ss", f"{offset:.6f}", "-i", str(webm), "-i", str(audio), "-map", "0:v:0", "-map", "1:a:0",
                             "-c:v", "libx264", "-preset", "medium", "-crf", "20", "-pix_fmt", "yuv420p",
                             "-r", "30", "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart",
                             "-t", f"{duration:.6f}", str(video)], check=True)
@@ -128,7 +145,7 @@ def main():
         if not any(s.get("codec_type") == "audio" and s.get("codec_name") == "aac" for s in streams):
             raise RuntimeError("出力音声がAACではありません")
         print(f"動画を作成しました: {video} ({duration:.1f}秒)", flush=True)
-    except (OSError, KeyError, TypeError, ValueError, subprocess.CalledProcessError) as exc:
+    except (OSError, KeyError, TypeError, ValueError, RuntimeError, subprocess.CalledProcessError) as exc:
         import shutil
         shutil.rmtree(output_dir, ignore_errors=True)
         raise SystemExit(f"ERROR: {exc}") from exc

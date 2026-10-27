@@ -61,7 +61,6 @@ jobs:
       EPISODE: ${{ inputs.episode }}
       STAGE: ${{ inputs.stage }}
       ENGINE_PORT: ${{ needs.configure.outputs.port }}
-      NODE_PATH: ${{ runner.temp }}/video-playwright/node_modules
       PYTHONUNBUFFERED: '1'
     services:
       speech:
@@ -93,6 +92,7 @@ jobs:
         run: |
           npm install --prefix "$RUNNER_TEMP/video-playwright" playwright
           "$RUNNER_TEMP/video-playwright/node_modules/.bin/playwright" install --with-deps chromium
+          echo "NODE_PATH=$RUNNER_TEMP/video-playwright/node_modules" >> "$GITHUB_ENV"
       - name: Unit tests
         run: python -m unittest discover -s pipeline/tests -v
       - name: Wait for speech engine

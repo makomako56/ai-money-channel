@@ -66,7 +66,7 @@ function animate(){if(active){const {item,who,expression,started}=active,elapsed
  if(!timeline.length)throw Error("timeline is empty");
  mirai.src=IMG.ミライ+CH.ミライ.expressions["通常"];hinata.src=IMG.ひなた+CH.ひなた.expressions["通常"];
  requestAnimationFrame(animate);
- let cursor=0,page=null,step=1,origin=performance.now();
+ let cursor=0,page=null,step=1,origin=performance.now();window.__origin=performance.timeOrigin+origin;
  for(const item of timeline){
    const line=Number(item.line),source=script[line-1];if(!Number.isFinite(line)||!source)throw Error("timeline has invalid script line");
    await waitUntil(Number(item.start),origin);
