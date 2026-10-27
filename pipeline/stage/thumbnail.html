@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ja">
+<meta charset="utf-8">
+<meta name="viewport" content="width=1280,initial-scale=1">
+<title>Thumbnail</title>
+<style>
+*{box-sizing:border-box}
+html,body{width:1280px;height:720px;margin:0;overflow:hidden}
+body{position:relative;background:linear-gradient(117deg,var(--bg-top) 0%,#140108 52%,var(--bg-bottom) 100%);font-family:Maru,sans-serif}
+.flow{position:absolute;inset:-200px;background:repeating-linear-gradient(130deg,transparent 0 160px,rgba(239,31,49,.07) 166px 175px,transparent 181px 310px);transform:skewX(-6deg)}
+.aura{position:absolute;right:-180px;top:-100px;width:890px;height:860px;border-radius:50%;background:radial-gradient(circle,rgba(231,29,48,.48),rgba(104,0,18,.2) 47%,transparent 72%)}
+.beam{position:absolute;top:-260px;left:780px;width:8px;height:1330px;transform:rotate(25deg);background:linear-gradient(180deg,transparent,#ffd5d8 42%,#fc6575 63%,transparent);box-shadow:0 0 24px var(--accent),0 0 70px var(--accent);opacity:.78}
+.character{position:absolute;z-index:1;right:var(--character-right);bottom:var(--character-bottom);width:var(--character-width);height:auto;max-height:780px;object-fit:contain;object-position:bottom right;filter:drop-shadow(0 0 9px var(--accent)) drop-shadow(-9px 0 24px var(--accent))}
+.headline{position:absolute;z-index:2;left:var(--text-x);top:var(--main-y);width:var(--text-width);color:var(--text);font-weight:900;line-height:1.08;letter-spacing:-.035em;-webkit-text-stroke:11px var(--stroke);paint-order:stroke fill;text-shadow:0 7px 15px rgba(0,0,0,.62)}
+.headline div{white-space:nowrap}
+.sub{position:absolute;z-index:3;left:var(--text-x);top:var(--sub-y);max-width:var(--text-width);padding:12px 26px 16px;background:var(--accent);border:5px solid #fff;color:#fff;font-weight:900;line-height:1.08;white-space:nowrap;box-shadow:0 9px 22px rgba(0,0,0,.62)}
+</style>
+<body>
+<div class="flow"></div><div class="aura"></div><div class="beam"></div>
+<img id="character" class="character" alt="">
+<div id="headline" class="headline"></div><div id="sub" class="sub"></div>
+<script>
+window.renderThumbnail=async function(data){
+ const style=document.body.style,layout=data.layout,colors=data.colors;
+ const set=(name,value)=>style.setProperty(name,value);
+ set("--accent",data.accent);set("--bg-top",colors.background_top);set("--bg-bottom",colors.background_bottom);
+ set("--text",colors.text);set("--stroke",colors.stroke);
+ for(const [key,variable] of Object.entries({text_x:"--text-x",main_y:"--main-y",sub_y:"--sub-y",text_width:"--text-width",character_width:"--character-width",character_right:"--character-right",character_bottom:"--character-bottom"})){
+   set(variable,layout[key]+"px");
+ }
+ const font=new FontFace("Maru",'url("'+data.font_url+'")',{weight:"900"});
+ document.fonts.add(await font.load());await document.fonts.ready;
+ const headline=document.getElementById("headline");
+ headline.replaceChildren(...data.main_lines.map(line=>{const row=document.createElement("div");row.textContent=line;return row}));
+ const maxLength=Math.max(...data.main_lines.map(line=>[...line].length));
+ headline.style.fontSize=Math.max(layout.main_font_min,Math.min(layout.main_font_max,Math.floor(layout.text_width*.93/maxLength)))+"px";
+ const sub=document.getElementById("sub");sub.textContent=data.sub_text;
+ sub.style.fontSize=Math.min(layout.sub_font_size,Math.floor((layout.text_width-60)*.94/[...data.sub_text].length))+"px";
+ const character=document.getElementById("character");character.src=data.image_url;await character.decode();
+};
+</script>
+</body>
+</html>
