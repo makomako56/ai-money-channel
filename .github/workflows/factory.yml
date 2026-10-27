@@ -14,7 +14,7 @@ on:
         required: true
         default: voice
         type: choice
-        options: [voice, video, voice_samples]
+        options: [voice, video, thumbnail, voice_samples]
   workflow_call:
     inputs:
       episode:
@@ -92,7 +92,7 @@ jobs:
           fc-match --format '%{family}\n' 'Noto Sans JP' | grep -F 'Noto Sans JP'
           python -m pip install -r requirements.txt
       - name: Install Playwright
-        if: env.STAGE == 'video'
+        if: env.STAGE == 'video' || env.STAGE == 'thumbnail'
         run: |
           npm install --prefix "$RUNNER_TEMP/video-playwright" playwright
           "$RUNNER_TEMP/video-playwright/node_modules/.bin/playwright" install --with-deps chromium
@@ -111,7 +111,7 @@ jobs:
           echo '::error::Speech engine did not become ready'
           exit 1
       - name: Generate audio
-        if: env.STAGE != 'video'
+        if: env.STAGE == 'voice' || env.STAGE == 'voice_samples'
         run: python -m pipeline.make_voice --episode "$EPISODE" --stage "$STAGE"
       - name: Generate voice timeline for video
         if: env.STAGE == 'video'
@@ -119,8 +119,11 @@ jobs:
       - name: Record and assemble video
         if: env.STAGE == 'video'
         run: python -m pipeline.make_video --episode "$EPISODE"
+      - name: Generate thumbnail
+        if: env.STAGE == 'thumbnail'
+        run: python -m pipeline.make_thumbnail --episode "$EPISODE"
       - name: Verify generated artifacts
-        if: env.STAGE != 'video'
+        if: env.STAGE == 'voice' || env.STAGE == 'voice_samples'
         run: python -m pipeline.verify_output --episode "$EPISODE" --stage "$STAGE"
       - name: Upload original audio or video
         uses: actions/upload-artifact@v4
@@ -130,7 +133,7 @@ jobs:
           if-no-files-found: error
           retention-days: 7
       - name: Prepare review copy
-        if: env.STAGE != 'video'
+        if: env.STAGE == 'voice' || env.STAGE == 'voice_samples'
         run: python -m pipeline.prepare_review --episode "$EPISODE" --stage "$STAGE"
       - name: Prepare low-resolution video review copy
         if: env.STAGE == 'video'
@@ -146,6 +149,11 @@ jobs:
             echo "::error::Review video is 100 MB or larger ($size bytes)"
             exit 1
           fi
+      - name: Prepare thumbnail review copy
+        if: env.STAGE == 'thumbnail'
+        run: |
+          mkdir -p "output/review/$EPISODE/thumbnail"
+          cp "output/$EPISODE/thumbnail/thumbnail.png" "output/review/$EPISODE/thumbnail/thumbnail.png"
       - name: Upload review copy for publisher
         uses: actions/upload-artifact@v4
         with:

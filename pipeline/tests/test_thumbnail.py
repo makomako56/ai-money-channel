@@ -4,6 +4,7 @@ import unittest
 from pathlib import Path
 
 from pipeline.make_thumbnail import MAX_BYTES, validate_input, verify_png
+from pipeline.publish_review import validate_source
 
 
 class ThumbnailTests(unittest.TestCase):
@@ -42,6 +43,22 @@ class ThumbnailTests(unittest.TestCase):
         image.unlink()
         with self.assertRaisesRegex(ValueError, "素材がありません"):
             validate_input(self.data, self.characters, self.style, self.root)
+
+    def test_review_copy_allows_only_small_thumbnail(self):
+        review = self.root / "review"
+        review.mkdir()
+        image = review / "thumbnail.png"
+        image.write_bytes(b"png")
+        self.assertEqual(validate_source(review, "ep001_disco", "thumbnail"), review.resolve())
+        extra = review / "extra.json"
+        extra.write_text("{}")
+        with self.assertRaises(ValueError):
+            validate_source(review, "ep001_disco", "thumbnail")
+        extra.unlink()
+        with image.open("ab") as stream:
+            stream.truncate(MAX_BYTES)
+        with self.assertRaisesRegex(ValueError, "2MB未満"):
+            validate_source(review, "ep001_disco", "thumbnail")
 
     def test_png_dimensions_and_size_limit(self):
         image = self.root / "thumbnail.png"
