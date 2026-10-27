@@ -17,6 +17,7 @@
    - タイトル・概要欄・タグ・カテゴリは `meta.json`。`selfDeclaredMadeForKids=false`。合成コンテンツの申告項目がAPIにあれば `true`
    - 完了後、動画IDとURLを `upload_result.json` に出し、artifact に保存
    - `--dry-run`：APIを呼ばずに送信内容を表示する
+   - アップロード前に、認証したチャンネルのIDが `config/channel.yaml` の `channel_id` と一致することを確認し、違えば止める（別チャンネルへの誤投稿防止）
 2. `stage=upload` を `factory.yml` に追加。Secrets がないときはわかりやすいエラー
 3. （不要）refresh token は OAuth 2.0 Playground で取得する方式にした
 4. `docs/YouTube_API準備.md`：Claudeが作成済み（OAuth 2.0 Playground 方式）。実装に合わせて必要なら追記する。旧要件：オーナー向けの手順書（Google Cloud のプロジェクト作成、YouTube Data API の有効化、OAuth 同意画面、デスクトップアプリ用の認証情報、ツールの実行、GitHub Secrets への登録）。スクリーンショットなしでも迷わないよう、画面上のボタン名を書く
