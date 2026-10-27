@@ -1,3 +1,5 @@
+import contextlib
+import io
 import json
 from pathlib import Path
 import shutil
@@ -55,7 +57,10 @@ class PreflightTest(unittest.TestCase):
             preflight.run("ep000_sample", "thumbnail", root=self.root)
 
     def test_cli_exit_code(self):
-        self.assertEqual(preflight.main(["--episode", "../x", "--stage", "all"]), 2)
+        # stdout を捨てる（::error:: がテスト中に Actions の注記にならないように）
+        with contextlib.redirect_stdout(io.StringIO()) as out:
+            self.assertEqual(preflight.main(["--episode", "../x", "--stage", "all"]), 2)
+        self.assertIn("入力チェックで停止", out.getvalue())
 
 
 class SummaryTest(unittest.TestCase):
