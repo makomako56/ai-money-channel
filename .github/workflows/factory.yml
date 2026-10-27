@@ -1,4 +1,4 @@
-name: 動画工場（音声・動画）
+name: 動画工場（音声・動画・サムネ）
 run-name: ${{ inputs.stage }}生成 / ${{ inputs.episode }} / ${{ inputs.stage }}
 
 on:
@@ -14,7 +14,7 @@ on:
         required: true
         default: voice
         type: choice
-        options: [voice, video, thumbnail, voice_samples]
+        options: [all, voice, video, thumbnail, voice_samples]
   workflow_call:
     inputs:
       episode:
@@ -100,8 +100,12 @@ jobs:
           fc-cache -f
           fc-match --format '%{family}\n' 'Noto Sans JP' | grep -F 'Noto Sans JP'
           python -m pip install -r requirements.txt
+      - name: Preflight (input check)
+        id: preflight
+        if: env.STAGE != 'voice_samples'
+        run: python -m pipeline.preflight --episode "$EPISODE" --stage "$STAGE" --warnings-file "$RUNNER_TEMP/warnings.txt"
       - name: Install Playwright
-        if: env.STAGE == 'video' || env.STAGE == 'thumbnail'
+        if: env.STAGE != 'voice' && env.STAGE != 'voice_samples'
         run: |
           npm install --prefix "$RUNNER_TEMP/video-playwright" playwright
           "$RUNNER_TEMP/video-playwright/node_modules/.bin/playwright" install --with-deps chromium
@@ -123,29 +127,50 @@ jobs:
         if: env.STAGE == 'voice' || env.STAGE == 'voice_samples'
         run: python -m pipeline.make_voice --episode "$EPISODE" --stage "$STAGE"
       - name: Generate voice timeline for video
-        if: env.STAGE == 'video'
+        id: voice
+        if: (env.STAGE == 'video' || env.STAGE == 'all')
         run: python -m pipeline.make_voice --episode "$EPISODE" --stage voice
       - name: Record and assemble video
-        if: env.STAGE == 'video'
+        id: video
+        if: (env.STAGE == 'video' || env.STAGE == 'all')
         run: python -m pipeline.make_video --episode "$EPISODE"
       - name: Generate thumbnail
-        if: env.STAGE == 'thumbnail'
+        id: thumbnail
+        if: (env.STAGE == 'thumbnail' || env.STAGE == 'all')
         run: python -m pipeline.make_thumbnail --episode "$EPISODE"
       - name: Verify generated artifacts
         if: env.STAGE == 'voice' || env.STAGE == 'voice_samples'
         run: python -m pipeline.verify_output --episode "$EPISODE" --stage "$STAGE"
-      - name: Upload original audio or video
+      - name: Upload original audio
+        if: env.STAGE == 'voice' || env.STAGE == 'voice_samples'
         uses: actions/upload-artifact@v4
         with:
           name: ${{ inputs.episode }}-${{ inputs.stage }}
           path: output/${{ inputs.episode }}/${{ inputs.stage }}/
           if-no-files-found: error
           retention-days: 7
+      # The upload job (04) downloads <ep>-video and <ep>-thumbnail by run id, for stage=all too.
+      - name: Upload original video
+        if: (env.STAGE == 'video' || env.STAGE == 'all')
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.episode }}-video
+          path: output/${{ inputs.episode }}/video/
+          if-no-files-found: error
+          retention-days: 7
+      - name: Upload original thumbnail
+        if: (env.STAGE == 'thumbnail' || env.STAGE == 'all')
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.episode }}-thumbnail
+          path: output/${{ inputs.episode }}/thumbnail/
+          if-no-files-found: error
+          retention-days: 7
       - name: Prepare review copy
         if: env.STAGE == 'voice' || env.STAGE == 'voice_samples'
         run: python -m pipeline.prepare_review --episode "$EPISODE" --stage "$STAGE"
       - name: Check video review copy
-        if: env.STAGE == 'video'
+        if: (env.STAGE == 'video' || env.STAGE == 'all')
         # make_video.py writes the 854x480 copy and frames/NN-S.png in the same pass as the master.
         run: |
           size=$(stat -c '%s' "output/review/$EPISODE/video/video.mp4")
@@ -153,7 +178,7 @@ jobs:
           echo "review video: $size bytes, frames: $frames"
           [ "$size" -lt 100000000 ] && [ "$frames" -gt 0 ]
       - name: Prepare thumbnail review copy
-        if: env.STAGE == 'thumbnail'
+        if: (env.STAGE == 'thumbnail' || env.STAGE == 'all')
         run: |
           mkdir -p "output/review/$EPISODE/thumbnail"
           cp "output/$EPISODE/thumbnail/thumbnail.png" "output/review/$EPISODE/thumbnail/thumbnail.png"
@@ -161,9 +186,20 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ inputs.episode }}-${{ inputs.stage }}-review
-          path: output/review/${{ inputs.episode }}/${{ inputs.stage }}/
+          # stage=all keeps video/ and thumbnail/ side by side; single stages upload their own folder.
+          path: output/review/${{ inputs.episode }}/${{ inputs.stage != 'all' && inputs.stage || '' }}
           if-no-files-found: error
           retention-days: 7
+      - name: Summary
+        if: always() && env.STAGE != 'voice' && env.STAGE != 'voice_samples'
+        run: >-
+          python -m pipeline.summary --episode "$EPISODE"
+          --outcome "preflight=${{ steps.preflight.outcome }}"
+          --outcome "voice=${{ steps.voice.outcome }}"
+          --outcome "video=${{ steps.video.outcome }}"
+          --outcome "thumbnail=${{ steps.thumbnail.outcome }}"
+          --warnings-file "$RUNNER_TEMP/warnings.txt"
+          --summary-file "$GITHUB_STEP_SUMMARY"
       - name: Engine logs on failure
         if: failure()
         env:
@@ -201,4 +237,11 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           EPISODE: ${{ inputs.episode }}
           STAGE: ${{ inputs.stage }}
-        run: python -m pipeline.publish_review --source review-input --episode "$EPISODE" --stage "$STAGE"
+        run: |
+          if [ "$STAGE" = all ]; then
+            for stage in video thumbnail; do
+              python -m pipeline.publish_review --source "review-input/$stage" --episode "$EPISODE" --stage "$stage"
+            done
+          else
+            python -m pipeline.publish_review --source review-input --episode "$EPISODE" --stage "$STAGE"
+          fi
