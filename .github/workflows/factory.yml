@@ -78,21 +78,30 @@ jobs:
       - name: Install dependencies
         timeout-minutes: 25
         run: |
-          # Skip slow man-db triggers and bound apt's network waits (installs sometimes hung for 10 minutes).
-          echo 'set man-db/auto-update false' | sudo debconf-communicate >/dev/null || true
-          sudo rm -f /var/lib/man-db/auto-update
-          APT_OPTS='-o Acquire::Retries=3 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30 -o Acquire::ForceIPv4=true -o DPkg::Lock::Timeout=120'
-          # apt sometimes stalls on the runner's mirror; retry a few times instead of hanging the job.
-          for attempt in 1 2 3; do
-            if timeout 180 sudo apt-get $APT_OPTS update && \
-               timeout 240 sudo apt-get $APT_OPTS install -y --no-install-recommends ffmpeg fontconfig; then
-              break
+          # apt on the runner's mirror stalls for 10+ minutes now and then (logs are not readable from Claude's side).
+          # Use what the image already has, try apt once with a time limit, then fall back to a static ffmpeg build.
+          source_note="preinstalled"
+          if ! command -v ffmpeg >/dev/null || ! command -v ffprobe >/dev/null || ! command -v fc-cache >/dev/null; then
+            echo 'set man-db/auto-update false' | sudo debconf-communicate >/dev/null || true
+            sudo rm -f /var/lib/man-db/auto-update
+            APT_OPTS='-o Acquire::Retries=2 -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20 -o Acquire::ForceIPv4=true -o DPkg::Lock::Timeout=60'
+            if timeout 150 sudo apt-get $APT_OPTS update && \
+               timeout 180 sudo apt-get $APT_OPTS install -y --no-install-recommends ffmpeg fontconfig; then
+              source_note="apt"
+            else
+              sudo dpkg --configure -a || true
+              source_note="static build (apt failed)"
             fi
-            [ "$attempt" = 3 ] && { echo '::error::apt-get failed 3 times'; exit 1; }
-            echo "::warning::apt-get attempt $attempt failed; retrying"
-            sudo dpkg --configure -a || true
-            sleep 10
-          done
+          fi
+          if ! command -v ffmpeg >/dev/null || ! command -v ffprobe >/dev/null; then
+            mkdir -p "$RUNNER_TEMP/ffmpeg"
+            curl --fail --location --retry 3 --connect-timeout 15 --max-time 300 \
+              'https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-linux64-gpl.tar.xz' \
+              | tar -xJ -C "$RUNNER_TEMP/ffmpeg" --strip-components=2 --wildcards '*/bin/ffmpeg' '*/bin/ffprobe'
+            echo "$RUNNER_TEMP/ffmpeg" >> "$GITHUB_PATH"
+            export PATH="$RUNNER_TEMP/ffmpeg:$PATH"
+          fi
+          echo "::notice title=ffmpeg::${source_note}: $(ffmpeg -version | head -1)"
           mkdir -p "$HOME/.local/share/fonts"
           curl --fail --location --retry 3 --connect-timeout 15 --max-time 120 --globoff \
             'https://raw.githubusercontent.com/google/fonts/main/ofl/notosansjp/NotoSansJP[wght].ttf' \
