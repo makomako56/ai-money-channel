@@ -40,13 +40,14 @@ class ScriptParserTests(unittest.TestCase):
         self.assertEqual(self.parse(text, check=False)[0]["slide"], "03")
 
     def test_invalid_rows_report_source_line(self):
-        for invalid in ['先生「はい」', 'ミライ「はい」{納得顔}', 'ミライ「」', 'ミライ「 」',
+        for invalid in ['先生「はい」', 'ミライ「はい」{未定義}', 'ミライ「」', 'ミライ「 」',
                         'ミライ「はい」{笑顔}余分', '[スライド: ../1]', '[スライド: 0]',
                         '[スライド: abc]', 'ミライ: はい', 'ミライ「はい」{}', 'ミライ「はい']:
             with self.subTest(invalid=invalid), self.assertRaisesRegex(ScriptError, r"script.txt:2:"):
                 self.parse('# comment\n' + invalid)
 
     def test_null_expression_assets_are_valid(self):
+        self.characters["ミライ"]["expressions"]["驚き"] = None
         self.assertEqual(self.parse('ミライ「え！」{驚き}')[0]["expression"], "驚き")
 
     def test_long_dialogue_warns_without_truncation(self):

@@ -6,7 +6,7 @@ import os
 import subprocess
 from pathlib import Path
 
-from pipeline.make_voice import SAMPLE_NAMES, inspect_wav, load_gaps
+from pipeline.make_voice import inspect_wav, load_gaps
 from pipeline.script_parser import load_characters, parse_script
 
 
@@ -39,11 +39,19 @@ def verify(episode, stage):
             previous_end, previous_slide = item["end"], item["slide"]
         if len(set(wavs)) != len(expected) or set(wavs) != set(output.glob("wav/*.wav")):
             raise ValueError("WAVの数が不正です")
-        summary = f"voice: {len(wavs)} WAV + timeline.json、尺 {previous_end:.3f}秒、30fps包絡・セリフ間0.25秒/切替0.6秒を検証"
+        summary = f"voice: {len(wavs)} WAV + timeline.json、尺 {previous_end:.3f}秒、30fps包絡・セリフ間{gaps[0]}秒/切替{gaps[1]}秒を検証"
     else:
         mp3s = sorted(output.glob("*.mp3"))
-        if len(mp3s) != 5 or {p.stem.rsplit("_", 1)[0] for p in mp3s} != set(SAMPLE_NAMES):
-            raise ValueError("5人分のMP3が揃っていません")
+        manifest = json.loads((output / "samples.json").read_text(encoding="utf-8"))
+        catalog = json.loads((output / "engine.json").read_text(encoding="utf-8"))["catalog"]
+        voices = manifest["voices"]
+        if not catalog or len(voices) != len(catalog) or {v["id"] for v in voices} != {v["id"] for v in catalog}:
+            raise ValueError("全話者・全スタイルのサンプルが揃っていません")
+        for item in voices:
+            if not any(all(item[key] == voice[key] for key in ("id", "name", "style")) for voice in catalog):
+                raise ValueError("サンプルの話者情報が不一致です")
+        if {p.name for p in mp3s} != {v["mp3"] for v in voices} or len(mp3s) != len(voices):
+            raise ValueError("MP3とサンプル一覧が一致しません")
         for path in mp3s:
             probe = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "json", str(path)], capture_output=True, text=True, check=True)
             duration = float(json.loads(probe.stdout)["format"]["duration"])
@@ -51,7 +59,7 @@ def verify(episode, stage):
                 raise ValueError(f"MP3の尺が不正: {path}")
             subprocess.run(["ffmpeg", "-v", "error", "-xerror", "-nostdin", "-i", str(path), "-f", "null", "-"], check=True)
             print(f"MP3検証: {path.name}, {duration:.3f}秒")
-        summary = "voice_samples: 指定の5人分のMP3、全ファイルの尺とデコードを検証"
+        summary = f"voice_samples: 全{len(catalog)}スタイルのMP3、全ファイルの尺とデコードを検証"
     print(summary)
     if os.environ.get("GITHUB_STEP_SUMMARY"):
         with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as stream:

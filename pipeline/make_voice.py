@@ -1,4 +1,4 @@
-"""Generate per-line WAV/timeline or five comparable MP3 voice samples."""
+"""Generate per-line WAV/timeline or MP3 samples of every available talking style."""
 import argparse
 import array
 import csv
@@ -18,18 +18,19 @@ from pathlib import Path
 
 import yaml
 
+from pipeline.engine_config import load_engine, validate_episode
 from pipeline.script_parser import load_characters, parse_script
 
 SAMPLE_TEXTS = (
     "結論から言うと、この会社はAIを売っているんじゃなくて、AIを動かす場所を貸しているんです",
     "え、それってつまり大家さんってことですか！？",
 )
-SAMPLE_NAMES = ("No.7", "九州そら", "冥鳴ひまり", "春日部つむぎ", "四国めたん")
 
 
-class Voicevox:
-    def __init__(self, url):
+class SpeechEngine:
+    def __init__(self, url, engine="voicevox"):
         self.url = url.rstrip("/")
+        self.engine = engine
 
     def request(self, endpoint, *, params=None, body=None, method="GET", binary=False):
         url = self.url + endpoint
@@ -40,17 +41,26 @@ class Voicevox:
         if data is not None:
             request.add_header("Content-Type", "application/json")
         try:
-            with urllib.request.urlopen(request, timeout=180) as response:
+            with urllib.request.urlopen(request, timeout=300) as response:
                 result = response.read()
         except urllib.error.HTTPError as exc:
-            raise RuntimeError(f"VOICEVOX {endpoint}: HTTP {exc.code}") from exc
+            raise RuntimeError(f"{self.engine} {endpoint}: HTTP {exc.code}") from exc
         except (urllib.error.URLError, TimeoutError) as exc:
-            raise RuntimeError(f"VOICEVOX {endpoint}: 接続失敗またはタイムアウト") from exc
+            raise RuntimeError(f"{self.engine} {endpoint}: 接続失敗またはタイムアウト") from exc
         return result if binary else json.loads(result)
 
-    def synthesize(self, text, speaker_id, speed, pitch):
+    def synthesize(self, text, speaker_id, speed, pitch, **settings):
         query = self.request("/audio_query", params={"text": text, "speaker": speaker_id}, method="POST")
-        query.update(speedScale=speed, pitchScale=pitch, outputSamplingRate=24000, outputStereo=False)
+        query.update(speedScale=speed, pitchScale=pitch, outputSamplingRate=24000, outputStereo=False,
+                     intonationScale=settings.get("intonation", 1.0), volumeScale=settings.get("volume", 1.0),
+                     prePhonemeLength=settings.get("pre_phoneme", 0.05),
+                     postPhonemeLength=settings.get("post_phoneme", 0.05))
+        if self.engine == "voicevox":
+            for phrase in query.get("accent_phrases", []):
+                pause = phrase.get("pause_mora")
+                if pause is not None:
+                    pause["vowel_length"] = min(0.5, pause["vowel_length"] * settings.get("pause_scale", 1.4))
+        # AivisSpeech ignores mora durations; preserve its original kana/text.
         return self.request("/synthesis", params={"speaker": speaker_id}, body=query, method="POST", binary=True)
 
 
@@ -68,7 +78,7 @@ def normal_voice(catalog, name):
     raise ValueError(f"通常系スタイルが見つかりません: {name}")
 
 
-def resolve_voice(config, catalog, speaker):
+def resolve_voice(config, catalog, speaker, engine="voicevox"):
     speaker_id = config.get("speaker_id")
     name = config.get("name")
     if speaker_id is not None:
@@ -82,7 +92,14 @@ def resolve_voice(config, catalog, speaker):
             f'{voice["name"]} {voice["style"]}', f'{voice["name"]}/{voice["style"]}',
             f'{voice["name"]}・{voice["style"]}')]
     else:
-        voice = normal_voice(catalog, "No.7" if speaker == "ミライ" else "春日部つむぎ")
+        if engine == "voicevox":
+            voice = normal_voice(catalog, "No.7" if speaker == "ミライ" else "春日部つむぎ")
+        else:
+            normal = [item for item in catalog if item["style"] in ("ノーマル", "通常", "Normal")]
+            choices = normal or catalog
+            if not choices:
+                raise ValueError("エンジンに利用可能な声がありません")
+            voice = choices[0 if speaker == "ミライ" else min(1, len(choices) - 1)]
         warnings.warn(f'{speaker}: 声が未設定のため仮の声 {voice["name"]}（{voice["style"]}）を使います', stacklevel=2)
         return voice
     if len(matches) != 1:
@@ -150,25 +167,40 @@ def load_gaps(path):
             finite_number(audio["slide_gap_seconds"], "slide_gap_seconds", 0, 60))
 
 
-def make_voice(lines, characters, catalog, client, output, gaps):
+def voice_settings(config, speaker):
+    defaults = {"intonation": 1.2 if speaker == "ミライ" else 1.3, "volume": 1.0,
+                "pre_phoneme": 0.05, "post_phoneme": 0.05, "pause_scale": 1.4}
+    limits = {"intonation": (0, 2), "volume": (0, 2), "pre_phoneme": (0, 2),
+              "post_phoneme": (0, 2), "pause_scale": (0, 10)}
+    return {key: finite_number(config.get(key, default), f"{speaker}.{key}", *limits[key])
+            for key, default in defaults.items()}
+
+
+def make_voice(lines, characters, catalog, client, output, gaps, engine="voicevox"):
     resolved = {}
+    if engine == "aivisspeech":
+        warnings.warn("AivisSpeechはモーラ長の変更に非対応のためpause_scaleは適用しません。句読点の自然な間はエンジンに任せます", stacklevel=2)
     for speaker, character in characters.items():
         config = character["voice"]
-        if config.get("engine") != "voicevox":
-            raise ValueError(f"{speaker}: engine は voicevox にしてください")
-        resolved[speaker] = (resolve_voice(config, catalog, speaker),
-                             finite_number(config.get("speed", 1), f"{speaker}.speed", 0.1, 4),
-                             finite_number(config.get("pitch", 0), f"{speaker}.pitch", -0.15, 0.15))
+        selection = config.get("voices", {}).get(engine, {})
+        # Read older VOICEVOX-only configuration without reusing its IDs in AivisSpeech.
+        if "voices" not in config and engine == "voicevox":
+            selection = config
+        settings_config = {**config, **selection}
+        resolved[speaker] = (resolve_voice(selection, catalog, speaker, engine),
+                             finite_number(settings_config.get("speed", 1), f"{speaker}.speed", 0.1, 4),
+                             finite_number(settings_config.get("pitch", 0), f"{speaker}.pitch", -0.15, 0.15),
+                             voice_settings(settings_config, speaker))
     timeline = []
     end = 0.0
     previous_slide = None
     (output / "wav").mkdir()
     for index, line in enumerate(lines, 1):
-        voice, speed, pitch = resolved[line["speaker"]]
+        voice, speed, pitch, settings = resolved[line["speaker"]]
         gap = 0 if index == 1 else gaps[int(line["slide"] != previous_slide)]
         start = end + gap
         try:
-            audio = client.synthesize(line["text"], voice["id"], speed, pitch)
+            audio = client.synthesize(line["text"], voice["id"], speed, pitch, **settings)
             duration, envelope = inspect_wav(audio)
         except (ValueError, RuntimeError, wave.Error) as exc:
             raise RuntimeError(f'script.txt:{line["line"]}: 音声生成失敗: {exc}') from exc
@@ -176,15 +208,15 @@ def make_voice(lines, characters, catalog, client, output, gaps):
         (output / relative).write_bytes(audio)
         end = start + duration
         timeline.append({**line, "start": start, "end": end, "wav": relative,
-                         "envelope_fps": 30, "envelope": envelope, "voice": voice})
+                         "envelope_fps": 30, "envelope": envelope, "voice": voice, "engine": engine})
         previous_slide = line["slide"]
         print(f'音声 {index}/{len(lines)}: 行{line["line"]}, {duration:.3f}秒')
     (output / "timeline.json").write_text(json.dumps(timeline, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
 def make_samples(catalog, client, output, gap):
-    voices = [normal_voice(catalog, name) for name in SAMPLE_NAMES]
-    for voice in voices:
+    samples = []
+    for voice in catalog:
         segments = [client.synthesize(text, voice["id"], 1.0, 0.0) for text in SAMPLE_TEXTS]
         for segment in segments:
             inspect_wav(segment)
@@ -199,32 +231,35 @@ def make_samples(catalog, client, output, gap):
                         if index:
                             target.writeframes(b"\0\0" * round(24000 * gap))
                         target.writeframes(source.readframes(source.getnframes()))
-            filename = f'{voice["name"]}_{voice["style"]}.mp3'
-            if "/" in filename or "\\" in filename:
-                raise ValueError("声の名前にパス区切りが含まれています")
+            label = re.sub(r"[^\w.（）()-]+", "_", f'{voice["name"]}_{voice["style"]}')[:100]
+            filename = f'{label}_{voice["id"]}.mp3' 
             subprocess.run(["ffmpeg", "-hide_banner", "-loglevel", "error", "-nostdin", "-y",
                             "-i", str(combined), "-codec:a", "libmp3lame", "-q:a", "2", str(output / filename)], check=True)
-        print(f"サンプル: {filename}（同じ2文、話速1.0・音高0.0）")
+        samples.append({**voice, "mp3": filename})
+        print(f"サンプル: {filename}（同じ2文、話速1.0・音高0.0）", flush=True)
+    (output / "samples.json").write_text(json.dumps({"texts": SAMPLE_TEXTS, "voices": samples}, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--episode", required=True)
     parser.add_argument("--stage", choices=("voice", "voice_samples"), default="voice")
-    parser.add_argument("--engine-url", default="http://127.0.0.1:50021")
+    parser.add_argument("--engine-url", help="ローカル検証用URL。通常はvoice_engine.yamlから決定")
     parser.add_argument("--no-slide-check", action="store_true")
     args = parser.parse_args()
     try:
-        if not re.fullmatch(r"ep[0-9]+_[\w-]+", args.episode):
-            raise ValueError("episode は ep000_sample の形式で指定してください（パス不可）")
+        validate_episode(args.episode)
         episode = Path("episodes") / args.episode
         if not episode.is_dir() or episode.is_symlink():
             raise ValueError(f"エピソードがありません: {episode}")
         characters = load_characters("config/characters.yaml")
         gaps = load_gaps("config/style.yaml")
         lines = parse_script(episode / "script.txt", characters, check_slides=not args.no_slide_check) if args.stage == "voice" else None
-        client = Voicevox(args.engine_url)
+        engine = load_engine()
+        client = SpeechEngine(args.engine_url or engine["url"], engine["engine"])
         catalog = voice_catalog(client.request("/speakers"))
+        if not catalog or len({voice["id"] for voice in catalog}) != len(catalog):
+            raise ValueError("エンジンの話者一覧が空、またはスタイルIDが重複しています")
         register_dictionary(client, "config/reading_dict.csv")
         output = Path("output") / args.episode / args.stage
         # Do not mix stale or partial outputs from a previous invocation.
@@ -235,9 +270,18 @@ def main():
             staging = Path(temporary) / args.stage
             staging.mkdir()
             if args.stage == "voice":
-                make_voice(lines, characters, catalog, client, staging, gaps)
+                make_voice(lines, characters, catalog, client, staging, gaps, engine["engine"])
             else:
                 make_samples(catalog, client, staging, gaps[0])
+            if args.stage == "voice":
+                timeline = json.loads((staging / "timeline.json").read_text(encoding="utf-8"))
+                used_names = list(dict.fromkeys(item["voice"]["name"] for speaker in characters for item in timeline if item["speaker"] == speaker))
+            else:
+                used_names = list(dict.fromkeys(item["name"] for item in catalog))
+            credit = ("音声：AivisSpeech（" + "・".join(used_names) + "）" if engine["engine"] == "aivisspeech"
+                      else " / ".join("VOICEVOX:" + name for name in used_names))
+            (staging / "engine.json").write_text(json.dumps({**engine, "version": client.request("/version"), "catalog": catalog,
+                                                          "credit": credit}, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
             staging.rename(output)
         print(f"完了: {output}")
     except (OSError, ValueError, RuntimeError, KeyError, TypeError, yaml.YAMLError, subprocess.CalledProcessError, wave.Error) as exc:

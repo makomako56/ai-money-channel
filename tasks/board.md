@@ -23,7 +23,7 @@
 | T013 | ep001 | リサーチ・台本・スライド11枚・meta・サムネ文言 | Claude | 完了 | 人(CP2) | episodes/ep001_disco/ |
 | T014 | ep001 | CP2：スライドレビュー（OK/NG） | 人 | 未着手 | Claude | v2で作り直してから再提出 |
 | T020 | 共通 | 作業依頼01：Actions土台と音声生成 | Codex | 完了 | | PR #6 マージ済み（2026-10-26） |
-| T020b | 共通 | 作業依頼01b：音声の追補（Issue #7） | Codex | 作業中 | Claude | PR #8（下書き）。CIの完了後にClaudeがレビュー |
+| T020b | 共通 | 作業依頼01b：音声の追補（Issue #7） | Codex | 承認待ち | Claude | PR #8。音声・全10スタイル・確認用コピーのCI成功：https://github.com/makomako56/ai-money-channel/actions/runs/40444924716 |
 | T029 | 共通 | Codexのクラウド環境を作成（chatgpt.com/codex/cloud/settings/environments） | 人 | 任意 | | Codexは自分で進めるため必須ではない。作れば GitHub の @codex でも依頼できる |
 | T021 | 共通 | 作業依頼02：動画の組み立て（v2：HTML画面の段階表示） | Codex | 未着手 | Claude | 01bの後。2026-10-26改訂 |
 | T027 | ep001 | ep001を書式v2（会話シーン・目次・章・段階表示のHTML画面）で作り直す | Claude | 作業中 | 人(CP2) | docs/動画スタイル仕様.md |
