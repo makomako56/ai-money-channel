@@ -164,7 +164,9 @@ jobs:
     permissions:
       contents: write
     concurrency:
-      group: review-outputs
+      # One queue per episode/stage: a shared group cancels the older pending job when a third run queues.
+      # publish_review.py retries when pushes to review-outputs race.
+      group: review-outputs-${{ inputs.episode }}-${{ inputs.stage }}
       cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4
