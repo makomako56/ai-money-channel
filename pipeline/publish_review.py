@@ -12,7 +12,7 @@ BRANCH = "review-outputs"
 
 
 def validate_source(source, episode, stage):
-    if not re.fullmatch(r"ep[0-9]+_[\w-]+", episode) or stage not in ("voice", "voice_samples"):
+    if not re.fullmatch(r"ep[0-9]+_[\w-]+", episode) or stage not in ("voice", "voice_samples", "video"):
         raise ValueError("確認用コピーのepisode/stageが不正です")
     source = Path(source)
     if source.is_symlink() or not source.is_dir():
@@ -22,12 +22,19 @@ def validate_source(source, episode, stage):
         if path.is_symlink() or path.name == ".git":
             raise ValueError("確認用コピーにシンボリックリンクまたは.gitがあります")
         if path.is_file():
-            if path.suffix not in (".mp3", ".json") or path.stat().st_size >= 100_000_000:
+            if stage == "video":
+                if path.relative_to(source).as_posix() != "video.mp4" or path.stat().st_size >= 100_000_000:
+                    raise ValueError(f"動画確認用コピーは100MB未満のvideo.mp4だけ許可します: {path.name}")
+            elif path.suffix not in (".mp3", ".json") or path.stat().st_size >= 100_000_000:
                 raise ValueError(f"確認用コピーに許可されないファイルがあります: {path.name}")
             files.append(path)
-    required = "timeline.json" if stage == "voice" else "samples.json"
-    if not files or not (source / required).is_file() or not any(p.suffix == ".mp3" for p in files):
-        raise ValueError("確認用コピーの必須ファイルがありません")
+    if stage == "video":
+        if len(files) != 1 or files[0].relative_to(source).as_posix() != "video.mp4":
+            raise ValueError("動画確認用コピーにはvideo.mp4だけが必要です")
+    else:
+        required = "timeline.json" if stage == "voice" else "samples.json"
+        if not files or not (source / required).is_file() or not any(p.suffix == ".mp3" for p in files):
+            raise ValueError("確認用コピーの必須ファイルがありません")
     return source.resolve()
 
 

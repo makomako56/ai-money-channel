@@ -1,5 +1,5 @@
-name: 動画工場（音声）
-run-name: 音声生成 / ${{ inputs.episode }} / ${{ inputs.stage }}
+name: 動画工場（音声・動画）
+run-name: ${{ inputs.stage }}生成 / ${{ inputs.episode }} / ${{ inputs.stage }}
 
 on:
   workflow_dispatch:
@@ -14,7 +14,7 @@ on:
         required: true
         default: voice
         type: choice
-        options: [voice, voice_samples]
+        options: [voice, video, voice_samples]
   workflow_call:
     inputs:
       episode:
@@ -32,7 +32,7 @@ permissions:
 
 jobs:
   configure:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
     outputs:
@@ -53,7 +53,7 @@ jobs:
   generate:
     needs: configure
     name: ${{ inputs.stage }} (${{ needs.configure.outputs.engine }})
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 60
     permissions:
       contents: read
@@ -78,8 +78,12 @@ jobs:
       - name: Install dependencies
         timeout-minutes: 10
         run: |
-          sudo apt-get update
-          sudo apt-get install -y ffmpeg fontconfig
+          # Skip slow man-db triggers and bound apt's network waits (installs sometimes hung for 10 minutes).
+          echo 'set man-db/auto-update false' | sudo debconf-communicate >/dev/null || true
+          sudo rm -f /var/lib/man-db/auto-update
+          APT_OPTS='-o Acquire::Retries=3 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30'
+          timeout 240 sudo apt-get $APT_OPTS update
+          timeout 300 sudo apt-get $APT_OPTS install -y --no-install-recommends ffmpeg fontconfig
           mkdir -p "$HOME/.local/share/fonts"
           curl --fail --location --retry 3 --connect-timeout 15 --max-time 120 --globoff \
             'https://raw.githubusercontent.com/google/fonts/main/ofl/notosansjp/NotoSansJP[wght].ttf' \
@@ -87,6 +91,12 @@ jobs:
           fc-cache -f
           fc-match --format '%{family}\n' 'Noto Sans JP' | grep -F 'Noto Sans JP'
           python -m pip install -r requirements.txt
+      - name: Install Playwright
+        if: env.STAGE == 'video'
+        run: |
+          npm install --prefix "$RUNNER_TEMP/video-playwright" playwright
+          "$RUNNER_TEMP/video-playwright/node_modules/.bin/playwright" install --with-deps chromium
+          echo "NODE_PATH=$RUNNER_TEMP/video-playwright/node_modules" >> "$GITHUB_ENV"
       - name: Unit tests
         run: python -m unittest discover -s pipeline/tests -v
       - name: Wait for speech engine
@@ -101,10 +111,18 @@ jobs:
           echo '::error::Speech engine did not become ready'
           exit 1
       - name: Generate audio
+        if: env.STAGE != 'video'
         run: python -m pipeline.make_voice --episode "$EPISODE" --stage "$STAGE"
+      - name: Generate voice timeline for video
+        if: env.STAGE == 'video'
+        run: python -m pipeline.make_voice --episode "$EPISODE" --stage voice
+      - name: Record and assemble video
+        if: env.STAGE == 'video'
+        run: python -m pipeline.make_video --episode "$EPISODE"
       - name: Verify generated artifacts
+        if: env.STAGE != 'video'
         run: python -m pipeline.verify_output --episode "$EPISODE" --stage "$STAGE"
-      - name: Upload original audio
+      - name: Upload original audio or video
         uses: actions/upload-artifact@v4
         with:
           name: ${{ inputs.episode }}-${{ inputs.stage }}
@@ -112,7 +130,22 @@ jobs:
           if-no-files-found: error
           retention-days: 7
       - name: Prepare review copy
+        if: env.STAGE != 'video'
         run: python -m pipeline.prepare_review --episode "$EPISODE" --stage "$STAGE"
+      - name: Prepare low-resolution video review copy
+        if: env.STAGE == 'video'
+        run: |
+          mkdir -p "output/review/$EPISODE/video"
+          ffmpeg -hide_banner -loglevel error -nostdin -y \
+            -i "output/$EPISODE/video/video.mp4" \
+            -vf "scale=854:480:flags=lanczos" -c:v libx264 -preset veryfast \
+            -crf 32 -maxrate 800k -bufsize 1600k -c:a aac -b:a 64k \
+            -movflags +faststart "output/review/$EPISODE/video/video.mp4"
+          size=$(stat -c '%s' "output/review/$EPISODE/video/video.mp4")
+          if [ "$size" -ge 100000000 ]; then
+            echo "::error::Review video is 100 MB or larger ($size bytes)"
+            exit 1
+          fi
       - name: Upload review copy for publisher
         uses: actions/upload-artifact@v4
         with:
@@ -132,7 +165,7 @@ jobs:
     if: >-
       (github.event_name == 'workflow_dispatch' || inputs.publish_review) &&
       (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:
       contents: write

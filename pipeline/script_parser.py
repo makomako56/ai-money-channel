@@ -8,6 +8,9 @@ from pathlib import Path
 import yaml
 
 
+MOTIONS = {"ぴょん", "びくっ", "うんうん", "かしげ", "ずいっ", "しょんぼり"}
+
+
 class ScriptError(ValueError):
     """Invalid script, with source path and line number."""
 
@@ -44,20 +47,29 @@ def parse_script(path, characters, *, check_slides=True):
         def fail(message):
             raise ScriptError(f"{path}:{line_number}: {message}")
 
-        match = re.fullmatch(r"\[スライド:\s*([0-9]+)\]", line)
+        match = re.fullmatch(r"\[(スライド|画面):\s*([0-9]+)\]", line)
         if match:
-            number = int(match[1])
+            kind, digits = match.groups()
+            number = int(digits)
             if number < 1:
-                fail("スライド番号は1以上にしてください")
+                fail(f"{kind}番号は1以上にしてください")
             slide = f"{number:02d}"
-            if check_slides and not (path.parent / "slides" / f"{slide}.png").is_file():
-                fail(f"スライド画像がありません: slides/{slide}.png")
+            asset = (Path("slides") / f"{slide}.png" if kind == "スライド"
+                     else Path("pages") / f"{slide}.html")
+            if check_slides and not (path.parent / asset).is_file():
+                fail(f"{kind}ファイルがありません: {asset}")
+            continue
+        if line == "[表示]":
             continue
         match = re.fullmatch(r"([^「]+)「(.+)」(?:\{([^{}]+)\})?", line)
         if not match:
             fail("形式が不正です。話者「セリフ」{表情} または [スライド: 03] を使ってください")
-        speaker, text, expression = match.groups()
-        expression = expression or "通常"
+        speaker, text, tag = match.groups()
+        expression = tag or "通常"
+        if "|" in expression:
+            expression, motion = expression.split("|", 1)
+            if motion not in MOTIONS:
+                fail(f"未定義の動き: {motion}")
         if speaker not in ("ミライ", "ひなた") or speaker not in characters:
             fail(f"不明な話者: {speaker}")
         if not text.strip():
