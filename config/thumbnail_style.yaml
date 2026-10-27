@@ -1,0 +1,18 @@
+# サムネの位置・色・フォント。1280×720のスマホ表示を基準にする。
+font_file: assets/fonts/zen-maru-gothic-japanese-900-normal.woff2
+colors:
+  background_top: "#050507"
+  background_bottom: "#320713"
+  text: "#ffffff"
+  stroke: "#070509"
+layout:
+  text_x: 64
+  main_y: 160
+  sub_y: 574
+  text_width: 780
+  main_font_max: 108
+  main_font_min: 64
+  sub_font_size: 44
+  character_width: 650
+  character_right: -28
+  character_bottom: -45

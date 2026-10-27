@@ -14,7 +14,7 @@ on:
         required: true
         default: voice
         type: choice
-        options: [voice, video, voice_samples]
+        options: [voice, video, thumbnail, voice_samples]
   workflow_call:
     inputs:
       episode:
@@ -76,14 +76,23 @@ jobs:
           python-version: '3.11'
           cache: pip
       - name: Install dependencies
-        timeout-minutes: 10
+        timeout-minutes: 25
         run: |
           # Skip slow man-db triggers and bound apt's network waits (installs sometimes hung for 10 minutes).
           echo 'set man-db/auto-update false' | sudo debconf-communicate >/dev/null || true
           sudo rm -f /var/lib/man-db/auto-update
-          APT_OPTS='-o Acquire::Retries=3 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30'
-          timeout 240 sudo apt-get $APT_OPTS update
-          timeout 300 sudo apt-get $APT_OPTS install -y --no-install-recommends ffmpeg fontconfig
+          APT_OPTS='-o Acquire::Retries=3 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30 -o Acquire::ForceIPv4=true -o DPkg::Lock::Timeout=120'
+          # apt sometimes stalls on the runner's mirror; retry a few times instead of hanging the job.
+          for attempt in 1 2 3; do
+            if timeout 180 sudo apt-get $APT_OPTS update && \
+               timeout 240 sudo apt-get $APT_OPTS install -y --no-install-recommends ffmpeg fontconfig; then
+              break
+            fi
+            [ "$attempt" = 3 ] && { echo '::error::apt-get failed 3 times'; exit 1; }
+            echo "::warning::apt-get attempt $attempt failed; retrying"
+            sudo dpkg --configure -a || true
+            sleep 10
+          done
           mkdir -p "$HOME/.local/share/fonts"
           curl --fail --location --retry 3 --connect-timeout 15 --max-time 120 --globoff \
             'https://raw.githubusercontent.com/google/fonts/main/ofl/notosansjp/NotoSansJP[wght].ttf' \
@@ -92,7 +101,7 @@ jobs:
           fc-match --format '%{family}\n' 'Noto Sans JP' | grep -F 'Noto Sans JP'
           python -m pip install -r requirements.txt
       - name: Install Playwright
-        if: env.STAGE == 'video'
+        if: env.STAGE == 'video' || env.STAGE == 'thumbnail'
         run: |
           npm install --prefix "$RUNNER_TEMP/video-playwright" playwright
           "$RUNNER_TEMP/video-playwright/node_modules/.bin/playwright" install --with-deps chromium
@@ -111,7 +120,7 @@ jobs:
           echo '::error::Speech engine did not become ready'
           exit 1
       - name: Generate audio
-        if: env.STAGE != 'video'
+        if: env.STAGE == 'voice' || env.STAGE == 'voice_samples'
         run: python -m pipeline.make_voice --episode "$EPISODE" --stage "$STAGE"
       - name: Generate voice timeline for video
         if: env.STAGE == 'video'
@@ -119,8 +128,11 @@ jobs:
       - name: Record and assemble video
         if: env.STAGE == 'video'
         run: python -m pipeline.make_video --episode "$EPISODE"
+      - name: Generate thumbnail
+        if: env.STAGE == 'thumbnail'
+        run: python -m pipeline.make_thumbnail --episode "$EPISODE"
       - name: Verify generated artifacts
-        if: env.STAGE != 'video'
+        if: env.STAGE == 'voice' || env.STAGE == 'voice_samples'
         run: python -m pipeline.verify_output --episode "$EPISODE" --stage "$STAGE"
       - name: Upload original audio or video
         uses: actions/upload-artifact@v4
@@ -130,7 +142,7 @@ jobs:
           if-no-files-found: error
           retention-days: 7
       - name: Prepare review copy
-        if: env.STAGE != 'video'
+        if: env.STAGE == 'voice' || env.STAGE == 'voice_samples'
         run: python -m pipeline.prepare_review --episode "$EPISODE" --stage "$STAGE"
       - name: Check video review copy
         if: env.STAGE == 'video'
@@ -140,6 +152,11 @@ jobs:
           frames=$(find "output/review/$EPISODE/video/frames" -name '*.png' | wc -l)
           echo "review video: $size bytes, frames: $frames"
           [ "$size" -lt 100000000 ] && [ "$frames" -gt 0 ]
+      - name: Prepare thumbnail review copy
+        if: env.STAGE == 'thumbnail'
+        run: |
+          mkdir -p "output/review/$EPISODE/thumbnail"
+          cp "output/$EPISODE/thumbnail/thumbnail.png" "output/review/$EPISODE/thumbnail/thumbnail.png"
       - name: Upload review copy for publisher
         uses: actions/upload-artifact@v4
         with:
