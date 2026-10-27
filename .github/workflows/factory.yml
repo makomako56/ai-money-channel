@@ -32,7 +32,7 @@ permissions:
 
 jobs:
   configure:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
     outputs:
@@ -53,7 +53,7 @@ jobs:
   generate:
     needs: configure
     name: ${{ inputs.stage }} (${{ needs.configure.outputs.engine }})
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 60
     permissions:
       contents: read
@@ -78,8 +78,12 @@ jobs:
       - name: Install dependencies
         timeout-minutes: 10
         run: |
-          sudo apt-get update
-          sudo apt-get install -y ffmpeg fontconfig
+          # Skip slow man-db triggers and bound apt's network waits (installs sometimes hung for 10 minutes).
+          echo 'set man-db/auto-update false' | sudo debconf-communicate >/dev/null || true
+          sudo rm -f /var/lib/man-db/auto-update
+          APT_OPTS='-o Acquire::Retries=3 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30'
+          timeout 240 sudo apt-get $APT_OPTS update
+          timeout 300 sudo apt-get $APT_OPTS install -y --no-install-recommends ffmpeg fontconfig
           mkdir -p "$HOME/.local/share/fonts"
           curl --fail --location --retry 3 --connect-timeout 15 --max-time 120 --globoff \
             'https://raw.githubusercontent.com/google/fonts/main/ofl/notosansjp/NotoSansJP[wght].ttf' \
@@ -161,7 +165,7 @@ jobs:
     if: >-
       (github.event_name == 'workflow_dispatch' || inputs.publish_review) &&
       (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:
       contents: write
