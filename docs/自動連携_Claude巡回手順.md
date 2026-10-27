@@ -12,6 +12,11 @@ Claude の定時タスクが1時間ごとにこの手順を実行する。オー
 - Claude から新しい作業を `@codex` で依頼するのは、Codex が止まっている（最後の動きから6時間以上、PR もコミットもない）ときだけ。依頼が重ならないようにする
 - GitHub の `@codex`（クラウド）は、クラウド環境が作られるまで作業を始めない。修正依頼は PR へのコメント（`@codex` なし）でも Codex に届く
 
+## 2026-10-27 夜の特例（オーナー指示「Claude も Codex の作業を分担してよい。翌朝8時までにキリの良いところまで」）
+- Claude も実装してよい。今夜の担当：02a・02b・03・05前半は完了。**04 は Codex**（PR が来たらレビュー→ `stage=upload_check` で鍵の確認→マージ）。**05 の残り（do_upload での予約投稿の接続・二重投稿防止のテスト）は 04 マージ後に Claude**
+- Claude の PR も、CI 緑と実際の出力（review-outputs）の確認ができたら Claude がマージしてよい
+- それでも **実際のアップロード（stage=upload、do_upload=true）は実行しない**。approval.json は作らない
+
 ## 1回の巡回でやること
 1. `tasks/board.md`、`tasks/指示ログ.md`、`CLAUDE.md`、`AGENTS.md` を読む
 2. 開いている PR を確認する
