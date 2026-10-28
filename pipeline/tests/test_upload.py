@@ -109,6 +109,9 @@ class UploadTests(unittest.TestCase):
         self.assertNotIn("not-a-real-token", str(context.exception))
 
     def test_cli_dry_run_output(self):
+        approval = json.loads(self.approval.read_text(encoding="utf-8"))
+        approval["publish_at"] = "2099-10-28T18:00:00+09:00"
+        self.approval.write_text(json.dumps(approval), encoding="utf-8")
         stdout = io.StringIO()
         with contextlib.redirect_stdout(stdout):
             code = upload.main(["--root", str(self.root), "--episode", "ep000_sample", "--dry-run"])
