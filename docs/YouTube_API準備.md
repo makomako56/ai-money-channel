@@ -63,3 +63,9 @@ Claudeが、動画工場の予約投稿ができたあとに、テスト動画�
 - 手順5で「redirect_uri_mismatch」：手順4のリダイレクトURIが一字一句同じか確認
 - 「access_denied」：手順3のテストユーザーに自分が入っているか、公開ステータスを確認
 - チャンネルが選べない：YouTube Studio でチャンネルを作成済みか確認
+
+## 動画工場での接続確認と予約投稿
+
+GitHub の「Actions」→「動画工場」→「Run workflow」で、まず `stage=upload_check` を選ぶ。これは認証とチャンネルIDの照合だけを行い、動画をアップロードしない。
+
+投稿する場合は、オーナーの承認後に `stage=upload` を選び、`source_run_id` に動画・サムネを生成した Actions 実行の ID を入れる。`approval_json` には、承認日時と未来の公開日時を含む JSON を入力する（例：`{"approved_by":"owner","approved_at":"2026-10-28T09:00:00+09:00","publish_at":"2026-10-29T18:00:00+09:00"}`）。この入力は実行中に一時ファイルへ書き込み、リポジトリへコミットしない。動画工場は同じ実行から `<ep>-video` と `<ep>-thumbnail` を取得し、登録済みのチャンネルIDと同名動画の有無を確認してから非公開・予約公開で投稿する。結果の動画IDとURLは `<ep>-upload-result` artifact に保存する。
