@@ -62,10 +62,10 @@ jobs:
       port: ${{ steps.engine.outputs.port }}
       engine: ${{ steps.engine.outputs.engine }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.11'
       - run: python -m pip install -r requirements.txt
@@ -90,10 +90,10 @@ jobs:
         ports:
           - ${{ format('{0}:{0}', needs.configure.outputs.port) }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.11'
           cache: pip
@@ -253,10 +253,10 @@ jobs:
       group: review-outputs-${{ inputs.episode }}-${{ inputs.stage }}
       cancel-in-progress: false
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.11'
       - uses: actions/download-artifact@v4
@@ -288,10 +288,10 @@ jobs:
       EPISODE: ${{ inputs.episode }}
       STAGE: ${{ inputs.stage }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.11'
       - name: Check YouTube connection and channel

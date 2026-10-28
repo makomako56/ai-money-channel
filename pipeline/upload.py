@@ -136,7 +136,12 @@ def check_channel(youtube: YouTube, expected_id: str) -> str:
     data = youtube.get_json("channels", part="id,contentDetails", mine="true")
     items = data.get("items", [])
     if len(items) != 1 or items[0].get("id") != expected_id:
-        raise UploadError("認証したYouTubeチャンネルIDがconfig/channel.yamlと一致しません")
+        ids = [item.get("id") for item in items if isinstance(item, dict)]
+        public_ids = [id_ for id_ in ids if isinstance(id_, str) and re.fullmatch(r"UC[A-Za-z0-9_-]+", id_)]
+        detail = f"認証したチャンネル数: {len(items)}、見つかったチャンネルID: {', '.join(public_ids) or 'なし'}"
+        if not items:
+            raise UploadError(f"{detail}。このアカウントにはチャンネルがありません（Playgroundでブランドアカウントを選ぶ）")
+        raise UploadError(f"認証したYouTubeチャンネルIDがconfig/channel.yamlと一致しません（{detail}）")
     return items[0]["contentDetails"]["relatedPlaylists"]["uploads"]
 
 
@@ -251,7 +256,10 @@ def main(argv: list[str] | None = None) -> int:
                      video=args.video, thumbnail=args.thumbnail)
     except (UploadError, OSError, KeyError, TypeError) as exc:
         # Do not print raw exceptions from network clients or credential values.
-        print(f"エラー: {exc if isinstance(exc, UploadError) else 'アップロード処理に失敗しました'}", file=sys.stderr)
+        message = f"エラー: {exc if isinstance(exc, UploadError) else 'アップロード処理に失敗しました'}"
+        print(message, file=sys.stderr)
+        if isinstance(exc, UploadError) and os.environ.get("GITHUB_ACTIONS", "").lower() == "true":
+            print(f"::error::{message}")
         return 1
     print(json.dumps(result, ensure_ascii=False, indent=2))
     return 0
