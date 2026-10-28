@@ -28,6 +28,7 @@ jobs:
     # The reusable workflow limits write access to its publish-review job.
     permissions:
       contents: write
+      actions: read
     uses: ./.github/workflows/factory.yml
     with:
       episode: ep000_sample
@@ -39,6 +40,7 @@ jobs:
     if: needs.config.outputs.engine == 'aivisspeech'
     permissions:
       contents: write
+      actions: read
     uses: ./.github/workflows/factory.yml
     with:
       episode: ep000_sample

@@ -14,7 +14,15 @@ on:
         required: true
         default: voice
         type: choice
-        options: [all, voice, video, thumbnail, voice_samples]
+        options: [all, voice, video, thumbnail, voice_samples, upload, upload_check]
+      source_run_id:
+        description: 動画とサムネを生成したActions実行ID（upload時のみ）
+        required: false
+        type: string
+      approval_json:
+        description: オーナーの承認JSON（upload時のみ。リポジトリに保存しない）
+        required: false
+        type: string
   workflow_call:
     inputs:
       episode:
@@ -26,12 +34,26 @@ on:
       publish_review:
         type: boolean
         default: false
+      source_run_id:
+        type: string
+        default: ''
+      approval_json:
+        type: string
+        default: ''
+    secrets:
+      YT_CLIENT_ID:
+        required: false
+      YT_CLIENT_SECRET:
+        required: false
+      YT_REFRESH_TOKEN:
+        required: false
 
 permissions:
   contents: read
 
 jobs:
   configure:
+    if: inputs.stage != 'upload' && inputs.stage != 'upload_check'
     runs-on: ubuntu-24.04
     permissions:
       contents: read
@@ -254,3 +276,89 @@ jobs:
           else
             python -m pipeline.publish_review --source review-input --episode "$EPISODE" --stage "$STAGE"
           fi
+
+  upload:
+    if: inputs.stage == 'upload' || inputs.stage == 'upload_check'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    permissions:
+      contents: read
+      actions: read
+    env:
+      EPISODE: ${{ inputs.episode }}
+      STAGE: ${{ inputs.stage }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Check YouTube connection and channel
+        if: env.STAGE == 'upload_check'
+        env:
+          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+          YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
+        run: python -m pipeline.upload --episode "$EPISODE" --check
+      - name: Check upload inputs and write temporary approval
+        if: env.STAGE == 'upload'
+        env:
+          SOURCE_RUN_ID: ${{ inputs.source_run_id }}
+          APPROVAL_JSON: ${{ inputs.approval_json }}
+        run: |
+          if ! [[ "$SOURCE_RUN_ID" =~ ^[1-9][0-9]*$ ]]; then
+            echo '::error::source_run_idには動画とサムネを生成した実行IDが必要です'
+            exit 1
+          fi
+          if [ -z "$APPROVAL_JSON" ]; then
+            echo '::error::approval_jsonが必要です。承認されていない動画は投稿しません'
+            exit 1
+          fi
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          episode = os.environ['EPISODE']
+          if not episode.startswith('ep') or '/' in episode or '..' in episode:
+              raise SystemExit('episode名が不正です')
+          approval = json.loads(os.environ['APPROVAL_JSON'])
+          if not isinstance(approval, dict):
+              raise SystemExit('approval_jsonはJSONオブジェクトが必要です')
+          path = Path('episodes') / episode / 'approval.json'
+          path.parent.mkdir(parents=True, exist_ok=True)
+          path.write_text(json.dumps(approval), encoding='utf-8')
+          PY
+      - name: Download video artifact
+        if: env.STAGE == 'upload'
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.episode }}-video
+          path: upload-input/video
+          run-id: ${{ inputs.source_run_id }}
+          github-token: ${{ github.token }}
+      - name: Download thumbnail artifact
+        if: env.STAGE == 'upload'
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.episode }}-thumbnail
+          path: upload-input/thumbnail
+          run-id: ${{ inputs.source_run_id }}
+          github-token: ${{ github.token }}
+      - name: Upload approved episode
+        if: env.STAGE == 'upload'
+        env:
+          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+          YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
+        run: >-
+          python -m pipeline.upload --episode "$EPISODE"
+          --video upload-input/video/video.mp4
+          --thumbnail upload-input/thumbnail/thumbnail.png
+      - name: Save upload result
+        if: env.STAGE == 'upload'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.episode }}-upload-result
+          path: output/${{ inputs.episode }}/upload/upload_result.json
+          if-no-files-found: error
+          retention-days: 30
