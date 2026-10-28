@@ -64,6 +64,7 @@ Claudeが、動画工場の予約投稿ができたあとに、テスト動画�
 - 「access_denied」：手順3のテストユーザーに自分が入っているか、公開ステータスを確認
 - チャンネルが選べない：YouTube Studio でチャンネルを作成済みか確認
 - upload_check で「チャンネルIDが一致しません」：手順5の4で個人のチャンネルを選んでいる。手順5をやり直し、アカウント選択で「ミライ先生のAIマネー教室」（ブランドアカウント）を選ぶ。新しい Refresh token で Secrets の `YT_REFRESH_TOKEN` だけを更新する（「Update secret」）
+- 実際の構成（2026-10-28 確認）：チャンネルはブランドアカウント「AI企業ニュース」（管理者 tenissanalysis@gmail.com）。OAuth アプリ ai-money-channel は aiqiyejieshuochanneru@gmail.com のプロジェクト。Playground では Analysis teniss → 「AI企業ニュース」を選ぶ。テストユーザーに tenissanalysis@gmail.com とブランドアカウントのアドレス（…@pages.plusgoogle.com）が必要。Step 3 で `https://www.googleapis.com/youtube/v3/channels?part=id,snippet&mine=true` を送り、title がミライ先生のチャンネルになることを確かめてから Secrets を更新する
 
 ## 動画工場での接続確認と予約投稿
 
