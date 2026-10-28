@@ -63,3 +63,4 @@ Claudeが、動画工場の予約投稿ができたあとに、テスト動画�
 - 手順5で「redirect_uri_mismatch」：手順4のリダイレクトURIが一字一句同じか確認
 - 「access_denied」：手順3のテストユーザーに自分が入っているか、公開ステータスを確認
 - チャンネルが選べない：YouTube Studio でチャンネルを作成済みか確認
+- upload_check で「チャンネルIDが一致しません」：手順5の4で個人のチャンネルを選んでいる。手順5をやり直し、アカウント選択で「ミライ先生のAIマネー教室」（ブランドアカウント）を選ぶ。新しい Refresh token で Secrets の `YT_REFRESH_TOKEN` だけを更新する（「Update secret」）
