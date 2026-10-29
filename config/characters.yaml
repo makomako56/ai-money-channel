@@ -1,3 +1,4 @@
+# 字幕の横の丸い顔アイコンは assets/characters/<キャラ>/face/ にある同じファイル名の画像（顔が中心になるよう切り出し済み・256×256）
 # キャラ設定（Claudeの台本とCodexのパイプラインの共通定義）
 mirai:
   display_name: ミライ

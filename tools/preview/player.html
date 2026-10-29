@@ -17,7 +17,7 @@ body[data-layout=scene] .mirai{left:560px;height:640px}body[data-layout=scene] .
 .m-しょんぼり{animation:sag 1s forwards;filter:brightness(.75)}@keyframes sag{to{transform:translateY(16px)}}
 .sub{position:absolute;bottom:42px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:22px}
 .face{width:120px;height:120px;border-radius:50%;border:7px solid #fff;overflow:hidden;background:#fff;box-shadow:0 0 0 6px var(--c)}
-.face img{width:220px;margin-left:-50px;margin-top:-6px}
+.face img{width:100%;height:100%;display:block}
 .txt{font-family:Maru,sans-serif;font-size:62px;font-weight:900;color:#fff;line-height:1.2;-webkit-text-stroke:14px var(--c);paint-order:stroke fill;white-space:nowrap}
 </style>
 <body><iframe id=pg></iframe>
@@ -47,7 +47,7 @@ function setStep(k){pg.contentDocument.querySelectorAll('[data-step]').forEach(e
   me.classList.remove('dim');other.classList.add('dim');
   me.className=me.className.replace(/ m-\S+/g,'');void me.offsetWidth;me.classList.add('m-'+(mo||'ぴょん'));
   me.src=IMG[who]+CH[who].expressions[exp[who]];
-  sub.style.setProperty('--c',who=='ミライ'?'#2f4a8a':'#f08a3c');face.src=me.src;
+  sub.style.setProperty('--c',who=='ミライ'?'#2f4a8a':'#f08a3c');face.src=IMG[who].replace('/transparent/','/face/')+CH[who].expressions[exp[who]];
   txt.innerHTML=t.replace('／','<br>');
   const dur=Math.max(1400,t.replace('／','').length*205);const end=Date.now()+dur;let o=false;
   while(Date.now()<end){o=!o;if(exp[who]=='通常')me.src=IMG[who]+(o?CH[who].mouth.open:CH[who].mouth.closed);await sleep(130)}
