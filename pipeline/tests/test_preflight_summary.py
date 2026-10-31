@@ -78,6 +78,18 @@ class SummaryTest(unittest.TestCase):
         self.assertIn("0.5分", summary.length_warning(30))
         self.assertIsNone(summary.length_warning(None))
 
+    def test_upload_result_states(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            output = root / "output/ep000_sample/upload"
+            output.mkdir(parents=True)
+            text, _ = summary.build("ep000_sample", {}, [], root=root)
+            self.assertIn("| アップロード結果 | 未実行 |", text)
+            (output / "upload_result.json").write_text(
+                json.dumps({"video_id": "abc123", "status": "already_uploaded"}), encoding="utf-8")
+            text, _ = summary.build("ep000_sample", {}, [], root=root)
+            self.assertIn("| アップロード結果 | 投稿済み（動画ID: abc123） |", text)
+
 
 if __name__ == "__main__":
     unittest.main()

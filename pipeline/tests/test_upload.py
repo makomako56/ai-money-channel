@@ -109,6 +109,28 @@ class UploadTests(unittest.TestCase):
                            thumbnail=self.thumbnail, youtube=client, now=NOW)
             insert.assert_not_called()
 
+    def test_existing_result_stops_before_api(self):
+        target = self.root / "output/ep000_sample/upload/upload_result.json"
+        target.parent.mkdir(parents=True)
+        target.write_text(json.dumps({"video_id": "video-123", "url": "https://example.invalid"}),
+                          encoding="utf-8")
+        self.approval.unlink()
+        client = FakeYouTube()
+        result = upload.run(self.root, "ep000_sample", video=self.video,
+                            thumbnail=self.thumbnail, youtube=client, now=NOW)
+        self.assertEqual(result["video_id"], "video-123")
+        self.assertEqual(result["status"], "already_uploaded")
+        self.assertEqual(client.calls, [])
+
+    def test_do_upload_false_does_not_call_run(self):
+        stdout = io.StringIO()
+        with patch.object(upload, "run", side_effect=AssertionError("upload called")), \
+                contextlib.redirect_stdout(stdout):
+            code = upload.main(["--root", str(self.root), "--episode", "ep000_sample",
+                                "--do-upload", "false"])
+        self.assertEqual(code, 0)
+        self.assertEqual(json.loads(stdout.getvalue()), {"status": "not_run"})
+
     def test_dry_run_is_private_utc_and_never_calls_api(self):
         with patch.object(upload, "access_token", side_effect=AssertionError("API called")):
             result = upload.run(self.root, "ep000_sample", dry_run=True, now=NOW)
