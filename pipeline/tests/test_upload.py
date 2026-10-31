@@ -1,6 +1,7 @@
 import contextlib
 import io
 import json
+import os
 import tempfile
 import unittest
 from datetime import datetime, timezone
@@ -16,15 +17,17 @@ NOW = datetime(2026, 10, 27, 0, 0, tzinfo=timezone.utc)
 class FakeYouTube:
     token = "not-a-real-token"
 
-    def __init__(self, *, channel="UCexpected", titles=()):
+    def __init__(self, *, channel="UCexpected", channels=None, titles=()):
         self.channel = channel
+        self.channels = [channel] if channels is None else channels
         self.titles = titles
         self.calls = []
 
     def get_json(self, resource, **params):
         self.calls.append((resource, params))
         if resource == "channels":
-            return {"items": [{"id": self.channel, "contentDetails": {"relatedPlaylists": {"uploads": "playlist"}}}]}
+            return {"items": [{"id": id_, "contentDetails": {"relatedPlaylists": {"uploads": "playlist"}}}
+                              for id_ in self.channels]}
         if resource == "playlistItems":
             return {"items": [{"snippet": {"title": title}} for title in self.titles]}
         raise AssertionError("unexpected API call")
@@ -79,6 +82,24 @@ class UploadTests(unittest.TestCase):
                            thumbnail=self.thumbnail, youtube=client, now=NOW)
             insert.assert_not_called()
 
+    def test_channel_error_lists_count_and_public_ids(self):
+        client = FakeYouTube(channels=["UCwrong1", "UCwrong2"])
+        with self.assertRaises(upload.UploadError) as caught:
+            upload.check_channel(client, "UCexpected")
+        message = str(caught.exception)
+        self.assertIn("認証したチャンネル数: 2", message)
+        self.assertIn("UCwrong1", message)
+        self.assertIn("UCwrong2", message)
+
+    def test_no_channel_explains_brand_account_selection(self):
+        client = FakeYouTube(channels=[])
+        with self.assertRaises(upload.UploadError) as caught:
+            upload.check_channel(client, "UCexpected")
+        message = str(caught.exception)
+        self.assertIn("認証したチャンネル数: 0", message)
+        self.assertIn("見つかったチャンネルID: なし", message)
+        self.assertIn("このアカウントにはチャンネルがありません（Playgroundでブランドアカウントを選ぶ）", message)
+
     def test_duplicate_title_stops_before_upload(self):
         client = FakeYouTube(titles=["別の動画", "テスト動画"])
         self.assertTrue(upload.already_uploaded(client, "テスト動画"))
@@ -119,6 +140,27 @@ class UploadTests(unittest.TestCase):
         result = json.loads(stdout.getvalue())
         self.assertEqual(result["request"]["status"]["privacyStatus"], "private")
         self.assertTrue(result["request"]["status"]["publishAt"].endswith("Z"))
+
+    def test_github_actions_error_annotation_contains_only_upload_error(self):
+        self.approval.unlink()
+        stdout, stderr = io.StringIO(), io.StringIO()
+        with patch.dict(os.environ, {"GITHUB_ACTIONS": "true"}), \
+                contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+            code = upload.main(["--root", str(self.root), "--episode", "ep000_sample", "--dry-run"])
+        self.assertEqual(code, 1)
+        self.assertEqual(stdout.getvalue(), "::error::エラー: 必須ファイルがありません: approval.json\n")
+        self.assertEqual(stderr.getvalue(), "エラー: 必須ファイルがありません: approval.json\n")
+        self.assertNotIn("not-a-real-token", stdout.getvalue())
+
+    def test_generic_error_does_not_show_exception_or_annotation(self):
+        stdout, stderr = io.StringIO(), io.StringIO()
+        with patch.dict(os.environ, {"GITHUB_ACTIONS": "true"}), \
+                patch.object(upload, "run", side_effect=OSError("secret response body")), \
+                contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+            code = upload.main(["--root", str(self.root), "--episode", "ep000_sample", "--dry-run"])
+        self.assertEqual(code, 1)
+        self.assertEqual(stdout.getvalue(), "")
+        self.assertNotIn("secret response body", stderr.getvalue())
 
 
 if __name__ == "__main__":
