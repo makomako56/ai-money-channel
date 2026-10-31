@@ -7,7 +7,7 @@
 | T001 | 共通 | GitHubリポジトリ作成 | 人 | 完了 | Codex | makomako56/ai-money-channel（Private） |
 | T001b | 共通 | GitHubのClaude許可に ai-money-channel を追加 | 人 | 完了 | | Claudeから読み書き可能を確認（2026-10-24） |
 | T001c | 共通 | （不要）クラウドのCodexを使う方式に変更 | - | 完了 | | 2026-10-26 |
-| T001d | 共通 | Codexのクラウド環境を作成・公開、コードレビューを有効化 | 人 | 未着手 | Claude | 仕組みの資料を参照。2026-10-29 01:28 の #15 接続テストでボットが「create an environment」と返答＝未作成。T033・05b を @codex で依頼するにはこれが必要 |
+| T001d | 共通 | Codexのクラウド環境を作成・公開、コードレビューを有効化 | 人 | 完了 | Claude | 2026-10-31 解決：@codex は使わず、Mac の Codex アプリ予定済みタスク「連絡確認」（毎時・プロジェクト ai-money-channel・gh 使用）が #15 を読む方式で稼働 |
 | T001e | 共通 | テストIssueで @codex 連携を確認 | Claude | 未着手 | Claude | T001dの後 |
 | T002 | 共通 | VOICEVOX導入、2人の声を決定 | 人 | 未着手 | Claude | 候補は設定書の「声」 |
 | T003 | 共通 | YouTube APIの鍵を作りGitHub Secretsに登録 | 人 | 完了 | | 2026-10-28に作り直し（T031）、client_secret も取り替え済み。upload_check 成功。アプリは「テスト中」のため鍵は約7日で失効→11/4ごろ更新。恒久対策はアプリの公開（ホームページとプライバシーポリシーのURLが必要） |
@@ -32,7 +32,8 @@
 | T022 | 共通 | 作業依頼03：サムネ生成 | Codex | 完了 | | PR #11 マージ（2026-10-27）。review-outputs/ep001_disco/thumbnail/ |
 | T023 | 共通 | 作業依頼04：YouTube予約投稿 | Codex | 完了 | | PR #13 マージ（2026-10-28、オーナー許可・Claudeレビュー）。upload_check は認証成功・チャンネルID不一致で停止（誤投稿防止が正常に動作）→T031 |
 | T024 | 共通 | 作業依頼05：一括実行 | Codex | 承認待ち | 人 | 前半（stage=all・入力チェック・Summary）はPR #12でマージ（2026-10-27）。残りは docs/作業依頼/05b_一括実行の残り.md。夜の特例（Claude実装）は終了・Codexのクラウド環境がないため、オーナーに「Codexへ依頼文を貼る」か「Claudeに実装を任せる」かを確認中（2026-10-28 23時 通知済み。返事まで巡回は待つだけ） |
-| T033 | 共通 | 本番の player（pipeline/stage/player.html）の字幕アイコンを face/ の顔画像に切り替える | Codex | レビュー済み・マージ待ち | Claude(レビュー) | PR #16 |
+| T033 | 共通 | 本番の player（pipeline/stage/player.html）の字幕アイコンを face/ の顔画像に切り替える | Codex | 完了 | Claude(レビュー) | PR #16 マージ（2026-10-31、オーナーOK） |
+| T034 | 共通 | 連絡板の自動実行テスト（T033の行を更新） | Codex | 完了 | Claude(レビュー) | PR #17 マージ（2026-10-31）。Codexの予定済みタスクが #15 の依頼を自動で拾いPR作成まで成功 |
 | T032 | 共通 | YouTube投稿エラーの表示改善・Actions更新（PR #14） | Codex | 承認待ち | 人 | 2026-10-28 Claudeレビュー済み・問題なし（CI緑、テスト55件通過）。巡回からのマージは権限確認で止められたため、オーナーのマージ待ち |
 | T025 | ep000 | サンプル用スライド3枚 | Claude | 完了 | Codex | episodes/ep000_sample/slides/ |
 | T026 | 共通 | 声の選定 | 人 | 完了 | | AivisSpeech。ミライ＝まお（おちつき）、ひなた＝コハク（仮決定） |
