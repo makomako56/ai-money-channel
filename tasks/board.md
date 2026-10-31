@@ -32,7 +32,7 @@
 | T022 | 共通 | 作業依頼03：サムネ生成 | Codex | 完了 | | PR #11 マージ（2026-10-27）。review-outputs/ep001_disco/thumbnail/ |
 | T023 | 共通 | 作業依頼04：YouTube予約投稿 | Codex | 完了 | | PR #13 マージ（2026-10-28、オーナー許可・Claudeレビュー）。upload_check は認証成功・チャンネルID不一致で停止（誤投稿防止が正常に動作）→T031 |
 | T024 | 共通 | 作業依頼05：一括実行 | Codex | 承認待ち | 人 | 前半（stage=all・入力チェック・Summary）はPR #12でマージ（2026-10-27）。残りは docs/作業依頼/05b_一括実行の残り.md。夜の特例（Claude実装）は終了・Codexのクラウド環境がないため、オーナーに「Codexへ依頼文を貼る」か「Claudeに実装を任せる」かを確認中（2026-10-28 23時 通知済み。返事まで巡回は待つだけ） |
-| T033 | 共通 | 本番の player（pipeline/stage/player.html）の字幕アイコンを face/ の顔画像に切り替える | Codex | 未着手 | Claude(レビュー) | 2026-10-29 オーナー指摘「アイコンの顔が円の中央にない」。tools/preview/player.html が見本：`.face img{width:100%;height:100%;display:block}` と `face.src=` を `IMG[who].replace('/transparent/','/face/')+…` に。変更はこの2か所だけ、CIは1回で可。2026-10-30 13:13 に #15 で「🤖Claude→Codex：」依頼済み。16:12 の巡回時点で Codex の返信・PR・コミットなし（30分ごとの予定済みタスクが動いていない可能性）→オーナーに確認を通知 |
+| T033 | 共通 | 本番の player（pipeline/stage/player.html）の字幕アイコンを face/ の顔画像に切り替える | Codex | レビュー済み・マージ待ち | Claude(レビュー) | PR #16 |
 | T032 | 共通 | YouTube投稿エラーの表示改善・Actions更新（PR #14） | Codex | 承認待ち | 人 | 2026-10-28 Claudeレビュー済み・問題なし（CI緑、テスト55件通過）。巡回からのマージは権限確認で止められたため、オーナーのマージ待ち |
 | T025 | ep000 | サンプル用スライド3枚 | Claude | 完了 | Codex | episodes/ep000_sample/slides/ |
 | T026 | 共通 | 声の選定 | 人 | 完了 | | AivisSpeech。ミライ＝まお（おちつき）、ひなた＝コハク（仮決定） |
