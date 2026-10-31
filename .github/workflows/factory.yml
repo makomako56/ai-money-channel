@@ -249,9 +249,14 @@ jobs:
           path = Path('episodes') / episode / 'approval.json'
           path.write_text(json.dumps(approval), encoding='utf-8')
           PY
+      - name: Restore prior upload result for stage=all
+        if: env.STAGE == 'all' && inputs.do_upload
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python -m pipeline.upload_result_store fetch --episode "$EPISODE"
       - name: Upload after stage=all
         id: upload
-        if: env.STAGE == 'all'
+        if: env.STAGE == 'all' && inputs.do_upload
         env:
           YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
           YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
@@ -377,6 +382,11 @@ jobs:
           path.parent.mkdir(parents=True, exist_ok=True)
           path.write_text(json.dumps(approval), encoding='utf-8')
           PY
+      - name: Restore prior upload result
+        if: env.STAGE == 'upload'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python -m pipeline.upload_result_store fetch --episode "$EPISODE"
       - name: Download video artifact
         if: env.STAGE == 'upload'
         uses: actions/download-artifact@v4
@@ -411,3 +421,37 @@ jobs:
           path: output/${{ inputs.episode }}/upload/upload_result.json
           if-no-files-found: error
           retention-days: 30
+
+  persist-upload-result:
+    needs: [generate, upload]
+    if: >-
+      always() &&
+      ((inputs.stage == 'all' && inputs.do_upload && needs.generate.result == 'success') ||
+       (inputs.stage == 'upload' && needs.upload.result == 'success'))
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      actions: read
+    concurrency:
+      group: upload-result-${{ inputs.episode }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.episode }}-upload-result
+          path: result-input
+      - name: Persist upload result to review-outputs
+        run: |
+          mkdir -p "output/$EPISODE/upload"
+          cp result-input/upload_result.json "output/$EPISODE/upload/upload_result.json"
+          python -m pipeline.upload_result_store publish --episode "$EPISODE"
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EPISODE: ${{ inputs.episode }}
