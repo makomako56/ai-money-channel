@@ -1,5 +1,5 @@
 # 切り替えはこの1行。声の指定は characters.yaml の voice.voices.<engine>。
-engine: aivisspeech
+engine: voicevox
 engines:
   voicevox:
     image: voicevox/voicevox_engine:cpu-latest@sha256:6c6c07dfebc34294b432864cfce4387738dfa840d3b1a2859e68486b2bd99807
