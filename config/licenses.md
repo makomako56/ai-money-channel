@@ -30,6 +30,18 @@
 - 義務はないが、概要欄に「音声：AivisSpeech（まお・コハク）」と表記する
 - 未確認：ACML 1.0 の全文（禁止事項）。モデルの元キャラとは別の自作キャラに声を当てる使い方に制限がないかを、全文で確認する
 
+### AivisHub 追加モデル候補（T036）
+
+| モデル | UUID | ライセンス | AivisHub・補足 |
+|---|---|---|---|
+| すみれ | `2ff1c526-27d4-4eeb-b069-4207ae5fe259` | ACML 1.0 | [モデルページ](https://hub.aivis-project.com/aivm-models/2ff1c526-27d4-4eeb-b069-4207ae5fe259)。説明欄で声のクレジット表記を要請 |
+| わかな | `f83c385c-829b-40c4-8c11-639027e61636` | ACML 1.0 | [モデルページ](https://hub.aivis-project.com/aivm-models/f83c385c-829b-40c4-8c11-639027e61636)。説明欄で声のクレジット表記を要請 |
+| みちのくあいり | `1b2830f4-8cf1-4184-a0d9-3a1bace3a844` | ACML 1.0 | [モデルページ](https://hub.aivis-project.com/aivm-models/1b2830f4-8cf1-4184-a0d9-3a1bace3a844)。声：上戸恵里 |
+| 天深シノ | `0f6821f4-9f86-4da1-a41a-fbe6fff9ca88` | **ACML-NC 1.0** | [モデルページ](https://hub.aivis-project.com/aivm-models/0f6821f4-9f86-4da1-a41a-fbe6fff9ca88)。非商用向けのため収益化動画には採用不可 |
+| ほのか | `59f96896-64d2-4378-830a-4d5feb3d81aa` | ACML 1.0 | [モデルページ](https://hub.aivis-project.com/aivm-models/59f96896-64d2-4378-830a-4d5feb3d81aa)。説明欄で声のクレジット表記を要請 |
+
+ライセンス確認日：2026-11-01。サンプル比較には全候補を含めるが、採用時にはモデルページと ACML 本文を再確認する。
+
 ## Gemini（画像生成）
 - Googleの利用規約で、生成物の商用利用は明確には禁止されていない（ただし公式に「許可」と言い切れる文言でもない）
 - [生成AIの使用禁止に関するポリシー](https://policies.google.com/terms/generative-ai/use-policy?hl=ja) で、違法・有害・誤解を招く内容などの生成は禁止
