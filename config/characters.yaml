@@ -8,9 +8,9 @@ mirai:
   color: "#24345c"
   accent: "#c9a14a"
   voice:
-    speed: 1.0
-    pitch: 0.0  # AivisSpeechでは音質保持のため0
-    intonation: 1.0  # AivisSpeechのスタイル強度は標準値
+    speed: 0.93
+    pitch: -0.03  # AivisSpeechでは音質保持のため0
+    intonation: 0.9  # AivisSpeechのスタイル強度は標準値
     volume: 1.0
     pre_phoneme: 0.05
     post_phoneme: 0.05
