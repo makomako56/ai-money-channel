@@ -16,6 +16,6 @@ layout:
   character_width: 650
   character_right: -28
   character_bottom: -45
-  sub_character_width: 488
-  sub_character_right: 370
-  sub_character_bottom: -45
+  sub_character_width: 360
+  sub_character_right: 330
+  sub_character_bottom: -20
