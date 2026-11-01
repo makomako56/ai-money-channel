@@ -17,6 +17,7 @@ PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
 MAX_BYTES = 2_000_000
 WIDTH, HEIGHT = 1280, 720
 REQUIRED_FIELDS = {"main_text", "sub_text", "character", "expression", "accent"}
+OPTIONAL_FIELDS = {"sub_character", "sub_expression"}
 COLOR = re.compile(r"#[0-9a-fA-F]{6}\Z")
 EPISODE = re.compile(r"ep[0-9]+_[\w-]+\Z")
 
@@ -34,8 +35,11 @@ def asset_url(root, relative):
 
 
 def validate_input(data, characters, style, root=ROOT):
-    if not isinstance(data, dict) or set(data) != REQUIRED_FIELDS:
+    if (not isinstance(data, dict) or not REQUIRED_FIELDS.issubset(data) or
+            not set(data).issubset(REQUIRED_FIELDS | OPTIONAL_FIELDS)):
         raise ValueError("thumbnail.json には main_text、sub_text、character、expression、accent が必要です")
+    if ("sub_character" in data) != ("sub_expression" in data):
+        raise ValueError("sub_character と sub_expression は両方指定してください")
     main = data["main_text"]
     if not isinstance(main, str) or "\r" in main:
         raise ValueError("main_text は1〜2行の文字列が必要です")
@@ -59,6 +63,22 @@ def validate_input(data, characters, style, root=ROOT):
     if Path(image_name).name != image_name or not image_name.endswith(".png"):
         raise ValueError("キャラ画像名が不正です")
     image_url = asset_url(root, f"assets/characters/{character}/transparent/{image_name}")
+    sub_image_url = None
+    if "sub_character" in data:
+        sub_character = data["sub_character"]
+        if (not isinstance(sub_character, str) or sub_character not in ("mirai", "hinata") or
+                sub_character not in characters or sub_character == character):
+            raise ValueError(f"未定義またはメインと同じサブキャラです: {sub_character}")
+        sub_expression = data["sub_expression"]
+        sub_images = characters[sub_character].get("expressions", {})
+        if (not isinstance(sub_expression, str) or sub_expression not in sub_images or
+                not isinstance(sub_images[sub_expression], str)):
+            raise ValueError(f"未定義のサブキャラ表情または画像です: {sub_expression}")
+        sub_image_name = sub_images[sub_expression]
+        if Path(sub_image_name).name != sub_image_name or not sub_image_name.endswith(".png"):
+            raise ValueError("サブキャラ画像名が不正です")
+        sub_image_url = asset_url(
+            root, f"assets/characters/{sub_character}/transparent/{sub_image_name}")
     if not isinstance(style, dict) or not isinstance(style.get("font_file"), str):
         raise ValueError("thumbnail_style.yaml の font_file が必要です")
     font_url = asset_url(root, style["font_file"])
@@ -68,7 +88,8 @@ def validate_input(data, characters, style, root=ROOT):
     color_keys = ("background_top", "background_bottom", "text", "stroke")
     layout_keys = ("text_x", "main_y", "sub_y", "text_width", "main_font_max",
                    "main_font_min", "sub_font_size", "character_width",
-                   "character_right", "character_bottom")
+                   "character_right", "character_bottom", "sub_character_width",
+                   "sub_character_right", "sub_character_bottom")
     if not isinstance(colors, dict) or any(not isinstance(colors.get(key), str) or
                                             not COLOR.fullmatch(colors[key]) for key in color_keys):
         raise ValueError("thumbnail_style.yaml の colors が不正です")
@@ -77,10 +98,12 @@ def validate_input(data, characters, style, root=ROOT):
         raise ValueError("thumbnail_style.yaml の layout が不正です")
     if not 1 <= layout["main_font_min"] <= layout["main_font_max"] or not 1 <= layout["sub_font_size"]:
         raise ValueError("thumbnail_style.yaml の文字サイズが不正です")
-    if not 1 <= layout["text_width"] <= WIDTH or not 1 <= layout["character_width"] <= WIDTH:
+    if (not 1 <= layout["text_width"] <= WIDTH or
+            not 1 <= layout["character_width"] <= WIDTH or
+            not 1 <= layout["sub_character_width"] <= WIDTH):
         raise ValueError("thumbnail_style.yaml の幅が不正です")
     return {"main_lines": lines, "sub_text": sub, "accent": accent,
-            "image_url": image_url, "font_url": font_url,
+            "image_url": image_url, "sub_image_url": sub_image_url, "font_url": font_url,
             "colors": {key: colors[key] for key in color_keys},
             "layout": {key: layout[key] for key in layout_keys}}
 
