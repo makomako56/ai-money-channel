@@ -240,6 +240,11 @@ def make_samples(catalog, client, output, gap):
     (output / "samples.json").write_text(json.dumps({"texts": SAMPLE_TEXTS, "voices": samples}, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
+def engine_credit(engine, names):
+    return ("音声：AivisSpeech（" + "・".join(names) + "）" if engine == "aivisspeech"
+            else " / ".join("VOICEVOX:" + name for name in names))
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--episode", required=True)
@@ -278,8 +283,7 @@ def main():
                 used_names = list(dict.fromkeys(item["voice"]["name"] for speaker in characters for item in timeline if item["speaker"] == speaker))
             else:
                 used_names = list(dict.fromkeys(item["name"] for item in catalog))
-            credit = ("音声：AivisSpeech（" + "・".join(used_names) + "）" if engine["engine"] == "aivisspeech"
-                      else " / ".join("VOICEVOX:" + name for name in used_names))
+            credit = engine_credit(engine["engine"], used_names)
             (staging / "engine.json").write_text(json.dumps({**engine, "version": client.request("/version"), "catalog": catalog,
                                                           "credit": credit}, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
             staging.rename(output)

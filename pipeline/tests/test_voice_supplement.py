@@ -1,4 +1,5 @@
 import copy
+import io
 import json
 import os
 import subprocess
@@ -9,7 +10,8 @@ from pathlib import Path
 from unittest.mock import Mock, patch
 
 from pipeline.engine_config import load_engine
-from pipeline.make_voice import SpeechEngine, make_samples, resolve_voice, voice_settings
+from pipeline.aivis_models import download_models
+from pipeline.make_voice import SpeechEngine, engine_credit, make_samples, resolve_voice, voice_settings
 from pipeline.publish_review import publish, validate_source
 from test_make_voice import audio
 
@@ -61,6 +63,30 @@ class VoiceSupplementTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 load_engine(path)
 
+    def test_aivishub_extra_models_are_validated(self):
+        model = "2ff1c526-27d4-4eeb-b069-4207ae5fe259"
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "engine.yaml"
+            prefix = ("engine: aivisspeech\nengines:\n  aivisspeech:\n"
+                      "    image: ghcr.io/aivis-project/aivisspeech-engine:cpu-latest\n    port: 10101\n")
+            path.write_text(prefix + f"    extra_models: [{model}]\n")
+            self.assertEqual(load_engine(path)["extra_models"], [model])
+            for models in ("[not-a-uuid]", f"[{model}, {model}]", "not-a-list"):
+                path.write_text(prefix + f"    extra_models: {models}\n")
+                with self.subTest(models=models), self.assertRaises(ValueError):
+                    load_engine(path)
+
+    def test_aivishub_download_is_atomic_and_reuses_cache(self):
+        model = "2ff1c526-27d4-4eeb-b069-4207ae5fe259"
+        with tempfile.TemporaryDirectory() as tmp, patch(
+                "pipeline.aivis_models.urllib.request.urlopen", return_value=io.BytesIO(b"aivmx")) as get:
+            output = Path(tmp)
+            download_models([model], output)
+            self.assertEqual((output / f"{model}.aivmx").read_bytes(), b"aivmx")
+            self.assertFalse((output / f"{model}.aivmx.part").exists())
+            download_models([model], output)
+            get.assert_called_once()
+
     def test_samples_include_every_style_and_unique_filenames(self):
         catalog = [{"name": "声/名", "style": "通常", "id": 1},
                    {"name": "声_名", "style": "通常", "id": 2},
@@ -75,6 +101,10 @@ class VoiceSupplementTests(unittest.TestCase):
             self.assertTrue(all("/" not in v["mp3"] for v in data["voices"]))
             self.assertEqual(client.synthesize.call_count, 6)
             self.assertEqual(ffmpeg.call_count, 3)
+
+    def test_aivis_credit_includes_all_sample_model_names(self):
+        self.assertEqual(engine_credit("aivisspeech", ["まお", "すみれ", "わかな"]),
+                         "音声：AivisSpeech（まお・すみれ・わかな）")
 
 
 class ReviewPublisherTests(unittest.TestCase):

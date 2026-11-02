@@ -69,6 +69,7 @@ jobs:
       image: ${{ steps.engine.outputs.image }}
       port: ${{ steps.engine.outputs.port }}
       engine: ${{ steps.engine.outputs.engine }}
+      extra_models: ${{ steps.engine.outputs.extra_models }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -92,12 +93,9 @@ jobs:
       STAGE: ${{ inputs.stage }}
       DO_UPLOAD: ${{ inputs.do_upload }}
       ENGINE_PORT: ${{ needs.configure.outputs.port }}
+      ENGINE: ${{ needs.configure.outputs.engine }}
+      ENGINE_IMAGE: ${{ needs.configure.outputs.image }}
       PYTHONUNBUFFERED: '1'
-    services:
-      speech:
-        image: ${{ needs.configure.outputs.image }}
-        ports:
-          - ${{ format('{0}:{0}', needs.configure.outputs.port) }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -140,6 +138,15 @@ jobs:
           fc-cache -f
           fc-match --format '%{family}\n' 'Noto Sans JP' | grep -F 'Noto Sans JP'
           python -m pip install -r requirements.txt
+      - name: Restore AivisHub models
+        if: env.ENGINE == 'aivisspeech'
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/aivis-engine/Models
+          key: aivishub-aivmx-v1-${{ hashFiles('config/voice_engine.yaml') }}
+      - name: Download missing AivisHub models
+        if: env.ENGINE == 'aivisspeech'
+        run: python -m pipeline.aivis_models --output "$RUNNER_TEMP/aivis-engine/Models"
       - name: Preflight (input check)
         id: preflight
         if: env.STAGE != 'voice_samples'
@@ -152,6 +159,17 @@ jobs:
           echo "NODE_PATH=$RUNNER_TEMP/video-playwright/node_modules" >> "$GITHUB_ENV"
       - name: Unit tests
         run: python -m unittest discover -s pipeline/tests -v
+      - name: Start speech engine
+        run: |
+          mount_args=()
+          if [ "$ENGINE" = aivisspeech ]; then
+            mkdir -p "$RUNNER_TEMP/aivis-engine/Models"
+            chmod -R a+rwX "$RUNNER_TEMP/aivis-engine"
+            mount_args=(-v "$RUNNER_TEMP/aivis-engine:/home/user/.local/share/AivisSpeech-Engine-Dev")
+          fi
+          docker run --detach --name speech-engine \
+            --publish "127.0.0.1:$ENGINE_PORT:$ENGINE_PORT" \
+            "${mount_args[@]}" "$ENGINE_IMAGE"
       - name: Wait for speech engine
         run: |
           for attempt in $(seq 1 120); do
@@ -287,9 +305,10 @@ jobs:
           --summary-file "$GITHUB_STEP_SUMMARY"
       - name: Engine logs on failure
         if: failure()
-        env:
-          ENGINE_CONTAINER: ${{ job.services.speech.id }}
-        run: docker logs --tail 100 "$ENGINE_CONTAINER"
+        run: docker logs --tail 100 speech-engine 2>/dev/null || true
+      - name: Stop speech engine
+        if: always()
+        run: docker rm --force speech-engine 2>/dev/null || true
 
   publish-review:
     needs: generate
