@@ -215,9 +215,25 @@ def _set_thumbnail(youtube: YouTube, video_id: str, image: Path) -> None:
     _request(url, method="POST", token=youtube.token, data=raw, headers={"Content-Type": "image/png"})
 
 
+def existing_result(root: Path, episode: str) -> dict | None:
+    """Return a prior successful result before any approval or API work."""
+    path = root / "output" / episode / "upload" / "upload_result.json"
+    if not path.is_file():
+        return None
+    result = _json_file(path)
+    video_id = result.get("video_id")
+    if not isinstance(video_id, str) or not video_id.strip():
+        raise UploadError("upload_result.jsonの動画IDが不正です")
+    return {**result, "status": "already_uploaded"}
+
+
 def run(root: Path, episode: str, *, dry_run: bool = False, upload_check: bool = False,
         video: Path | None = None, thumbnail: Path | None = None, env: dict | None = None,
         youtube: YouTube | None = None, now: datetime | None = None) -> dict:
+    if not dry_run and not upload_check:
+        previous = existing_result(root, episode)
+        if previous is not None:
+            return previous
     expected_channel = load_channel_id(root)
     if upload_check:
         client = youtube or YouTube(access_token(dict(os.environ if env is None else env)))
@@ -250,7 +266,12 @@ def main(argv: list[str] | None = None) -> int:
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--dry-run", action="store_true")
     mode.add_argument("--check", action="store_true")
+    parser.add_argument("--do-upload", choices=("true", "false"), default="true",
+                        help="falseならアップロード処理を呼ばず成功終了する")
     args = parser.parse_args(argv)
+    if args.do_upload == "false":
+        print(json.dumps({"status": "not_run"}, ensure_ascii=False))
+        return 0
     try:
         result = run(args.root, args.episode, dry_run=args.dry_run, upload_check=args.check,
                      video=args.video, thumbnail=args.thumbnail)

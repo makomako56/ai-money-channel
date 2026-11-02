@@ -20,9 +20,14 @@ on:
         required: false
         type: string
       approval_json:
-        description: オーナーの承認JSON（upload時のみ。リポジトリに保存しない）
+        description: オーナーの承認JSON（uploadまたはdo_upload=true時。リポジトリに保存しない）
         required: false
         type: string
+      do_upload:
+        description: stage=all の最後に予約投稿する
+        required: false
+        default: false
+        type: boolean
   workflow_call:
     inputs:
       episode:
@@ -40,6 +45,9 @@ on:
       approval_json:
         type: string
         default: ''
+      do_upload:
+        type: boolean
+        default: false
     secrets:
       YT_CLIENT_ID:
         required: false
@@ -83,6 +91,7 @@ jobs:
     env:
       EPISODE: ${{ inputs.episode }}
       STAGE: ${{ inputs.stage }}
+      DO_UPLOAD: ${{ inputs.do_upload }}
       ENGINE_PORT: ${{ needs.configure.outputs.port }}
       ENGINE: ${{ needs.configure.outputs.engine }}
       ENGINE_IMAGE: ${{ needs.configure.outputs.image }}
@@ -239,6 +248,50 @@ jobs:
           path: output/review/${{ inputs.episode }}/${{ inputs.stage != 'all' && inputs.stage || '' }}
           if-no-files-found: error
           retention-days: 7
+      - name: Write temporary approval for stage=all upload
+        if: env.STAGE == 'all' && inputs.do_upload
+        env:
+          APPROVAL_JSON: ${{ inputs.approval_json }}
+        run: |
+          if [ -z "$APPROVAL_JSON" ]; then
+            echo '::error::approval_jsonが必要です。承認されていない動画は投稿しません'
+            exit 1
+          fi
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          episode = os.environ['EPISODE']
+          approval = json.loads(os.environ['APPROVAL_JSON'])
+          if not isinstance(approval, dict):
+              raise SystemExit('approval_jsonはJSONオブジェクトが必要です')
+          path = Path('episodes') / episode / 'approval.json'
+          path.write_text(json.dumps(approval), encoding='utf-8')
+          PY
+      - name: Restore prior upload result for stage=all
+        if: env.STAGE == 'all' && inputs.do_upload
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python -m pipeline.upload_result_store fetch --episode "$EPISODE"
+      - name: Upload after stage=all
+        id: upload
+        if: env.STAGE == 'all' && inputs.do_upload
+        env:
+          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+          YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
+        run: >-
+          python -m pipeline.upload --episode "$EPISODE"
+          --do-upload "$DO_UPLOAD"
+          --video "output/$EPISODE/video/video.mp4"
+          --thumbnail "output/$EPISODE/thumbnail/thumbnail.png"
+      - name: Save stage=all upload result
+        if: env.STAGE == 'all' && inputs.do_upload && steps.upload.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.episode }}-upload-result
+          path: output/${{ inputs.episode }}/upload/upload_result.json
+          if-no-files-found: error
+          retention-days: 30
       - name: Summary
         if: always() && env.STAGE != 'voice' && env.STAGE != 'voice_samples'
         run: >-
@@ -247,6 +300,7 @@ jobs:
           --outcome "voice=${{ steps.voice.outcome }}"
           --outcome "video=${{ steps.video.outcome }}"
           --outcome "thumbnail=${{ steps.thumbnail.outcome }}"
+          --outcome "upload=${{ steps.upload.outcome }}"
           --warnings-file "$RUNNER_TEMP/warnings.txt"
           --summary-file "$GITHUB_STEP_SUMMARY"
       - name: Engine logs on failure
@@ -347,6 +401,11 @@ jobs:
           path.parent.mkdir(parents=True, exist_ok=True)
           path.write_text(json.dumps(approval), encoding='utf-8')
           PY
+      - name: Restore prior upload result
+        if: env.STAGE == 'upload'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python -m pipeline.upload_result_store fetch --episode "$EPISODE"
       - name: Download video artifact
         if: env.STAGE == 'upload'
         uses: actions/download-artifact@v4
@@ -381,3 +440,37 @@ jobs:
           path: output/${{ inputs.episode }}/upload/upload_result.json
           if-no-files-found: error
           retention-days: 30
+
+  persist-upload-result:
+    needs: [generate, upload]
+    if: >-
+      always() &&
+      ((inputs.stage == 'all' && inputs.do_upload && needs.generate.result == 'success') ||
+       (inputs.stage == 'upload' && needs.upload.result == 'success'))
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      actions: read
+    concurrency:
+      group: upload-result-${{ inputs.episode }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.episode }}-upload-result
+          path: result-input
+      - name: Persist upload result to review-outputs
+        run: |
+          mkdir -p "output/$EPISODE/upload"
+          cp result-input/upload_result.json "output/$EPISODE/upload/upload_result.json"
+          python -m pipeline.upload_result_store publish --episode "$EPISODE"
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EPISODE: ${{ inputs.episode }}
