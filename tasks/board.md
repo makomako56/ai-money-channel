@@ -18,7 +18,7 @@
 | T008 | ep000 | 30秒サンプル台本 | Claude | 完了 | Codex | episodes/ep000_sample/script.txt |
 | T009 | ep000 | サンプル30秒動画を生成 | Claude | 完了 | 人(CP0) | stage=all で生成（2026-10-27夜）。review-outputs/ep000_sample/video/video.mp4 |
 | T037 | ep001 | 新しい声（まい）で本番動画を生成→オーナーOK→予約投稿 | Claude | 完了 | 人(Studioで確認) | 2026-11-03 オーナーOK。stage=upload（run 41563028266）で 11/3 18:00 JST に予約投稿。https://www.youtube.com/watch?v=PbxeScsFcOM 。オーナーが Studio で「公開予約」・サムネ反映を確認（ロックなし） |
-| T038 | 共通 | サムネのデザインv3（2キャラ・PIVOT風）を動画工場に組み込む | Codex | 未着手 | Claude(レビュー) | 2026-11-03 オーナー指示。見本 templates/thumbnail_v3/ep001.html、依頼 docs/作業依頼/06。PR #19 の上に作る |
+| T038 | 共通 | サムネのデザインv3（2キャラ・PIVOT風）を動画工場に組み込む | Codex | 差し戻し | Claude(レビュー) | 2026-11-03 オーナー指示。見本 templates/thumbnail_v3/ep001.html、依頼 docs/作業依頼/06。PR #21（CI緑）→ 11/3 13:00 JST レビューで修正依頼：旧形式jsonで文字はみ出し・顔に重なる・1キャラ、重なりチェックとテスト、ep001の実物を review-outputs に |
 | T039 | 共通 | 毎朝のテーマ提案→制作→OKで予約公開 の流れを開始 | Claude | 完了 | | 2026-11-03。定時タスク「毎朝のテーマ提案」（7:13 JST）。docs/毎朝のテーマ提案と制作の流れ.md |
 | T040 | ep002 | 題材3案（11/4 18:00公開分）を #15 に提案 | Claude | 承認待ち | 人(番号を選ぶ) | 2026-11-03。tasks/ep002_テーマ案.md。番号の返事が来たら巡回で制作 |
 | T010 | ep000 | CP0：キャラ・声・画面構成を承認 | 人 | 承認待ち | Claude | ここを越えたら毎日制作へ |
