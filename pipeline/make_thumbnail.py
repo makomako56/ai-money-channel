@@ -18,6 +18,7 @@ MAX_BYTES = 2_000_000
 WIDTH, HEIGHT = 1280, 720
 REQUIRED_FIELDS = {"main_text", "sub_text", "character", "expression", "accent"}
 OPTIONAL_FIELDS = {"sub_character", "sub_expression"}
+V3_FIELDS = {"lines", "characters"}
 COLOR = re.compile(r"#[0-9a-fA-F]{6}\Z")
 EPISODE = re.compile(r"ep[0-9]+_[\w-]+\Z")
 
@@ -36,7 +37,7 @@ def asset_url(root, relative):
 
 def validate_input(data, characters, style, root=ROOT):
     if (not isinstance(data, dict) or not REQUIRED_FIELDS.issubset(data) or
-            not set(data).issubset(REQUIRED_FIELDS | OPTIONAL_FIELDS)):
+            not set(data).issubset(REQUIRED_FIELDS | OPTIONAL_FIELDS | V3_FIELDS)):
         raise ValueError("thumbnail.json には main_text、sub_text、character、expression、accent が必要です")
     if ("sub_character" in data) != ("sub_expression" in data):
         raise ValueError("sub_character と sub_expression は両方指定してください")
@@ -79,6 +80,64 @@ def validate_input(data, characters, style, root=ROOT):
             raise ValueError("サブキャラ画像名が不正です")
         sub_image_url = asset_url(
             root, f"assets/characters/{sub_character}/transparent/{sub_image_name}")
+    has_v3_lines = "lines" in data
+    has_v3_characters = "characters" in data
+    if has_v3_lines != has_v3_characters:
+        raise ValueError("v3 の lines と characters は両方指定してください")
+    v3_lines = None
+    character_urls = [image_url] + ([sub_image_url] if sub_image_url else [])
+    if has_v3_lines:
+        raw_lines = data["lines"]
+        if not isinstance(raw_lines, list) or not 3 <= len(raw_lines) <= 4:
+            raise ValueError("lines は3〜4段で指定してください")
+        v3_lines = []
+        for line in raw_lines:
+            if not isinstance(line, dict) or set(line) != {"segments"}:
+                raise ValueError("lines の各段には segments だけを指定してください")
+            segments = line["segments"]
+            if not isinstance(segments, list) or not 1 <= len(segments) <= 6:
+                raise ValueError("各段の segments は1〜6個で指定してください")
+            normalized = []
+            total_length = 0
+            for segment in segments:
+                if (not isinstance(segment, dict) or "text" not in segment or
+                        not set(segment).issubset({"text", "color"})):
+                    raise ValueError("segment には text と任意の color を指定してください")
+                text = segment["text"]
+                color = segment.get("color")
+                if (not isinstance(text, str) or not text or text != text.strip() or
+                        "\n" in text or "\r" in text):
+                    raise ValueError("segment の text は空白のない1行で指定してください")
+                if color is not None and (not isinstance(color, str) or not COLOR.fullmatch(color)):
+                    raise ValueError("segment の color は #RRGGBB 形式が必要です")
+                total_length += len(text)
+                normalized.append({"text": text, "color": color})
+            if not 1 <= total_length <= 18:
+                raise ValueError("各段の文字は合計1〜18文字で指定してください")
+            v3_lines.append(normalized)
+
+        specs = data["characters"]
+        if not isinstance(specs, list) or len(specs) != 2:
+            raise ValueError("characters は異なる2人を指定してください")
+        character_urls = []
+        names = []
+        for spec in specs:
+            if not isinstance(spec, dict) or set(spec) != {"character", "expression"}:
+                raise ValueError("characters には character と expression を指定してください")
+            name, face = spec["character"], spec["expression"]
+            if not isinstance(name, str) or name not in ("mirai", "hinata") or name not in characters:
+                raise ValueError(f"未定義のキャラです: {name}")
+            images = characters[name].get("expressions", {})
+            if not isinstance(face, str) or face not in images or not isinstance(images[face], str):
+                raise ValueError(f"未定義の表情または画像です: {face}")
+            image_name = images[face]
+            if Path(image_name).name != image_name or not image_name.endswith(".png"):
+                raise ValueError("キャラ画像名が不正です")
+            names.append(name)
+            character_urls.append(asset_url(
+                root, f"assets/characters/{name}/transparent/{image_name}"))
+        if len(set(names)) != 2:
+            raise ValueError("characters は異なる2人を指定してください")
     if not isinstance(style, dict) or not isinstance(style.get("font_file"), str):
         raise ValueError("thumbnail_style.yaml の font_file が必要です")
     font_url = asset_url(root, style["font_file"])
@@ -104,6 +163,7 @@ def validate_input(data, characters, style, root=ROOT):
         raise ValueError("thumbnail_style.yaml の幅が不正です")
     return {"main_lines": lines, "sub_text": sub, "accent": accent,
             "image_url": image_url, "sub_image_url": sub_image_url, "font_url": font_url,
+            "lines": v3_lines, "character_urls": character_urls,
             "colors": {key: colors[key] for key in color_keys},
             "layout": {key: layout[key] for key in layout_keys}}
 
@@ -132,8 +192,37 @@ const { chromium } = require("playwright");
   try {
     const context = await browser.newContext({viewport:{width:1280,height:720},deviceScaleFactor:1});
     const page = await context.newPage();
-    await page.goto("http://127.0.0.1:" + port + "/pipeline/stage/thumbnail.html", {waitUntil:"load"});
-    await page.evaluate(async data => { await window.renderThumbnail(data); }, payload);
+    await page.goto("http://127.0.0.1:" + port + "/", {waitUntil:"load"});
+    await page.setContent(`<!doctype html><html lang="ja"><meta charset="utf-8"><style>
+*{margin:0;padding:0;box-sizing:border-box}html,body{width:1280px;height:720px;overflow:hidden}
+body{position:relative;font-family:Maru,sans-serif;font-weight:900;background:#24345c}
+.card{position:absolute;left:14px;top:14px;width:1196px;height:692px;border-radius:26px;overflow:hidden;background:radial-gradient(ellipse 80% 90% at 70% 60%,#2b3f7a 0%,#141c3a 70%)}
+.grid{position:absolute;inset:0;background:linear-gradient(rgba(120,170,255,.10) 2px,transparent 2px) 0 0/48px 48px,linear-gradient(90deg,rgba(120,170,255,.10) 2px,transparent 2px) 0 0/48px 48px}
+.glow{position:absolute;right:-80px;bottom:-120px;width:760px;height:760px;border-radius:50%;background:radial-gradient(circle,rgba(255,170,60,.45),transparent 62%)}
+.side{position:absolute;right:0;top:0;width:70px;height:720px;display:flex;align-items:center;justify-content:center}.side span{writing-mode:vertical-rl;color:#fff;font-size:30px;letter-spacing:.12em;white-space:nowrap}.side b{color:#ffb35c}
+.character{position:absolute;filter:drop-shadow(4px 0 0 #fff) drop-shadow(-4px 0 0 #fff) drop-shadow(0 -4px 0 #fff) drop-shadow(0 10px 18px rgba(0,0,0,.5))}.main{right:10px;bottom:-300px;height:880px}.sub-character{right:300px;bottom:-290px;height:720px}
+.box{position:absolute;left:30px;transform:skew(-7deg);white-space:nowrap;line-height:1;z-index:2}.box>span{display:inline-block;transform:skew(7deg)}
+.b1{top:34px;background:#fff;padding:12px 24px 16px;font-size:66px;color:#141c3a;border-radius:6px}.b2{top:150px;padding:0 10px;font-size:150px;color:#fff;letter-spacing:-.05em;paint-order:stroke fill;-webkit-text-stroke:20px #141c3a;filter:drop-shadow(0 8px 0 #000)}
+.b3{top:318px;font-size:150px;color:#fff;letter-spacing:-.05em;padding:0 10px;paint-order:stroke fill;-webkit-text-stroke:20px #141c3a;filter:drop-shadow(0 8px 0 #000)}.b4{top:528px;background:#141c3a;border:5px solid #fff;padding:12px 26px 16px;font-size:64px;color:#fff;border-radius:8px}.b4>span>span+span{margin-left:.25em}
+</style><body><div class="card"><div class="grid"></div><div class="glow"></div><img id="person1" class="character main" alt=""><img id="person2" class="character sub-character" alt=""><div id="copy"></div></div><div class="side"><span>ミライ先生の<b>AI</b>マネー教室</span></div></body></html>`, {waitUntil:"load"});
+    await page.evaluate(async data => {
+      const font=new FontFace("Maru",'url("'+data.font_url+'")',{weight:"900"});
+      document.fonts.add(await font.load());await document.fonts.ready;
+      const fallback=[...data.main_lines.map(text=>[{text,color:null}]),[{text:data.sub_text,color:data.accent}]];
+      const lines=data.lines || fallback;
+      const copy=document.getElementById("copy");
+      lines.forEach((segments,index)=>{
+        const box=document.createElement("div");box.className="box b"+(index+1);
+        const row=document.createElement("span");
+        segments.forEach(segment=>{const span=document.createElement("span");span.textContent=segment.text;if(segment.color)span.style.color=segment.color;row.appendChild(span)});
+        box.appendChild(row);copy.appendChild(box);
+      });
+      const people=data.character_urls;
+      for(let i=0;i<2;i++){
+        const image=document.getElementById("person"+(i+1));
+        if(people[i]){image.src=people[i];await image.decode()}else{image.hidden=true}
+      }
+    }, payload);
     await page.screenshot({path:output,type:"png",animations:"disabled"});
     await context.close();
   } finally {
