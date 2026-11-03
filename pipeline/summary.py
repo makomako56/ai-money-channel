@@ -28,7 +28,22 @@ def length_warning(seconds):
     return None
 
 
-def build(episode, outcomes, warnings, root=ROOT, upload="未実行（このしくみでは投稿しない）"):
+def upload_result(output):
+    path = output / "upload" / "upload_result.json"
+    if not path.is_file():
+        return "未実行"
+    try:
+        result = json.loads(path.read_text(encoding="utf-8"))
+        video_id = result["video_id"]
+        if not isinstance(video_id, str) or not video_id:
+            raise ValueError
+    except (OSError, ValueError, KeyError, TypeError, json.JSONDecodeError):
+        return "結果ファイルが不正"
+    status = "投稿済み" if result.get("status") == "already_uploaded" else "予約済み"
+    return f"{status}（動画ID: {video_id}）"
+
+
+def build(episode, outcomes, warnings, root=ROOT):
     """outcomes: {段階: 'success'|'failure'|'skipped'|...}。Markdown を返す。"""
     output = root / "output" / episode
     seconds = video_seconds(output / "video" / "video.mp4")
@@ -49,7 +64,7 @@ def build(episode, outcomes, warnings, root=ROOT, upload="未実行（このし�
     rows.append(f"| 画面（スライド）数 | {screens or '－'} |")
     rows.append(f"| 確認用の静止画 | {len(frames) or '－'}枚 |")
     rows.append(f"| サムネ | {f'{thumbnail.stat().st_size / 1_000_000:.2f}MB' if thumbnail.is_file() else '－'} |")
-    rows.append(f"| 予約投稿 | {upload} |")
+    rows.append(f"| アップロード結果 | {upload_result(output)} |")
     rows += ["", "### 警告", ""]
     rows += [f"- {warning}" for warning in warnings] or ["- なし"]
     return "\n".join(rows) + "\n", bool(failed)

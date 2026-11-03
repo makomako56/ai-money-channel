@@ -1,6 +1,7 @@
 """Publish only the selected review subtree to the fixed review-outputs branch."""
 import argparse
 import base64
+import json
 import os
 import re
 import shutil
@@ -12,7 +13,7 @@ BRANCH = "review-outputs"
 
 
 def validate_source(source, episode, stage):
-    if not re.fullmatch(r"ep[0-9]+_[\w-]+", episode) or stage not in ("voice", "voice_samples", "video", "thumbnail"):
+    if not re.fullmatch(r"ep[0-9]+_[\w-]+", episode) or stage not in ("voice", "voice_samples", "video", "thumbnail", "upload"):
         raise ValueError("確認用コピーのepisode/stageが不正です")
     source = Path(source)
     if source.is_symlink() or not source.is_dir():
@@ -22,7 +23,16 @@ def validate_source(source, episode, stage):
         if path.is_symlink() or path.name == ".git":
             raise ValueError("確認用コピーにシンボリックリンクまたは.gitがあります")
         if path.is_file():
-            if stage == "thumbnail":
+            if stage == "upload":
+                if path.relative_to(source).as_posix() != "upload_result.json" or path.stat().st_size >= 100_000:
+                    raise ValueError(f"投稿結果は100KB未満のupload_result.jsonだけ許可します: {path.name}")
+                try:
+                    result = json.loads(path.read_text(encoding="utf-8"))
+                except (OSError, ValueError) as exc:
+                    raise ValueError("upload_result.jsonが不正です") from exc
+                if not isinstance(result, dict) or not isinstance(result.get("video_id"), str) or not result["video_id"].strip():
+                    raise ValueError("upload_result.jsonの動画IDが不正です")
+            elif stage == "thumbnail":
                 if path.relative_to(source).as_posix() != "thumbnail.png" or path.stat().st_size >= 2_000_000:
                     raise ValueError(f"サムネ確認用コピーは2MB未満のthumbnail.pngだけ許可します: {path.name}")
             elif stage == "video":
@@ -33,7 +43,10 @@ def validate_source(source, episode, stage):
             elif path.suffix not in (".mp3", ".json") or path.stat().st_size >= 100_000_000:
                 raise ValueError(f"確認用コピーに許可されないファイルがあります: {path.name}")
             files.append(path)
-    if stage == "thumbnail":
+    if stage == "upload":
+        if len(files) != 1 or files[0].relative_to(source).as_posix() != "upload_result.json":
+            raise ValueError("投稿結果にはupload_result.jsonだけが必要です")
+    elif stage == "thumbnail":
         if len(files) != 1 or files[0].relative_to(source).as_posix() != "thumbnail.png":
             raise ValueError("サムネ確認用コピーにはthumbnail.pngだけが必要です")
     elif stage == "video":

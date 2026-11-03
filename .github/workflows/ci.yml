@@ -46,3 +46,14 @@ jobs:
       episode: ep000_sample
       stage: voice_samples
       publish_review: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+  all-without-upload:
+    needs: config
+    permissions:
+      contents: write
+      actions: read
+    uses: ./.github/workflows/factory.yml
+    with:
+      episode: ep000_sample
+      stage: all
+      do_upload: false
+      publish_review: ${{ github.event.pull_request.head.repo.full_name == github.repository }}

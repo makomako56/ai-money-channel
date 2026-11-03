@@ -10,13 +10,17 @@
 | T001d | 共通 | Codexのクラウド環境を作成・公開、コードレビューを有効化 | 人 | 完了 | Claude | 2026-10-31 解決：@codex は使わず、Mac の Codex アプリ予定済みタスク「連絡確認」（毎時・プロジェクト ai-money-channel・gh 使用）が #15 を読む方式で稼働 |
 | T001e | 共通 | テストIssueで @codex 連携を確認 | Claude | 未着手 | Claude | T001dの後 |
 | T002 | 共通 | VOICEVOX導入、2人の声を決定 | 人 | 未着手 | Claude | 候補は設定書の「声」 |
-| T003 | 共通 | YouTube APIの鍵を作りGitHub Secretsに登録 | 人 | 完了 | | 2026-10-28に作り直し（T031）、client_secret も取り替え済み。upload_check 成功。アプリは「テスト中」のため鍵は約7日で失効→11/4ごろ更新。恒久対策はアプリの公開（ホームページとプライバシーポリシーのURLが必要） |
+| T003 | 共通 | YouTube APIの鍵を作りGitHub Secretsに登録 | 人 | 完了 | | 2026-11-03 OAuthアプリを「本番環境」に変更（ホーム・プライバシーポリシー・利用規約は https://makomako56.github.io ）。新しい client_secret と refresh_token を登録し upload_check 成功（run 41581024741）。7日失効はなくなった。古い client_secret は1つ残っているので削除する |
 | T004 | 共通 | 声・Gemini画像・BGMの利用規約確認 → config/licenses.md | Claude | 作業中 | Claude | 全体とGeminiは確認済み。キャラ別は声の決定（T002）後 |
 | T005 | 共通 | （作業依頼01〜05に置き換え） | - | 完了 | | |
 | T006 | 共通 | ミライ先生の残り差分を生成（口少し開き・目閉じ・驚き・困り顔・ドヤ顔） | Codex | 未着手 | Claude | make_character.py で |
 | T007 | 共通 | ひなたの立ち絵 | 人 | 作業中 | Claude | 口開き1枚を透過済み（assets/characters/hinata/transparent/hinata_02_normal_open.png）。口閉じの基本画像を依頼中。characters.yaml への登録は01bのマージ後にClaudeが行う |
 | T008 | ep000 | 30秒サンプル台本 | Claude | 完了 | Codex | episodes/ep000_sample/script.txt |
 | T009 | ep000 | サンプル30秒動画を生成 | Claude | 完了 | 人(CP0) | stage=all で生成（2026-10-27夜）。review-outputs/ep000_sample/video/video.mp4 |
+| T037 | ep001 | 新しい声（まい）で本番動画を生成→オーナーOK→予約投稿 | Claude | 完了 | 人(Studioで確認) | 2026-11-03 オーナーOK。stage=upload（run 41563028266）で 11/3 18:00 JST に予約投稿。https://www.youtube.com/watch?v=PbxeScsFcOM 。オーナーが Studio で「公開予約」・サムネ反映を確認（ロックなし） |
+| T038 | 共通 | サムネのデザインv3（2キャラ・PIVOT風）を動画工場に組み込む | Codex | 差し戻し | Claude(レビュー) | 2026-11-03 オーナー指示。見本 templates/thumbnail_v3/ep001.html、依頼 docs/作業依頼/06。PR #21（CI緑）→ 11/3 13:00 JST レビューで修正依頼：旧形式jsonで文字はみ出し・顔に重なる・1キャラ、重なりチェックとテスト、ep001の実物を review-outputs に |
+| T039 | 共通 | 毎朝のテーマ提案→制作→OKで予約公開 の流れを開始 | Claude | 完了 | | 2026-11-03。定時タスク「毎朝のテーマ提案」（7:13 JST）。docs/毎朝のテーマ提案と制作の流れ.md |
+| T040 | ep002 | 題材3案（11/4 18:00公開分）を #15 に提案 | Claude | 承認待ち | 人(番号を選ぶ) | 2026-11-03。tasks/ep002_テーマ案.md。番号の返事が来たら巡回で制作 |
 | T010 | ep000 | CP0：キャラ・声・画面構成を承認 | 人 | 承認待ち | Claude | ここを越えたら毎日制作へ |
 | T011 | ep001 | テーマ3案 | Claude | 完了 | 人(CP1) | tasks/ep001_テーマ案.md |
 | T012 | ep001 | CP1：テーマを1つ選ぶ | 人 | 完了 | | ディスコに決定（2026-10-26） |
@@ -31,12 +35,13 @@
 | T021b | 共通 | 作業依頼02b：動画の組み立て（仕上げ） | Claude | 完了 | | PR #10 マージ（2026-10-27）。静止画59枚・旧書式・BGM（ファイルがあれば）・ep001で21分 |
 | T022 | 共通 | 作業依頼03：サムネ生成 | Codex | 完了 | | PR #11 マージ（2026-10-27）。review-outputs/ep001_disco/thumbnail/ |
 | T023 | 共通 | 作業依頼04：YouTube予約投稿 | Codex | 完了 | | PR #13 マージ（2026-10-28、オーナー許可・Claudeレビュー）。upload_check は認証成功・チャンネルID不一致で停止（誤投稿防止が正常に動作）→T031 |
-| T024 | 共通 | 作業依頼05：一括実行 | Codex | 承認待ち | 人(マージ) | 前半は PR #12。残り（05b）は PR #18。2026-10-31 Codex修正→Claude再レビューでマージ可（CI緑・テスト26件OK）。巡回からのマージが権限で止められたため、オーナーにマージを依頼（#15 comment 6545104794）。注意：投稿成功後に結果保存ジョブだけ失敗すると再実行で二重投稿の恐れ→初回投稿後に review-outputs の upload_result.json を確認 |
+| T024 | 共通 | 作業依頼05：一括実行 | Codex | 完了 | | 前半は PR #12、残り（05b）は PR #18 マージ（2026-11-02、Codexが衝突解消→CI緑・差分が前回レビュー時と同じことを確認し Claude がマージ）。注意：投稿成功後に結果保存ジョブだけ失敗すると再実行で二重投稿の恐れ→初回投稿後に review-outputs の upload_result.json を確認 |
 | T033 | 共通 | 本番の player（pipeline/stage/player.html）の字幕アイコンを face/ の顔画像に切り替える | Codex | 完了 | Claude(レビュー) | PR #16 マージ（2026-10-31、オーナーOK） |
 | T034 | 共通 | 連絡板の自動実行テスト（T033の行を更新） | Codex | 完了 | Claude(レビュー) | PR #17 マージ（2026-10-31）。Codexの予定済みタスクが #15 の依頼を自動で拾いPR作成まで成功 |
-| T035 | 共通 | サムネに2人目のキャラ（ひなた）を出せるようにする | Codex | 依頼済み | Claude(レビュー) | 2026-11-01 オーナー指示。#15 で依頼 |
+| T035 | 共通 | サムネに2人目のキャラ（ひなた）を出せるようにする | Codex | 承認待ち | 人(マージ) | 2026-11-01 オーナー指示。PR #19：Codex修正済み→Claude再レビューOK（CI緑・描画で重なりなしを確認）。巡回からのマージは権限で止められるため、#15 でサムネ確認とマージを依頼（プレビュー https://claude.ai/artifact/MBFoVmqi8NoEXZC5jxpW93） |
+| T036 | 共通 | AivisHub の追加モデル（ミライの新しい声の候補5つ）を入れられるようにする | Codex | 完了 | 人(声の選択) | 2026-11-01 オーナー指示。PR #20 マージ（2026-11-01、CI緑・Claudeレビュー）。声の候補は聞き比べページ（7〜10）で #15 にてオーナーの選択待ち |
 | T032 | 共通 | YouTube投稿エラーの表示改善・Actions更新（PR #14） | Codex | 完了 | Claude | PR #14 マージ（2026-10-31、オーナーOK） |
 | T025 | ep000 | サンプル用スライド3枚 | Claude | 完了 | Codex | episodes/ep000_sample/slides/ |
-| T026 | 共通 | 声の選定 | 人 | 完了 | | AivisSpeech。ミライ＝まお（おちつき）、ひなた＝コハク（仮決定） |
+| T026 | 共通 | 声の選定 | 人 | 完了 | | AivisSpeech。ミライ＝まい（ノーマル・2026-11-03 決定、まおから変更）、ひなた＝コハク |
 | T030 | 共通 | YouTubeチャンネル開設・中級者向け機能（カスタムサムネ）を有効化 | 人 | 完了 | | 2026-10-27 |
 | T031 | 共通 | YouTubeの鍵を作り直す（ブランドアカウント「AI企業ニュース」で認可） | 人 | 完了 | | 2026-10-28。テストユーザーにブランドアカウントのアドレスと tenissanalysis@gmail.com を追加。upload_check 成功（run 40705702609）。鍵は「テスト中」のため約7日で失効→11/4ごろ更新が必要。client_secret がチャットのスクショに写ったため取り替えを案内 |

@@ -25,10 +25,22 @@
 ## AivisSpeech（採用：2026-10-26）
 - ソフト本体：個人・法人・商用・非商用を問わず無料、クレジット不要（[AivisSpeech Engine](https://github.com/Aivis-Project/AivisSpeech-Engine)）
 - 声のモデルごとにライセンスがある。ACML と CC0 はクレジット義務なし、ACML-NC は非商用向け（同上）
-- **ミライ：まお（おちつき）** ／ ライセンス ACML 1.0 ／ 推奨表記「AivisSpeech: まお」／ キャラクター ©Oz Chat/Trippy、CV: ねゆたろ（[モデルページ](https://hub.aivis-project.com/aivm-models/a59cb814-0083-4369-8542-f51a29e72af7)）
+- **ミライ：まい（ノーマル）**（2026-11-03 まおから変更） ／ ライセンス ACML 1.0 ／ 表記「AivisSpeech: まい」（[モデルページ](https://hub.aivis-project.com/aivm-models/e9339137-2ae3-4d41-9394-fb757a7e61e6)）。モデル作者の情報なし・研究開発用の試作と記載あり
 - **ひなた：コハク（ノーマル）** ／ ライセンス ACML 1.0 ／ 推奨表記「AivisSpeech: コハク」／ キャラクター ©Oz Chat/Trippy、CV: ねゆたろ（[モデルページ](https://hub.aivis-project.com/aivm-models/22e8ed77-94fe-4ef2-871f-a86f94e9a579)）
-- 義務はないが、概要欄に「音声：AivisSpeech（まお・コハク）」と表記する
+- 義務はないが、概要欄に「音声：AivisSpeech（まい・コハク）」と表記する
 - 未確認：ACML 1.0 の全文（禁止事項）。モデルの元キャラとは別の自作キャラに声を当てる使い方に制限がないかを、全文で確認する
+
+### AivisHub 追加モデル候補（T036）
+
+| モデル | UUID | ライセンス | AivisHub・補足 |
+|---|---|---|---|
+| すみれ | `2ff1c526-27d4-4eeb-b069-4207ae5fe259` | ACML 1.0 | [モデルページ](https://hub.aivis-project.com/aivm-models/2ff1c526-27d4-4eeb-b069-4207ae5fe259)。説明欄で声のクレジット表記を要請 |
+| わかな | `f83c385c-829b-40c4-8c11-639027e61636` | ACML 1.0 | [モデルページ](https://hub.aivis-project.com/aivm-models/f83c385c-829b-40c4-8c11-639027e61636)。説明欄で声のクレジット表記を要請 |
+| みちのくあいり | `1b2830f4-8cf1-4184-a0d9-3a1bace3a844` | ACML 1.0 | [モデルページ](https://hub.aivis-project.com/aivm-models/1b2830f4-8cf1-4184-a0d9-3a1bace3a844)。声：上戸恵里 |
+| 天深シノ | `0f6821f4-9f86-4da1-a41a-fbe6fff9ca88` | **ACML-NC 1.0** | [モデルページ](https://hub.aivis-project.com/aivm-models/0f6821f4-9f86-4da1-a41a-fbe6fff9ca88)。非商用向けのため収益化動画には採用不可 |
+| ほのか | `59f96896-64d2-4378-830a-4d5feb3d81aa` | ACML 1.0 | [モデルページ](https://hub.aivis-project.com/aivm-models/59f96896-64d2-4378-830a-4d5feb3d81aa)。説明欄で声のクレジット表記を要請 |
+
+ライセンス確認日：2026-11-01。サンプル比較には全候補を含めるが、採用時にはモデルページと ACML 本文を再確認する。
 
 ## Gemini（画像生成）
 - Googleの利用規約で、生成物の商用利用は明確には禁止されていない（ただし公式に「許可」と言い切れる文言でもない）
