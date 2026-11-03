@@ -8,15 +8,15 @@ mirai:
   color: "#24345c"
   accent: "#c9a14a"
   voice:
-    speed: 0.93  # 2026-11-01 オーナー選択（案B：大人っぽく）
-    pitch: -0.03  # 案B。少し低め（AivisSpeechの音質を保てる範囲）
-    intonation: 0.9  # 案B。抑揚を控えめに
+    speed: 1.0  # 2026-11-03 オーナー選択（14 まい）。試聴サンプルと同じ標準値
+    pitch: 0.0
+    intonation: 1.0
     volume: 1.0
     pre_phoneme: 0.05
     post_phoneme: 0.05
     pause_scale: 1.4  # VOICEVOXのみ適用。AivisSpeechでは警告して無視
     voices:
-      aivisspeech: { name: まお（おちつき）, speaker_id: null }
+      aivisspeech: { name: まい（ノーマル）, speaker_id: null }  # 2026-11-03 まお（おちつき）から変更
       voicevox: { name: null, speaker_id: null, speed: 1.1, pitch: -0.02, intonation: 1.2 }
   fixed_traits: [黒髪ロングの低い一つ結び, 細いフレームの眼鏡, グレーの瞳, ネイビーに金のふちのジャケット, 白いブラウス]
   expressions:

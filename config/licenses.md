@@ -25,9 +25,9 @@
 ## AivisSpeech（採用：2026-10-26）
 - ソフト本体：個人・法人・商用・非商用を問わず無料、クレジット不要（[AivisSpeech Engine](https://github.com/Aivis-Project/AivisSpeech-Engine)）
 - 声のモデルごとにライセンスがある。ACML と CC0 はクレジット義務なし、ACML-NC は非商用向け（同上）
-- **ミライ：まお（おちつき）** ／ ライセンス ACML 1.0 ／ 推奨表記「AivisSpeech: まお」／ キャラクター ©Oz Chat/Trippy、CV: ねゆたろ（[モデルページ](https://hub.aivis-project.com/aivm-models/a59cb814-0083-4369-8542-f51a29e72af7)）
+- **ミライ：まい（ノーマル）**（2026-11-03 まおから変更） ／ ライセンス ACML 1.0 ／ 表記「AivisSpeech: まい」（[モデルページ](https://hub.aivis-project.com/aivm-models/e9339137-2ae3-4d41-9394-fb757a7e61e6)）。モデル作者の情報なし・研究開発用の試作と記載あり
 - **ひなた：コハク（ノーマル）** ／ ライセンス ACML 1.0 ／ 推奨表記「AivisSpeech: コハク」／ キャラクター ©Oz Chat/Trippy、CV: ねゆたろ（[モデルページ](https://hub.aivis-project.com/aivm-models/22e8ed77-94fe-4ef2-871f-a86f94e9a579)）
-- 義務はないが、概要欄に「音声：AivisSpeech（まお・コハク）」と表記する
+- 義務はないが、概要欄に「音声：AivisSpeech（まい・コハク）」と表記する
 - 未確認：ACML 1.0 の全文（禁止事項）。モデルの元キャラとは別の自作キャラに声を当てる使い方に制限がないかを、全文で確認する
 
 ### AivisHub 追加モデル候補（T036）
