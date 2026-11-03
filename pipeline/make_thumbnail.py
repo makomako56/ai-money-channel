@@ -89,10 +89,24 @@ def validate_input(data, characters, style, root=ROOT):
     if has_v3_lines != has_v3_characters:
         raise ValueError("v3 の lines と characters は両方指定してください")
     v3_lines = None
-    character_urls = [image_url] + ([sub_image_url] if sub_image_url else [])
+    character_urls = [image_url]
     character_faces = [FACE_AREAS[character]]
     if sub_image_url:
+        character_urls.append(sub_image_url)
         character_faces.append(FACE_AREAS[data["sub_character"]])
+    else:
+        # v3 thumbnails always show both people. Keep old thumbnail.json files
+        # compatible by supplying the other character's default expression.
+        partner = "hinata" if character != "hinata" else "mirai"
+        partner_images = characters.get(partner, {}).get("expressions", {})
+        partner_image = partner_images.get("通常")
+        if not isinstance(partner_image, str):
+            raise ValueError(f"既定の表情がありません: {partner}")
+        if Path(partner_image).name != partner_image or not partner_image.endswith(".png"):
+            raise ValueError("既定のキャラ画像名が不正です")
+        character_urls.append(asset_url(
+            root, f"assets/characters/{partner}/transparent/{partner_image}"))
+        character_faces.append(FACE_AREAS[partner])
     if has_v3_lines:
         raw_lines = data["lines"]
         if not isinstance(raw_lines, list) or not 3 <= len(raw_lines) <= 4:
@@ -221,8 +235,10 @@ body{position:relative;font-family:Maru,sans-serif;font-weight:900;background:#2
       const fallback=[...data.main_lines.map(text=>[{text,color:null}]),[{text:data.sub_text,color:data.accent}]];
       const lines=data.lines || fallback;
       const copy=document.getElementById("copy");
+      const classes=data.lines ? lines.map((_,index)=>"b"+(index+1)) :
+        (data.main_lines.length===2 ? ["b1","b2","b4"] : ["b2","b4"]);
       lines.forEach((segments,index)=>{
-        const box=document.createElement("div");box.className="box b"+(index+1);
+        const box=document.createElement("div");box.className="box "+classes[index];
         const row=document.createElement("span");
         segments.forEach(segment=>{const span=document.createElement("span");span.textContent=segment.text;if(segment.color)span.style.color=segment.color;row.appendChild(span)});
         box.appendChild(row);copy.appendChild(box);
@@ -239,11 +255,25 @@ body{position:relative;font-family:Maru,sans-serif;font-weight:900;background:#2
         return {name:image.className,x1:rect.left+left*scale,y1:rect.top+top*scale,
           x2:rect.left+right*scale,y2:rect.top+bottom*scale};
       });
+      const intersects=(a,b)=>a.x1<b.x2&&b.x1<a.x2&&a.y1<b.y2&&b.y1<a.y2;
+      const bounds=document.querySelector(".card").getBoundingClientRect();
+      const boxRect=box=>{const rect=box.getBoundingClientRect();return {
+        name:box.textContent,x1:rect.left,y1:rect.top,x2:rect.right,y2:rect.bottom};};
+      const minimum={b1:36,b2:56,b3:56,b4:28};
+      [...document.querySelectorAll(".box")].forEach(box=>{
+        const kind=[...box.classList].find(name=>minimum[name]);
+        let size=parseFloat(getComputedStyle(box).fontSize);
+        let rect=boxRect(box);
+        while((rect.x2>bounds.right-20 || faces.some(face=>intersects(face,rect))) && size>minimum[kind]){
+          size=Math.max(minimum[kind],size-2);box.style.fontSize=size+"px";rect=boxRect(box);
+        }
+      });
       const boxes=[...document.querySelectorAll(".box")].map(box=>{
         const rect=box.getBoundingClientRect();
         return {name:box.textContent,x1:rect.left,y1:rect.top,x2:rect.right,y2:rect.bottom};
       });
-      const intersects=(a,b)=>a.x1<b.x2&&b.x1<a.x2&&a.y1<b.y2&&b.y1<a.y2;
+      const overflow=boxes.filter(box=>box.x1<bounds.left || box.x2>bounds.right-20);
+      if(overflow.length)throw new Error("文字のはみ出しを検出: "+overflow.map(box=>box.name).join(", "));
       const overlaps=[];
       faces.forEach((face,index)=>{
         faces.slice(index+1).forEach(other=>intersects(face,other)&&overlaps.push(face.name+" × "+other.name));

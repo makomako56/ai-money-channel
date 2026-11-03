@@ -1,9 +1,12 @@
 import struct
+import subprocess
 import tempfile
 import unittest
 from pathlib import Path
 
-from pipeline.make_thumbnail import MAX_BYTES, validate_input, verify_png
+import yaml
+
+from pipeline.make_thumbnail import MAX_BYTES, ROOT, render, validate_input, verify_png
 from pipeline.publish_review import validate_source
 
 
@@ -18,12 +21,14 @@ class ThumbnailTests(unittest.TestCase):
         sub_image = self.root / "assets/characters/hinata/transparent/hinata_06_surprised.png"
         sub_image.parent.mkdir(parents=True)
         sub_image.write_bytes(b"image")
+        default_sub_image = sub_image.with_name("hinata_01_normal_closed.png")
+        default_sub_image.write_bytes(b"image")
         font = self.root / "assets/fonts/font.woff2"
         font.parent.mkdir(parents=True)
         font.write_bytes(b"font")
         self.characters = {
             "mirai": {"expressions": {"ドヤ顔": image.name}},
-            "hinata": {"expressions": {"驚き": sub_image.name}},
+            "hinata": {"expressions": {"通常": default_sub_image.name, "驚き": sub_image.name}},
         }
         self.style = {
             "font_file": "assets/fonts/font.woff2",
@@ -42,7 +47,10 @@ class ThumbnailTests(unittest.TestCase):
         result = validate_input(self.data, self.characters, self.style, self.root)
         self.assertEqual(result["main_lines"], ["AIが混む裏で", "稼ぐ日本企業"])
         self.assertEqual(result["image_url"], "/assets/characters/mirai/transparent/mirai_08_smug.png")
-        self.assertEqual(result["character_faces"], [[95, 25, 245, 215]])
+        self.assertEqual(result["character_faces"],
+                         [[95, 25, 245, 215], [90, 20, 250, 210]])
+        self.assertEqual(result["character_urls"][1],
+                         "/assets/characters/hinata/transparent/hinata_01_normal_closed.png")
         self.assertIsNone(result["sub_image_url"])
         for changed in ({"accent": "red"}, {"expression": "未定義"},
                         {"main_text": "長" * 11}, {"sub_text": ""}, {"character": "../mirai"},
@@ -117,6 +125,20 @@ class ThumbnailTests(unittest.TestCase):
             stream.truncate(MAX_BYTES)
         with self.assertRaisesRegex(ValueError, "2MB未満"):
             verify_png(image)
+
+    def test_render_fails_for_overlapping_faces(self):
+        available = subprocess.run(
+            ["node", "-e", "require('playwright')"], capture_output=True, text=True).returncode == 0
+        if not available:
+            self.skipTest("Playwright is not installed")
+        data = yaml.safe_load((ROOT / "episodes/ep001_disco/thumbnail.json").read_text())
+        characters = yaml.safe_load((ROOT / "config/characters.yaml").read_text())
+        style = yaml.safe_load((ROOT / "config/thumbnail_style.yaml").read_text())
+        payload = validate_input(data, characters, style)
+        payload["character_faces"] = [[0, 0, 2000, 2000], [0, 0, 2000, 2000]]
+        output = self.root / "overlap.png"
+        with self.assertRaisesRegex(RuntimeError, "顔の重なりを検出"):
+            render(payload, output)
 
 
 if __name__ == "__main__":
