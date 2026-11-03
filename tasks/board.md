@@ -17,6 +17,7 @@
 | T007 | 共通 | ひなたの立ち絵 | 人 | 作業中 | Claude | 口開き1枚を透過済み（assets/characters/hinata/transparent/hinata_02_normal_open.png）。口閉じの基本画像を依頼中。characters.yaml への登録は01bのマージ後にClaudeが行う |
 | T008 | ep000 | 30秒サンプル台本 | Claude | 完了 | Codex | episodes/ep000_sample/script.txt |
 | T009 | ep000 | サンプル30秒動画を生成 | Claude | 完了 | 人(CP0) | stage=all で生成（2026-10-27夜）。review-outputs/ep000_sample/video/video.mp4 |
+| T037 | ep001 | 新しい声（まい）で本番動画を生成・レビュー → プレビューを #15 に | Claude | 承認待ち | 人(OK/NG) | 2026-11-03 stage=all 成功（run 41559295078）。プレビュー https://claude.ai/artifact/Bc4oZ66chJj6hrBAuusyfb |
 | T010 | ep000 | CP0：キャラ・声・画面構成を承認 | 人 | 承認待ち | Claude | ここを越えたら毎日制作へ |
 | T011 | ep001 | テーマ3案 | Claude | 完了 | 人(CP1) | tasks/ep001_テーマ案.md |
 | T012 | ep001 | CP1：テーマを1つ選ぶ | 人 | 完了 | | ディスコに決定（2026-10-26） |
@@ -38,6 +39,6 @@
 | T036 | 共通 | AivisHub の追加モデル（ミライの新しい声の候補5つ）を入れられるようにする | Codex | 完了 | 人(声の選択) | 2026-11-01 オーナー指示。PR #20 マージ（2026-11-01、CI緑・Claudeレビュー）。声の候補は聞き比べページ（7〜10）で #15 にてオーナーの選択待ち |
 | T032 | 共通 | YouTube投稿エラーの表示改善・Actions更新（PR #14） | Codex | 完了 | Claude | PR #14 マージ（2026-10-31、オーナーOK） |
 | T025 | ep000 | サンプル用スライド3枚 | Claude | 完了 | Codex | episodes/ep000_sample/slides/ |
-| T026 | 共通 | 声の選定 | 人 | 完了 | | AivisSpeech。ミライ＝まお（おちつき）、ひなた＝コハク（仮決定） |
+| T026 | 共通 | 声の選定 | 人 | 完了 | | AivisSpeech。ミライ＝まい（ノーマル・2026-11-03 決定、まおから変更）、ひなた＝コハク |
 | T030 | 共通 | YouTubeチャンネル開設・中級者向け機能（カスタムサムネ）を有効化 | 人 | 完了 | | 2026-10-27 |
 | T031 | 共通 | YouTubeの鍵を作り直す（ブランドアカウント「AI企業ニュース」で認可） | 人 | 完了 | | 2026-10-28。テストユーザーにブランドアカウントのアドレスと tenissanalysis@gmail.com を追加。upload_check 成功（run 40705702609）。鍵は「テスト中」のため約7日で失効→11/4ごろ更新が必要。client_secret がチャットのスクショに写ったため取り替えを案内 |
