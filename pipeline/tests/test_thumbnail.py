@@ -42,6 +42,7 @@ class ThumbnailTests(unittest.TestCase):
         result = validate_input(self.data, self.characters, self.style, self.root)
         self.assertEqual(result["main_lines"], ["AIが混む裏で", "稼ぐ日本企業"])
         self.assertEqual(result["image_url"], "/assets/characters/mirai/transparent/mirai_08_smug.png")
+        self.assertEqual(result["character_faces"], [[95, 25, 245, 215]])
         self.assertIsNone(result["sub_image_url"])
         for changed in ({"accent": "red"}, {"expression": "未定義"},
                         {"main_text": "長" * 11}, {"sub_text": ""}, {"character": "../mirai"},
@@ -59,6 +60,25 @@ class ThumbnailTests(unittest.TestCase):
         self.assertEqual(
             result["sub_image_url"],
             "/assets/characters/hinata/transparent/hinata_06_surprised.png")
+        self.assertEqual(result["character_faces"],
+                         [[95, 25, 245, 215], [90, 20, 250, 210]])
+
+    def test_v3_face_areas_follow_character_order(self):
+        data = {
+            **self.data,
+            "lines": [
+                {"segments": [{"text": "AIの返事が"}]},
+                {"segments": [{"text": "この会社が"}]},
+                {"segments": [{"text": "儲かる!?", "color": "#ffe14a"}]},
+            ],
+            "characters": [
+                {"character": "hinata", "expression": "驚き"},
+                {"character": "mirai", "expression": "ドヤ顔"},
+            ],
+        }
+        result = validate_input(data, self.characters, self.style, self.root)
+        self.assertEqual(result["character_faces"],
+                         [[90, 20, 250, 210], [95, 25, 245, 215]])
 
     def test_invalid_second_character(self):
         for changed in (

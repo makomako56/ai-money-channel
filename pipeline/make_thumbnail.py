@@ -21,6 +21,10 @@ OPTIONAL_FIELDS = {"sub_character", "sub_expression"}
 V3_FIELDS = {"lines", "characters"}
 COLOR = re.compile(r"#[0-9a-fA-F]{6}\Z")
 EPISODE = re.compile(r"ep[0-9]+_[\w-]+\Z")
+FACE_AREAS = {
+    "mirai": [95, 25, 245, 215],
+    "hinata": [90, 20, 250, 210],
+}
 
 
 def asset_url(root, relative):
@@ -86,6 +90,9 @@ def validate_input(data, characters, style, root=ROOT):
         raise ValueError("v3 の lines と characters は両方指定してください")
     v3_lines = None
     character_urls = [image_url] + ([sub_image_url] if sub_image_url else [])
+    character_faces = [FACE_AREAS[character]]
+    if sub_image_url:
+        character_faces.append(FACE_AREAS[data["sub_character"]])
     if has_v3_lines:
         raw_lines = data["lines"]
         if not isinstance(raw_lines, list) or not 3 <= len(raw_lines) <= 4:
@@ -120,6 +127,7 @@ def validate_input(data, characters, style, root=ROOT):
         if not isinstance(specs, list) or len(specs) != 2:
             raise ValueError("characters は異なる2人を指定してください")
         character_urls = []
+        character_faces = []
         names = []
         for spec in specs:
             if not isinstance(spec, dict) or set(spec) != {"character", "expression"}:
@@ -136,6 +144,7 @@ def validate_input(data, characters, style, root=ROOT):
             names.append(name)
             character_urls.append(asset_url(
                 root, f"assets/characters/{name}/transparent/{image_name}"))
+            character_faces.append(FACE_AREAS[name])
         if len(set(names)) != 2:
             raise ValueError("characters は異なる2人を指定してください")
     if not isinstance(style, dict) or not isinstance(style.get("font_file"), str):
@@ -164,6 +173,7 @@ def validate_input(data, characters, style, root=ROOT):
     return {"main_lines": lines, "sub_text": sub, "accent": accent,
             "image_url": image_url, "sub_image_url": sub_image_url, "font_url": font_url,
             "lines": v3_lines, "character_urls": character_urls,
+            "character_faces": character_faces,
             "colors": {key: colors[key] for key in color_keys},
             "layout": {key: layout[key] for key in layout_keys}}
 
@@ -200,10 +210,10 @@ body{position:relative;font-family:Maru,sans-serif;font-weight:900;background:#2
 .grid{position:absolute;inset:0;background:linear-gradient(rgba(120,170,255,.10) 2px,transparent 2px) 0 0/48px 48px,linear-gradient(90deg,rgba(120,170,255,.10) 2px,transparent 2px) 0 0/48px 48px}
 .glow{position:absolute;right:-80px;bottom:-120px;width:760px;height:760px;border-radius:50%;background:radial-gradient(circle,rgba(255,170,60,.45),transparent 62%)}
 .side{position:absolute;right:0;top:0;width:70px;height:720px;display:flex;align-items:center;justify-content:center}.side span{writing-mode:vertical-rl;color:#fff;font-size:30px;letter-spacing:.12em;white-space:nowrap}.side b{color:#ffb35c}
-.character{position:absolute;filter:drop-shadow(4px 0 0 #fff) drop-shadow(-4px 0 0 #fff) drop-shadow(0 -4px 0 #fff) drop-shadow(0 10px 18px rgba(0,0,0,.5))}.main{right:10px;bottom:-300px;height:880px}.sub-character{right:300px;bottom:-290px;height:720px}
+.character{position:absolute;filter:drop-shadow(4px 0 0 #fff) drop-shadow(-4px 0 0 #fff) drop-shadow(0 -4px 0 #fff) drop-shadow(0 10px 18px rgba(0,0,0,.5))}.main{left:826px;top:45px;height:800px}.sub-character{left:603px;top:273px;height:760px}
 .box{position:absolute;left:30px;transform:skew(-7deg);white-space:nowrap;line-height:1;z-index:2}.box>span{display:inline-block;transform:skew(7deg)}
-.b1{top:34px;background:#fff;padding:12px 24px 16px;font-size:66px;color:#141c3a;border-radius:6px}.b2{top:150px;padding:0 10px;font-size:150px;color:#fff;letter-spacing:-.05em;paint-order:stroke fill;-webkit-text-stroke:20px #141c3a;filter:drop-shadow(0 8px 0 #000)}
-.b3{top:318px;font-size:150px;color:#fff;letter-spacing:-.05em;padding:0 10px;paint-order:stroke fill;-webkit-text-stroke:20px #141c3a;filter:drop-shadow(0 8px 0 #000)}.b4{top:528px;background:#141c3a;border:5px solid #fff;padding:12px 26px 16px;font-size:64px;color:#fff;border-radius:8px}.b4>span>span+span{margin-left:.25em}
+.b1{top:34px;background:#fff;padding:12px 24px 16px;font-size:66px;color:#141c3a;border-radius:6px}.b2{top:150px;padding:0 10px;font-size:130px;color:#fff;letter-spacing:-.05em;paint-order:stroke fill;-webkit-text-stroke:20px #141c3a;filter:drop-shadow(0 8px 0 #000)}
+.b3{top:318px;font-size:150px;color:#fff;letter-spacing:-.05em;padding:0 10px;paint-order:stroke fill;-webkit-text-stroke:20px #141c3a;filter:drop-shadow(0 8px 0 #000)}.b4{top:540px;background:#141c3a;border:5px solid #fff;padding:12px 22px 16px;font-size:48px;color:#fff;border-radius:8px}.b4>span>span+span{margin-left:.25em}
 </style><body><div class="card"><div class="grid"></div><div class="glow"></div><img id="person1" class="character main" alt=""><img id="person2" class="character sub-character" alt=""><div id="copy"></div></div><div class="side"><span>ミライ先生の<b>AI</b>マネー教室</span></div></body></html>`, {waitUntil:"load"});
     await page.evaluate(async data => {
       const font=new FontFace("Maru",'url("'+data.font_url+'")',{weight:"900"});
@@ -222,6 +232,25 @@ body{position:relative;font-family:Maru,sans-serif;font-weight:900;background:#2
         const image=document.getElementById("person"+(i+1));
         if(people[i]){image.src=people[i];await image.decode()}else{image.hidden=true}
       }
+      await new Promise(resolve=>requestAnimationFrame(()=>resolve()));
+      const faces=[...document.querySelectorAll(".character:not([hidden])")].map((image,index)=>{
+        const rect=image.getBoundingClientRect(),scale=rect.height/image.naturalHeight;
+        const [left,top,right,bottom]=data.character_faces[index];
+        return {name:image.className,x1:rect.left+left*scale,y1:rect.top+top*scale,
+          x2:rect.left+right*scale,y2:rect.top+bottom*scale};
+      });
+      const boxes=[...document.querySelectorAll(".box")].map(box=>{
+        const rect=box.getBoundingClientRect();
+        return {name:box.textContent,x1:rect.left,y1:rect.top,x2:rect.right,y2:rect.bottom};
+      });
+      const intersects=(a,b)=>a.x1<b.x2&&b.x1<a.x2&&a.y1<b.y2&&b.y1<a.y2;
+      const overlaps=[];
+      faces.forEach((face,index)=>{
+        faces.slice(index+1).forEach(other=>intersects(face,other)&&overlaps.push(face.name+" × "+other.name));
+        boxes.forEach(box=>intersects(face,box)&&overlaps.push(face.name+" × "+box.name));
+      });
+      window.__overlaps=overlaps;
+      if(overlaps.length)throw new Error("顔の重なりを検出: "+overlaps.join(", "));
     }, payload);
     await page.screenshot({path:output,type:"png",animations:"disabled"});
     await context.close();
