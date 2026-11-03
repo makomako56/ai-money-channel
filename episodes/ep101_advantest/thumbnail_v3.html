@@ -1,0 +1,44 @@
+<!doctype html><meta charset=utf-8><style>
+*{margin:0;padding:0;box-sizing:border-box}html,body{width:1280px;height:720px;overflow:hidden}
+body{position:relative;font-family:"Noto Sans CJK JP";font-weight:900;background:#24345c}
+/* 外枠＝チャンネル色。右に縦のチャンネル名 */
+.card{position:absolute;left:14px;top:14px;width:1196px;height:692px;border-radius:26px;overflow:hidden;
+ background:radial-gradient(ellipse 80% 90% at 70% 60%,#2b3f7a 0%,#141c3a 70%)}
+.grid{position:absolute;inset:0;background:
+ linear-gradient(rgba(120,170,255,.10) 2px,transparent 2px) 0 0/48px 48px,
+ linear-gradient(90deg,rgba(120,170,255,.10) 2px,transparent 2px) 0 0/48px 48px}
+.glow{position:absolute;right:-80px;bottom:-120px;width:760px;height:760px;border-radius:50%;background:radial-gradient(circle,rgba(255,170,60,.45),transparent 62%)}
+.side{position:absolute;right:0;top:0;width:70px;height:720px;display:flex;align-items:center;justify-content:center}
+.side span{writing-mode:vertical-rl;color:#fff;font-size:30px;letter-spacing:.12em;white-space:nowrap}
+.side b{color:#ffb35c}
+/* キャラ（右下・約3割） */
+.c{position:absolute;filter:drop-shadow(0 0 0 #fff) drop-shadow(4px 0 0 #fff) drop-shadow(-4px 0 0 #fff) drop-shadow(0 -4px 0 #fff) drop-shadow(0 10px 18px rgba(0,0,0,.5))}
+.m{left:826px;top:45px;height:800px}
+.h{left:603px;top:273px;height:760px}
+/* 文字：白い箱＋黒文字、強調語に色。斜体ぎみ */
+.box{position:absolute;left:30px;transform:skew(-7deg);white-space:nowrap;line-height:1}
+.box>span{display:inline-block;transform:skew(7deg)}
+.b1{top:34px;background:#fff;padding:12px 24px 16px;font-size:66px;color:#141c3a;border-radius:6px}
+.b2{top:150px;padding:0 10px;font-size:130px;color:#fff;letter-spacing:-.05em;
+ paint-order:stroke fill;-webkit-text-stroke:20px #141c3a;filter:drop-shadow(0 8px 0 #000)}
+.b3{top:318px;font-size:150px;letter-spacing:-.05em;padding:0 10px;paint-order:stroke fill;-webkit-text-stroke:20px #141c3a;filter:drop-shadow(0 8px 0 #000)}
+.y{color:#ffe14a}.p{color:#ff3d8b}.g{color:#c8ff3a}.o{color:#ff8a1f}
+.b4{top:540px;background:#141c3a;border:5px solid #fff;padding:12px 22px 16px;font-size:48px;color:#fff;border-radius:8px}
+.small{font-size:.72em}
+</style><body>
+<div class=card><div class=grid></div><div class=glow></div>
+<img class="c m" src=../../assets/characters/mirai/transparent/mirai_06_surprise.png data-face="95,25,245,215"><img class="c h" src=../../assets/characters/hinata/transparent/hinata_11_shock.png data-face="90,20,250,210">
+<div class="box b1"><span>AIの裏で<span class=p>大忙し</span>！</span></div>
+<div class="box b2"><span>“検査”の会社</span></div>
+<div class="box b3"><span class=y>売上1兆円超</span></div>
+<div class="box b4"><span>アドバンテスト <span class=g>もうけ約2倍</span></span></div>
+</div>
+<div class=side><span>ミライ先生の<b>AI</b>マネー教室</span></div>
+<script>
+// 重なりチェック：顔どうし・顔と文字が重なったら window.__overlaps に記録し赤枠を出す
+window.addEventListener('load',()=>{const faces=[...document.querySelectorAll('[data-face]')].map(img=>{const r=img.getBoundingClientRect(),k=r.height/img.naturalHeight,[a,b,c,d]=img.dataset.face.split(',').map(Number);return{name:img.className,x1:r.left+a*k,y1:r.top+b*k,x2:r.left+c*k,y2:r.top+d*k}});
+const boxes=[...document.querySelectorAll('.box')].map(e=>{const r=e.getBoundingClientRect();return{name:e.textContent,x1:r.left,y1:r.top,x2:r.right,y2:r.bottom}});
+const hit=(p,q)=>p.x1<q.x2&&q.x1<p.x2&&p.y1<q.y2&&q.y1<p.y2,out=[];
+faces.forEach((f,i)=>{faces.slice(i+1).forEach(g=>hit(f,g)&&out.push(f.name+' × '+g.name));boxes.forEach(b=>hit(f,b)&&out.push(f.name+' × '+b.name))});
+window.__overlaps=out;window.__faces=faces;});
+</script></body>
