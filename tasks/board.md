@@ -17,7 +17,7 @@
 | T007 | 共通 | ひなたの立ち絵 | 人 | 作業中 | Claude | 口開き1枚を透過済み（assets/characters/hinata/transparent/hinata_02_normal_open.png）。口閉じの基本画像を依頼中。characters.yaml への登録は01bのマージ後にClaudeが行う |
 | T008 | ep000 | 30秒サンプル台本 | Claude | 完了 | Codex | episodes/ep000_sample/script.txt |
 | T009 | ep000 | サンプル30秒動画を生成 | Claude | 完了 | 人(CP0) | stage=all で生成（2026-10-27夜）。review-outputs/ep000_sample/video/video.mp4 |
-| T037 | ep001 | 新しい声（まい）で本番動画を生成→オーナーOK→予約投稿 | Claude | 完了 | 人(Studioで確認) | 2026-11-03 オーナーOK。stage=upload（run 41563028266）で 11/3 18:00 JST に予約投稿。https://www.youtube.com/watch?v=PbxeScsFcOM 。未審査アプリのため非公開ロックの恐れ→Studio で「予約済み」表示を確認 |
+| T037 | ep001 | 新しい声（まい）で本番動画を生成→オーナーOK→予約投稿 | Claude | 完了 | 人(Studioで確認) | 2026-11-03 オーナーOK。stage=upload（run 41563028266）で 11/3 18:00 JST に予約投稿。https://www.youtube.com/watch?v=PbxeScsFcOM 。オーナーが Studio で「公開予約」・サムネ反映を確認（ロックなし） |
 | T010 | ep000 | CP0：キャラ・声・画面構成を承認 | 人 | 承認待ち | Claude | ここを越えたら毎日制作へ |
 | T011 | ep001 | テーマ3案 | Claude | 完了 | 人(CP1) | tasks/ep001_テーマ案.md |
 | T012 | ep001 | CP1：テーマを1つ選ぶ | 人 | 完了 | | ディスコに決定（2026-10-26） |
