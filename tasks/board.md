@@ -45,5 +45,5 @@
 | T026 | 共通 | 声の選定 | 人 | 完了 | | AivisSpeech。ミライ＝まい（ノーマル・2026-11-03 決定、まおから変更）、ひなた＝コハク |
 | T030 | 共通 | YouTubeチャンネル開設・中級者向け機能（カスタムサムネ）を有効化 | 人 | 完了 | | 2026-10-27 |
 | T031 | 共通 | YouTubeの鍵を作り直す（ブランドアカウント「AI企業ニュース」で認可） | 人 | 完了 | | 2026-10-28。テストユーザーにブランドアカウントのアドレスと tenissanalysis@gmail.com を追加。upload_check 成功（run 40705702609）。鍵は「テスト中」のため約7日で失効→11/4ごろ更新が必要。client_secret がチャットのスクショに写ったため取り替えを案内 |
-| T041 | ep002_amd | 11/5分：AMD（オーナーが1を選択 2026-11-04） | Claude | 作業中 | Claude | 2026-11-05 10:25 JST オーナーOK（#15）。approval.json 作成、stage=upload（source_run_id 41819433521）で 11/5 18:00 JST に予約投稿中。予備 ep102 は使わない |
+| T041 | ep002_amd | 11/5分：AMD（オーナーが1を選択 2026-11-04） | Claude | 完了 | 人(Studioで確認) | 2026-11-05 10:25 JST オーナーOK（#15）。stage=upload（run 41952641061、source 41819433521）成功、11/5 18:00 JST 予約 https://www.youtube.com/watch?v=i9BcRbQXQl0 。**ep002 の upload は再実行しない**。予備 ep102 は未使用 |
 | T042 | ep003_qualcomm | 11/6分：クアルコム（オーナーが3を選択 2026-11-05 10:24 JST） | Claude | 作業中 | Claude | 2026-11-05 11:00 JST の巡回で制作開始（research→台本→pages→stage=all） |
