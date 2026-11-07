@@ -3,5 +3,17 @@
   "sub_text": "削る名人「ディスコ」売上1.4倍",
   "character": "mirai",
   "expression": "ドヤ顔",
-  "accent": "#e5322d"
+  "accent": "#e5322d",
+  "sub_character": "hinata",
+  "sub_expression": "驚き",
+  "lines": [
+    {"segments": [{"text": "AIの返事が"}, {"text": "遅い", "color": "#ff3d8b"}, {"text": "と…"}]},
+    {"segments": [{"text": "この会社が"}]},
+    {"segments": [{"text": "儲かる!?", "color": "#ffe14a"}]},
+    {"segments": [{"text": "削る名人ディスコ"}, {"text": "売上1.4倍", "color": "#c8ff3a"}]}
+  ],
+  "characters": [
+    {"character": "mirai", "expression": "ドヤ顔"},
+    {"character": "hinata", "expression": "衝撃"}
+  ]
 }
