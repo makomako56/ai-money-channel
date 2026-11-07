@@ -1,0 +1,72 @@
+{
+  "main_text": "売上2倍なのに\n株が急落!?",
+  "sub_text": "エヌビディア",
+  "character": "mirai",
+  "expression": "驚き",
+  "accent": "#e5322d",
+  "lines": [
+    {
+      "segments": [
+        {
+          "text": "AIを"
+        },
+        {
+          "text": "支える",
+          "color": "#ff8a1f"
+        },
+        {
+          "text": "会社"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "売上"
+        },
+        {
+          "text": "2倍",
+          "color": "#c8ff3a"
+        },
+        {
+          "text": "なのに"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "株が"
+        },
+        {
+          "text": "急落",
+          "color": "#ff3d8b"
+        },
+        {
+          "text": "!?"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "エヌビディア"
+        },
+        {
+          "text": "選挙のあと",
+          "color": "#ffe14a"
+        }
+      ]
+    }
+  ],
+  "characters": [
+    {
+      "character": "mirai",
+      "expression": "驚き"
+    },
+    {
+      "character": "hinata",
+      "expression": "衝撃"
+    }
+  ]
+}
