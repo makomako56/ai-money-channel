@@ -3,5 +3,57 @@
   "sub_text": "デュオリンゴ 毎日使う人29%増",
   "character": "mirai",
   "expression": "ドヤ顔",
-  "accent": "#e5322d"
+  "accent": "#e5322d",
+  "lines": [
+    {
+      "segments": [
+        {
+          "text": "AI",
+          "color": "#ff8a1f"
+        },
+        {
+          "text": "が話し相手の語学アプリ"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "三日坊主が"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "治る",
+          "color": "#ff3d8b"
+        },
+        {
+          "text": "!?"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "デュオリンゴ"
+        },
+        {
+          "text": "毎日使う人29%増",
+          "color": "#c8ff3a"
+        }
+      ]
+    }
+  ],
+  "characters": [
+    {
+      "character": "mirai",
+      "expression": "ドヤ顔"
+    },
+    {
+      "character": "hinata",
+      "expression": "驚き"
+    }
+  ]
 }

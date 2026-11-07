@@ -3,5 +3,67 @@
   "sub_text": "エアビー 売上19%増",
   "character": "mirai",
   "expression": "ドヤ顔",
-  "accent": "#e5322d"
+  "accent": "#e5322d",
+  "lines": [
+    {
+      "segments": [
+        {
+          "text": "旅の予約サイトの"
+        },
+        {
+          "text": "AI",
+          "color": "#ff8a1f"
+        },
+        {
+          "text": "窓口"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "問い合わせの"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "4割",
+          "color": "#ffe14a"
+        },
+        {
+          "text": "は"
+        },
+        {
+          "text": "AI",
+          "color": "#ff3d8b"
+        },
+        {
+          "text": "!?"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "エアビー"
+        },
+        {
+          "text": "売上19%増",
+          "color": "#c8ff3a"
+        }
+      ]
+    }
+  ],
+  "characters": [
+    {
+      "character": "mirai",
+      "expression": "ドヤ顔"
+    },
+    {
+      "character": "hinata",
+      "expression": "驚き"
+    }
+  ]
 }
