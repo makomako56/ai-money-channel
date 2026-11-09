@@ -115,7 +115,7 @@ jobs:
             sudo rm -f /var/lib/man-db/auto-update
             APT_OPTS='-o Acquire::Retries=2 -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20 -o Acquire::ForceIPv4=true -o DPkg::Lock::Timeout=60'
             if timeout 150 sudo apt-get $APT_OPTS update && \
-               timeout 180 sudo apt-get $APT_OPTS install -y --no-install-recommends ffmpeg fontconfig; then
+               timeout 180 sudo apt-get $APT_OPTS install -y --no-install-recommends ffmpeg fontconfig fonts-noto-color-emoji; then
               source_note="apt"
             else
               sudo dpkg --configure -a || true

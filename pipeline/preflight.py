@@ -11,7 +11,7 @@ import sys
 import yaml
 
 from pipeline.make_thumbnail import validate_input
-from pipeline.script_parser import ScriptError, load_characters, parse_script
+from pipeline.script_parser import ScriptError, episode_video_style, load_characters, parse_script
 
 ROOT = Path(__file__).resolve().parent.parent
 EPISODE = re.compile(r"ep[0-9]+_[\w-]+\Z")
@@ -27,7 +27,8 @@ def check_script(episode_dir, root=ROOT):
     """台本の形式と、[画面]/[スライド] のファイルの有無。セリフ数と画面数を返す。"""
     characters = load_characters(root / "config" / "characters.yaml")
     try:
-        lines = parse_script(episode_dir / "script.txt", characters)
+        lines = parse_script(episode_dir / "script.txt", characters,
+                             video_style=episode_video_style(episode_dir))
     except (ScriptError, OSError) as exc:
         raise PreflightError(f"台本: {exc}") from exc
     return len(lines), len({line["slide"] for line in lines if line["slide"]})

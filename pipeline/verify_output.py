@@ -7,14 +7,16 @@ import subprocess
 from pathlib import Path
 
 from pipeline.make_voice import inspect_wav, load_gaps
-from pipeline.script_parser import load_characters, parse_script
+from pipeline.script_parser import episode_video_style, load_characters, parse_script
 
 
 def verify(episode, stage):
     output = Path("output") / episode / stage
     if stage == "voice":
         timeline = json.loads((output / "timeline.json").read_text(encoding="utf-8"))
-        expected = parse_script(Path("episodes") / episode / "script.txt", load_characters("config/characters.yaml"), check_slides=False)
+        episode_dir = Path("episodes") / episode
+        expected = parse_script(episode_dir / "script.txt", load_characters("config/characters.yaml"),
+                                check_slides=False, video_style=episode_video_style(episode_dir))
         if len(timeline) != len(expected):
             raise ValueError("台本とタイムラインのセリフ数が不一致です")
         gaps = load_gaps("config/style.yaml")
