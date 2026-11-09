@@ -4,9 +4,10 @@
     {
       "keyword": "woman phone waiting frustrated",
       "note": "電話がつながらず待つ女性",
+      "requested_id": null,
       "start": 0.0,
-      "end": 6.442874999999999,
-      "required_seconds": 6.443,
+      "end": 6.4171249999999995,
+      "required_seconds": 6.417,
       "status": "ready",
       "candidates": [
         {
@@ -16,7 +17,9 @@
           "contributor": "mephala1980",
           "width": 1920,
           "height": 1080,
-          "download_url": "https://cdn.pixabay.com/video/2020/05/04/38084-416330724_large.mp4"
+          "thumbnail_url": "https://cdn.pixabay.com/video/2020/05/04/38084-416330724_large.jpg",
+          "download_url": "https://cdn.pixabay.com/video/2020/05/04/38084-416330724_large.mp4",
+          "preview": "broll_candidates/01-1.jpg"
         },
         {
           "id": 174003,
@@ -25,7 +28,9 @@
           "contributor": "Amorn_mimi",
           "width": 1920,
           "height": 1080,
-          "download_url": "https://cdn.pixabay.com/video/2023/07/31/174003-850361299_small.mp4"
+          "thumbnail_url": "https://cdn.pixabay.com/video/2023/07/31/174003-850361299_small.jpg",
+          "download_url": "https://cdn.pixabay.com/video/2023/07/31/174003-850361299_small.mp4",
+          "preview": "broll_candidates/01-2.jpg"
         },
         {
           "id": 1383,
@@ -34,7 +39,9 @@
           "contributor": "Activedia",
           "width": 1920,
           "height": 1080,
-          "download_url": "https://cdn.pixabay.com/video/2015/11/26/1383-147055496_large.mp4"
+          "thumbnail_url": "https://cdn.pixabay.com/video/2015/11/26/1383-147055496_large.jpg",
+          "download_url": "https://cdn.pixabay.com/video/2015/11/26/1383-147055496_large.mp4",
+          "preview": "broll_candidates/01-3.jpg"
         }
       ],
       "id": 38084,
@@ -44,214 +51,249 @@
       "file": "files/pixabay-38084.mp4"
     },
     {
-      "keyword": "family calendar planning trip",
+      "keyword": "calendar planner writing",
       "note": "家族の予定・カレンダー",
-      "start": 6.792874999999999,
-      "end": 10.691125,
-      "required_seconds": 3.898,
+      "requested_id": null,
+      "start": 6.767124999999999,
+      "end": 10.687124999999998,
+      "required_seconds": 3.92,
       "status": "ready",
       "candidates": [
         {
-          "id": 203974,
-          "duration": 14,
-          "page_url": "https://pixabay.com/videos/id-203974/",
-          "contributor": "Oleh_1977",
-          "width": 1920,
-          "height": 1080,
-          "download_url": "https://cdn.pixabay.com/video/2024/03/12/203974-923133846_small.mp4"
-        },
-        {
-          "id": 1101,
-          "duration": 8,
-          "page_url": "https://pixabay.com/videos/id-1101/",
-          "contributor": "Vimeo-Free-Videos",
-          "width": 1280,
-          "height": 720,
-          "download_url": "https://cdn.pixabay.com/video/2015/10/19/1101-143052492_medium.mp4"
-        },
-        {
-          "id": 2340,
-          "duration": 44,
-          "page_url": "https://pixabay.com/videos/id-2340/",
-          "contributor": "Life-Of-Vids",
-          "width": 1920,
-          "height": 1080,
-          "download_url": "https://cdn.pixabay.com/video/2016/02/29/2340-157269921_large.mp4"
-        }
-      ],
-      "id": 203974,
-      "page_url": "https://pixabay.com/videos/id-203974/",
-      "contributor": "Oleh_1977",
-      "duration": 14,
-      "file": "files/pixabay-203974.mp4"
-    },
-    {
-      "keyword": "call center busy phone",
-      "note": "混み合うコールセンター",
-      "start": 11.041125,
-      "end": 23.755041666666667,
-      "required_seconds": 12.714,
-      "status": "ready",
-      "candidates": [
-        {
-          "id": 202987,
-          "duration": 15,
-          "page_url": "https://pixabay.com/videos/id-202987/",
-          "contributor": "Natures_Embrace",
-          "width": 1920,
-          "height": 1080,
-          "download_url": "https://cdn.pixabay.com/video/2024/03/04/202987-919379330_small.mp4"
-        },
-        {
-          "id": 6387,
-          "duration": 14,
-          "page_url": "https://pixabay.com/videos/id-6387/",
-          "contributor": "Coverr-Free-Footage",
-          "width": 1920,
-          "height": 1080,
-          "download_url": "https://cdn.pixabay.com/video/2016/11/15/6387-191695740_large.mp4"
-        },
-        {
-          "id": 1360,
-          "duration": 20,
-          "page_url": "https://pixabay.com/videos/id-1360/",
-          "contributor": "Activedia",
-          "width": 1920,
-          "height": 1080,
-          "download_url": "https://cdn.pixabay.com/video/2015/11/25/1360-147055409_large.mp4"
-        }
-      ],
-      "id": 202987,
-      "page_url": "https://pixabay.com/videos/id-202987/",
-      "contributor": "Natures_Embrace",
-      "duration": 15,
-      "file": "files/pixabay-202987.mp4"
-    },
-    {
-      "keyword": "AI chatbot smartphone customer support",
-      "note": "スマホのAIチャット",
-      "start": 24.10504166666667,
-      "end": 31.685083333333335,
-      "required_seconds": 7.58,
-      "status": "ready",
-      "candidates": [
-        {
-          "id": 202987,
-          "duration": 15,
-          "page_url": "https://pixabay.com/videos/id-202987/",
-          "contributor": "Natures_Embrace",
-          "width": 1920,
-          "height": 1080,
-          "download_url": "https://cdn.pixabay.com/video/2024/03/04/202987-919379330_small.mp4"
-        },
-        {
-          "id": 38084,
-          "duration": 8,
-          "page_url": "https://pixabay.com/videos/id-38084/",
-          "contributor": "mephala1980",
-          "width": 1920,
-          "height": 1080,
-          "download_url": "https://cdn.pixabay.com/video/2020/05/04/38084-416330724_large.mp4"
-        },
-        {
-          "id": 142641,
-          "duration": 8,
-          "page_url": "https://pixabay.com/videos/id-142641/",
-          "contributor": "u_etjkkdz15b",
-          "width": 1920,
-          "height": 1080,
-          "download_url": "https://cdn.pixabay.com/video/2022/12/12/142641-780599369_small.mp4"
-        }
-      ],
-      "id": 202987,
-      "page_url": "https://pixabay.com/videos/id-202987/",
-      "contributor": "Natures_Embrace",
-      "duration": 15,
-      "file": "files/pixabay-202987.mp4"
-    },
-    {
-      "keyword": "vacation rental house travel",
-      "note": "旅先の貸し家",
-      "start": 32.03508333333333,
-      "end": 38.992416666666664,
-      "required_seconds": 6.957,
-      "status": "ready",
-      "candidates": [
-        {
-          "id": 363550,
+          "id": 149986,
           "duration": 10,
-          "page_url": "https://pixabay.com/videos/id-363550/",
-          "contributor": "Hoangbuifilms",
+          "page_url": "https://pixabay.com/videos/id-149986/",
+          "contributor": "chandorobray",
           "width": 1920,
           "height": 1080,
-          "download_url": "https://cdn.pixabay.com/video/2026/07/12/363550_small.mp4"
+          "thumbnail_url": "https://cdn.pixabay.com/video/2023/02/09/149986-797491778_large.jpg",
+          "download_url": "https://cdn.pixabay.com/video/2023/02/09/149986-797491778_large.mp4",
+          "preview": "broll_candidates/02-1.jpg"
         },
         {
-          "id": 203974,
-          "duration": 14,
-          "page_url": "https://pixabay.com/videos/id-203974/",
-          "contributor": "Oleh_1977",
+          "id": 185092,
+          "duration": 19,
+          "page_url": "https://pixabay.com/videos/id-185092/",
+          "contributor": "stefaniejockschat",
           "width": 1920,
           "height": 1080,
-          "download_url": "https://cdn.pixabay.com/video/2024/03/12/203974-923133846_small.mp4"
+          "thumbnail_url": "https://cdn.pixabay.com/video/2023/10/15/185092-874643408_large.jpg",
+          "download_url": "https://cdn.pixabay.com/video/2023/10/15/185092-874643408_large.mp4",
+          "preview": "broll_candidates/02-2.jpg"
         },
         {
-          "id": 3586,
-          "duration": 53,
-          "page_url": "https://pixabay.com/videos/id-3586/",
-          "contributor": "Life-Of-Vids",
+          "id": 43459,
+          "duration": 9,
+          "page_url": "https://pixabay.com/videos/id-43459/",
+          "contributor": "Nicolas_Garay",
           "width": 1920,
           "height": 1080,
-          "download_url": "https://cdn.pixabay.com/video/2016/06/27/3586-172490363_large.mp4"
+          "thumbnail_url": "https://cdn.pixabay.com/video/2020/06/30/43459-436106182_small.jpg",
+          "download_url": "https://cdn.pixabay.com/video/2020/06/30/43459-436106182_small.mp4",
+          "preview": "broll_candidates/02-3.jpg"
         }
       ],
-      "id": 363550,
-      "page_url": "https://pixabay.com/videos/id-363550/",
-      "contributor": "Hoangbuifilms",
+      "id": 149986,
+      "page_url": "https://pixabay.com/videos/id-149986/",
+      "contributor": "chandorobray",
       "duration": 10,
-      "file": "files/pixabay-363550.mp4"
+      "file": "files/pixabay-149986.mp4"
     },
     {
-      "keyword": "airbnb style home interior travel",
-      "note": "家に泊まる旅行のイメージ",
-      "start": 47.68516666666667,
-      "end": 55.114333333333335,
-      "required_seconds": 7.429,
+      "keyword": "call center headset",
+      "note": "混み合うコールセンター",
+      "requested_id": null,
+      "start": 11.037124999999998,
+      "end": 23.83058333333333,
+      "required_seconds": 12.793,
       "status": "ready",
       "candidates": [
         {
-          "id": 14476,
-          "duration": 11,
-          "page_url": "https://pixabay.com/videos/id-14476/",
-          "contributor": "wastedgeneration",
+          "id": 8989,
+          "duration": 21,
+          "page_url": "https://pixabay.com/videos/id-8989/",
+          "contributor": "PIRO4D",
           "width": 1920,
           "height": 1080,
-          "download_url": "https://cdn.pixabay.com/video/2018/02/24/14476-257440741_small.mp4"
+          "thumbnail_url": "https://cdn.pixabay.com/video/2017/05/05/8989-216205165_large.jpg",
+          "download_url": "https://cdn.pixabay.com/video/2017/05/05/8989-216205165_large.mp4",
+          "preview": "broll_candidates/03-1.jpg"
         },
         {
-          "id": 201968,
-          "duration": 30,
-          "page_url": "https://pixabay.com/videos/id-201968/",
-          "contributor": "Visual_Laurence",
+          "id": 3735,
+          "duration": 46,
+          "page_url": "https://pixabay.com/videos/id-3735/",
+          "contributor": "Skylent",
           "width": 1920,
           "height": 1080,
-          "download_url": "https://cdn.pixabay.com/video/2024/02/25/201968-916877887_medium.mp4"
+          "thumbnail_url": "https://cdn.pixabay.com/video/2016/07/07/3735-173719892_large.jpg",
+          "download_url": "https://cdn.pixabay.com/video/2016/07/07/3735-173719892_large.mp4",
+          "preview": "broll_candidates/03-2.jpg"
         },
         {
-          "id": 107573,
-          "duration": 30,
-          "page_url": "https://pixabay.com/videos/id-107573/",
-          "contributor": "soundsrelaxing89",
+          "id": 14088,
+          "duration": 15,
+          "page_url": "https://pixabay.com/videos/id-14088/",
+          "contributor": "Wowa84",
           "width": 1920,
           "height": 1080,
-          "download_url": "https://cdn.pixabay.com/video/2022/02/13/107573-678540733_small.mp4"
+          "thumbnail_url": "https://cdn.pixabay.com/video/2018/02/03/14088-254146901_large.jpg",
+          "download_url": "https://cdn.pixabay.com/video/2018/02/03/14088-254146901_large.mp4",
+          "preview": "broll_candidates/03-3.jpg"
         }
       ],
-      "id": 14476,
-      "page_url": "https://pixabay.com/videos/id-14476/",
-      "contributor": "wastedgeneration",
-      "duration": 11,
-      "file": "files/pixabay-14476.mp4"
+      "id": 8989,
+      "page_url": "https://pixabay.com/videos/id-8989/",
+      "contributor": "PIRO4D",
+      "duration": 21,
+      "file": "files/pixabay-8989.mp4"
+    },
+    {
+      "keyword": "smartphone chat app",
+      "note": "スマホのAIチャット",
+      "requested_id": null,
+      "start": 24.18058333333333,
+      "end": 32.098166666666664,
+      "required_seconds": 7.918,
+      "status": "ready",
+      "candidates": [
+        {
+          "id": 42408,
+          "duration": 23,
+          "page_url": "https://pixabay.com/videos/id-42408/",
+          "contributor": "SamuelFJohanns",
+          "width": 1920,
+          "height": 1080,
+          "thumbnail_url": "https://cdn.pixabay.com/video/2020/06/17/42408-431511624_large.jpg",
+          "download_url": "https://cdn.pixabay.com/video/2020/06/17/42408-431511624_large.mp4",
+          "preview": "broll_candidates/04-1.jpg"
+        },
+        {
+          "id": 9720,
+          "duration": 12,
+          "page_url": "https://pixabay.com/videos/id-9720/",
+          "contributor": "HazarMan",
+          "width": 1920,
+          "height": 1376,
+          "thumbnail_url": "https://cdn.pixabay.com/video/2017/06/08/9720-220808858_large.jpg",
+          "download_url": "https://cdn.pixabay.com/video/2017/06/08/9720-220808858_large.mp4",
+          "preview": "broll_candidates/04-2.jpg"
+        },
+        {
+          "id": 9719,
+          "duration": 10,
+          "page_url": "https://pixabay.com/videos/id-9719/",
+          "contributor": "HazarMan",
+          "width": 1920,
+          "height": 1376,
+          "thumbnail_url": "https://cdn.pixabay.com/video/2017/06/08/9719-220808856_large.jpg",
+          "download_url": "https://cdn.pixabay.com/video/2017/06/08/9719-220808856_large.mp4",
+          "preview": "broll_candidates/04-3.jpg"
+        }
+      ],
+      "id": 42408,
+      "page_url": "https://pixabay.com/videos/id-42408/",
+      "contributor": "SamuelFJohanns",
+      "duration": 23,
+      "file": "files/pixabay-42408.mp4"
+    },
+    {
+      "keyword": "vacation home exterior",
+      "note": "旅先の貸し家",
+      "requested_id": null,
+      "start": 32.448166666666665,
+      "end": 39.49008333333334,
+      "required_seconds": 7.042,
+      "status": "ready",
+      "candidates": [
+        {
+          "id": 64759,
+          "duration": 16,
+          "page_url": "https://pixabay.com/videos/id-64759/",
+          "contributor": "padrinan",
+          "width": 1920,
+          "height": 1080,
+          "thumbnail_url": "https://cdn.pixabay.com/video/2021/02/10/64759-510850877_small.jpg",
+          "download_url": "https://cdn.pixabay.com/video/2021/02/10/64759-510850877_small.mp4",
+          "preview": "broll_candidates/05-1.jpg"
+        },
+        {
+          "id": 64767,
+          "duration": 16,
+          "page_url": "https://pixabay.com/videos/id-64767/",
+          "contributor": "padrinan",
+          "width": 1920,
+          "height": 1080,
+          "thumbnail_url": "https://cdn.pixabay.com/video/2021/02/10/64767-510850921_small.jpg",
+          "download_url": "https://cdn.pixabay.com/video/2021/02/10/64767-510850921_small.mp4",
+          "preview": "broll_candidates/05-2.jpg"
+        },
+        {
+          "id": 61193,
+          "duration": 13,
+          "page_url": "https://pixabay.com/videos/id-61193/",
+          "contributor": "Train_Video",
+          "width": 1920,
+          "height": 1080,
+          "thumbnail_url": "https://cdn.pixabay.com/video/2021/01/05/61193-497862950_small.jpg",
+          "download_url": "https://cdn.pixabay.com/video/2021/01/05/61193-497862950_small.mp4",
+          "preview": "broll_candidates/05-3.jpg"
+        }
+      ],
+      "id": 64759,
+      "page_url": "https://pixabay.com/videos/id-64759/",
+      "contributor": "padrinan",
+      "duration": 16,
+      "file": "files/pixabay-64759.mp4"
+    },
+    {
+      "keyword": "cozy living room interior",
+      "note": "家に泊まる旅行のイメージ",
+      "requested_id": null,
+      "start": 48.10154166666668,
+      "end": 55.53595833333334,
+      "required_seconds": 7.434,
+      "status": "ready",
+      "candidates": [
+        {
+          "id": 205351,
+          "duration": 10,
+          "page_url": "https://pixabay.com/videos/id-205351/",
+          "contributor": "39034061",
+          "width": 1920,
+          "height": 1080,
+          "thumbnail_url": "https://cdn.pixabay.com/video/2024/03/23/205351-926737198_large.jpg",
+          "download_url": "https://cdn.pixabay.com/video/2024/03/23/205351-926737198_large.mp4",
+          "preview": "broll_candidates/06-1.jpg"
+        },
+        {
+          "id": 336161,
+          "duration": 9,
+          "page_url": "https://pixabay.com/videos/id-336161/",
+          "contributor": "DreamFlowLoops",
+          "width": 1920,
+          "height": 1080,
+          "thumbnail_url": "https://cdn.pixabay.com/video/2026/02/23/336161_large.jpg",
+          "download_url": "https://cdn.pixabay.com/video/2026/02/23/336161_large.mp4",
+          "preview": "broll_candidates/06-2.jpg"
+        },
+        {
+          "id": 337559,
+          "duration": 64,
+          "page_url": "https://pixabay.com/videos/id-337559/",
+          "contributor": "IAmTheDrama",
+          "width": 1920,
+          "height": 1080,
+          "thumbnail_url": "https://cdn.pixabay.com/video/2026/03/02/337559_small.jpg",
+          "download_url": "https://cdn.pixabay.com/video/2026/03/02/337559_small.mp4",
+          "preview": "broll_candidates/06-3.jpg"
+        }
+      ],
+      "id": 205351,
+      "page_url": "https://pixabay.com/videos/id-205351/",
+      "contributor": "39034061",
+      "duration": 10,
+      "file": "files/pixabay-205351.mp4"
     }
   ]
 }
