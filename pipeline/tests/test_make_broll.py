@@ -5,7 +5,7 @@ import tempfile
 import time
 import unittest
 
-from pipeline.make_broll import api_candidates, best_file, best_pixabay_file, generate, load_config, required_clips
+from pipeline.make_broll import api_candidates, best_file, best_pixabay_file, download, generate, load_config, required_clips
 
 
 class BrollTest(unittest.TestCase):
@@ -42,6 +42,8 @@ class BrollTest(unittest.TestCase):
 
         def opener(request, timeout):
             calls.append(request.full_url)
+            self.assertEqual(request.get_header("User-agent"), "ai-money-channel/1.0")
+            self.assertEqual(request.get_header("Accept"), "application/json")
             return io.BytesIO(json.dumps(payload).encode())
 
         with tempfile.TemporaryDirectory() as temporary:
@@ -61,6 +63,16 @@ class BrollTest(unittest.TestCase):
             (root / "config/broll.yaml").write_text(
                 "provider: pixabay\nsearch_cache_hours: 24\n", encoding="utf-8")
             self.assertEqual(load_config(root)["provider"], "pixabay")
+
+    def test_download_uses_identifiable_user_agent(self):
+        def opener(request, timeout):
+            self.assertEqual(request.get_header("User-agent"), "ai-money-channel/1.0")
+            return io.BytesIO(b"video")
+
+        with tempfile.TemporaryDirectory() as temporary:
+            target = Path(temporary) / "clip.mp4"
+            download("https://cdn.example/clip.mp4", target, opener=opener)
+            self.assertEqual(target.read_bytes(), b"video")
 
     def test_missing_key_writes_fallback_manifest(self):
         with tempfile.TemporaryDirectory() as temporary:

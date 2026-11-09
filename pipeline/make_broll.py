@@ -16,6 +16,10 @@ PROVIDERS = {
     "pixabay": {"api_url": "https://pixabay.com/api/videos/", "api_key_env": "PIXABAY_API_KEY"},
     "pexels": {"api_url": "https://api.pexels.com/videos/search", "api_key_env": "PEXELS_API_KEY"},
 }
+REQUEST_HEADERS = {
+    "User-Agent": "ai-money-channel/1.0",
+    "Accept": "application/json",
+}
 
 
 def load_config(root=ROOT):
@@ -95,12 +99,15 @@ def _request_candidates(keyword, api_key, provider, opener):
         query = urllib.parse.urlencode({"key": api_key, "q": keyword, "min_width": 1280,
                                         "min_height": 720, "safesearch": "true",
                                         "order": "popular", "per_page": 15})
-        request = urllib.request.Request(f'{settings["api_url"]}?{query}')
+        request = urllib.request.Request(f'{settings["api_url"]}?{query}', headers=REQUEST_HEADERS)
         result_key = "hits"
     else:
         query = urllib.parse.urlencode({"query": keyword, "orientation": "landscape",
                                         "size": "medium", "per_page": 15})
-        request = urllib.request.Request(f'{settings["api_url"]}?{query}', headers={"Authorization": api_key})
+        request = urllib.request.Request(
+            f'{settings["api_url"]}?{query}',
+            headers={**REQUEST_HEADERS, "Authorization": api_key},
+        )
         result_key = "videos"
     with opener(request, timeout=30) as response:
         payload = json.loads(response.read())
@@ -131,7 +138,8 @@ def download(url, target, opener=urllib.request.urlopen):
     temporary = target.with_suffix(".part")
     target.parent.mkdir(parents=True, exist_ok=True)
     try:
-        with opener(urllib.request.Request(url), timeout=180) as response, temporary.open("wb") as stream:
+        request = urllib.request.Request(url, headers=REQUEST_HEADERS)
+        with opener(request, timeout=180) as response, temporary.open("wb") as stream:
             shutil.copyfileobj(response, stream)
         temporary.replace(target)
     finally:
@@ -175,7 +183,8 @@ def generate(episode, api_key, *, provider="pixabay", root=ROOT,
                           contributor=chosen["contributor"], duration=chosen["duration"], file=str(relative))
         except (OSError, ValueError, KeyError, TypeError, json.JSONDecodeError,
                 urllib.error.URLError, urllib.error.HTTPError, TimeoutError) as exc:
-            record["fallback_reason"] = f"{provider.title()} request failed: {type(exc).__name__}"
+            status = f" HTTP {exc.code}" if isinstance(exc, urllib.error.HTTPError) else ""
+            record["fallback_reason"] = f"{provider.title()} request failed: {type(exc).__name__}{status}"
         clips.append(record)
     manifest = {"source": provider, "clips": clips}
     (output / "broll.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
