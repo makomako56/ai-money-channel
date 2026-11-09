@@ -1,0 +1,62 @@
+{
+  "main_text": "新社長が\nAIを急げ!?",
+  "sub_text": "アップル",
+  "character": "mirai",
+  "expression": "驚き",
+  "accent": "#e5322d",
+  "lines": [
+    {
+      "segments": [
+        {
+          "text": "iPhoneの"
+        },
+        {
+          "text": "アップル",
+          "color": "#ff8a1f"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "新社長が"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "AIを"
+        },
+        {
+          "text": "急げ",
+          "color": "#ff3d8b"
+        },
+        {
+          "text": "!?"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "Siriは"
+        },
+        {
+          "text": "遅れてる？",
+          "color": "#ffe14a"
+        }
+      ]
+    }
+  ],
+  "characters": [
+    {
+      "character": "mirai",
+      "expression": "驚き"
+    },
+    {
+      "character": "hinata",
+      "expression": "衝撃"
+    }
+  ]
+}
