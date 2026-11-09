@@ -1,0 +1,257 @@
+{
+  "source": "pixabay",
+  "clips": [
+    {
+      "keyword": "woman phone waiting frustrated",
+      "note": "電話がつながらず待つ女性",
+      "start": 0.0,
+      "end": 6.442874999999999,
+      "required_seconds": 6.443,
+      "status": "ready",
+      "candidates": [
+        {
+          "id": 38084,
+          "duration": 8,
+          "page_url": "https://pixabay.com/videos/id-38084/",
+          "contributor": "mephala1980",
+          "width": 1920,
+          "height": 1080,
+          "download_url": "https://cdn.pixabay.com/video/2020/05/04/38084-416330724_large.mp4"
+        },
+        {
+          "id": 174003,
+          "duration": 11,
+          "page_url": "https://pixabay.com/videos/id-174003/",
+          "contributor": "Amorn_mimi",
+          "width": 1920,
+          "height": 1080,
+          "download_url": "https://cdn.pixabay.com/video/2023/07/31/174003-850361299_small.mp4"
+        },
+        {
+          "id": 1383,
+          "duration": 7,
+          "page_url": "https://pixabay.com/videos/id-1383/",
+          "contributor": "Activedia",
+          "width": 1920,
+          "height": 1080,
+          "download_url": "https://cdn.pixabay.com/video/2015/11/26/1383-147055496_large.mp4"
+        }
+      ],
+      "id": 38084,
+      "page_url": "https://pixabay.com/videos/id-38084/",
+      "contributor": "mephala1980",
+      "duration": 8,
+      "file": "files/pixabay-38084.mp4"
+    },
+    {
+      "keyword": "family calendar planning trip",
+      "note": "家族の予定・カレンダー",
+      "start": 6.792874999999999,
+      "end": 10.691125,
+      "required_seconds": 3.898,
+      "status": "ready",
+      "candidates": [
+        {
+          "id": 203974,
+          "duration": 14,
+          "page_url": "https://pixabay.com/videos/id-203974/",
+          "contributor": "Oleh_1977",
+          "width": 1920,
+          "height": 1080,
+          "download_url": "https://cdn.pixabay.com/video/2024/03/12/203974-923133846_small.mp4"
+        },
+        {
+          "id": 1101,
+          "duration": 8,
+          "page_url": "https://pixabay.com/videos/id-1101/",
+          "contributor": "Vimeo-Free-Videos",
+          "width": 1280,
+          "height": 720,
+          "download_url": "https://cdn.pixabay.com/video/2015/10/19/1101-143052492_medium.mp4"
+        },
+        {
+          "id": 2340,
+          "duration": 44,
+          "page_url": "https://pixabay.com/videos/id-2340/",
+          "contributor": "Life-Of-Vids",
+          "width": 1920,
+          "height": 1080,
+          "download_url": "https://cdn.pixabay.com/video/2016/02/29/2340-157269921_large.mp4"
+        }
+      ],
+      "id": 203974,
+      "page_url": "https://pixabay.com/videos/id-203974/",
+      "contributor": "Oleh_1977",
+      "duration": 14,
+      "file": "files/pixabay-203974.mp4"
+    },
+    {
+      "keyword": "call center busy phone",
+      "note": "混み合うコールセンター",
+      "start": 11.041125,
+      "end": 23.755041666666667,
+      "required_seconds": 12.714,
+      "status": "ready",
+      "candidates": [
+        {
+          "id": 202987,
+          "duration": 15,
+          "page_url": "https://pixabay.com/videos/id-202987/",
+          "contributor": "Natures_Embrace",
+          "width": 1920,
+          "height": 1080,
+          "download_url": "https://cdn.pixabay.com/video/2024/03/04/202987-919379330_small.mp4"
+        },
+        {
+          "id": 6387,
+          "duration": 14,
+          "page_url": "https://pixabay.com/videos/id-6387/",
+          "contributor": "Coverr-Free-Footage",
+          "width": 1920,
+          "height": 1080,
+          "download_url": "https://cdn.pixabay.com/video/2016/11/15/6387-191695740_large.mp4"
+        },
+        {
+          "id": 1360,
+          "duration": 20,
+          "page_url": "https://pixabay.com/videos/id-1360/",
+          "contributor": "Activedia",
+          "width": 1920,
+          "height": 1080,
+          "download_url": "https://cdn.pixabay.com/video/2015/11/25/1360-147055409_large.mp4"
+        }
+      ],
+      "id": 202987,
+      "page_url": "https://pixabay.com/videos/id-202987/",
+      "contributor": "Natures_Embrace",
+      "duration": 15,
+      "file": "files/pixabay-202987.mp4"
+    },
+    {
+      "keyword": "AI chatbot smartphone customer support",
+      "note": "スマホのAIチャット",
+      "start": 24.10504166666667,
+      "end": 31.685083333333335,
+      "required_seconds": 7.58,
+      "status": "ready",
+      "candidates": [
+        {
+          "id": 202987,
+          "duration": 15,
+          "page_url": "https://pixabay.com/videos/id-202987/",
+          "contributor": "Natures_Embrace",
+          "width": 1920,
+          "height": 1080,
+          "download_url": "https://cdn.pixabay.com/video/2024/03/04/202987-919379330_small.mp4"
+        },
+        {
+          "id": 38084,
+          "duration": 8,
+          "page_url": "https://pixabay.com/videos/id-38084/",
+          "contributor": "mephala1980",
+          "width": 1920,
+          "height": 1080,
+          "download_url": "https://cdn.pixabay.com/video/2020/05/04/38084-416330724_large.mp4"
+        },
+        {
+          "id": 142641,
+          "duration": 8,
+          "page_url": "https://pixabay.com/videos/id-142641/",
+          "contributor": "u_etjkkdz15b",
+          "width": 1920,
+          "height": 1080,
+          "download_url": "https://cdn.pixabay.com/video/2022/12/12/142641-780599369_small.mp4"
+        }
+      ],
+      "id": 202987,
+      "page_url": "https://pixabay.com/videos/id-202987/",
+      "contributor": "Natures_Embrace",
+      "duration": 15,
+      "file": "files/pixabay-202987.mp4"
+    },
+    {
+      "keyword": "vacation rental house travel",
+      "note": "旅先の貸し家",
+      "start": 32.03508333333333,
+      "end": 38.992416666666664,
+      "required_seconds": 6.957,
+      "status": "ready",
+      "candidates": [
+        {
+          "id": 363550,
+          "duration": 10,
+          "page_url": "https://pixabay.com/videos/id-363550/",
+          "contributor": "Hoangbuifilms",
+          "width": 1920,
+          "height": 1080,
+          "download_url": "https://cdn.pixabay.com/video/2026/07/12/363550_small.mp4"
+        },
+        {
+          "id": 203974,
+          "duration": 14,
+          "page_url": "https://pixabay.com/videos/id-203974/",
+          "contributor": "Oleh_1977",
+          "width": 1920,
+          "height": 1080,
+          "download_url": "https://cdn.pixabay.com/video/2024/03/12/203974-923133846_small.mp4"
+        },
+        {
+          "id": 3586,
+          "duration": 53,
+          "page_url": "https://pixabay.com/videos/id-3586/",
+          "contributor": "Life-Of-Vids",
+          "width": 1920,
+          "height": 1080,
+          "download_url": "https://cdn.pixabay.com/video/2016/06/27/3586-172490363_large.mp4"
+        }
+      ],
+      "id": 363550,
+      "page_url": "https://pixabay.com/videos/id-363550/",
+      "contributor": "Hoangbuifilms",
+      "duration": 10,
+      "file": "files/pixabay-363550.mp4"
+    },
+    {
+      "keyword": "airbnb style home interior travel",
+      "note": "家に泊まる旅行のイメージ",
+      "start": 47.68516666666667,
+      "end": 55.114333333333335,
+      "required_seconds": 7.429,
+      "status": "ready",
+      "candidates": [
+        {
+          "id": 14476,
+          "duration": 11,
+          "page_url": "https://pixabay.com/videos/id-14476/",
+          "contributor": "wastedgeneration",
+          "width": 1920,
+          "height": 1080,
+          "download_url": "https://cdn.pixabay.com/video/2018/02/24/14476-257440741_small.mp4"
+        },
+        {
+          "id": 201968,
+          "duration": 30,
+          "page_url": "https://pixabay.com/videos/id-201968/",
+          "contributor": "Visual_Laurence",
+          "width": 1920,
+          "height": 1080,
+          "download_url": "https://cdn.pixabay.com/video/2024/02/25/201968-916877887_medium.mp4"
+        },
+        {
+          "id": 107573,
+          "duration": 30,
+          "page_url": "https://pixabay.com/videos/id-107573/",
+          "contributor": "soundsrelaxing89",
+          "width": 1920,
+          "height": 1080,
+          "download_url": "https://cdn.pixabay.com/video/2022/02/13/107573-678540733_small.mp4"
+        }
+      ],
+      "id": 14476,
+      "page_url": "https://pixabay.com/videos/id-14476/",
+      "contributor": "wastedgeneration",
+      "duration": 11,
+      "file": "files/pixabay-14476.mp4"
+    }
+  ]
+}
