@@ -1,9 +1,11 @@
 import json
+import io
 from pathlib import Path
 import tempfile
+import time
 import unittest
 
-from pipeline.make_broll import best_file, generate, required_clips
+from pipeline.make_broll import api_candidates, best_file, best_pixabay_file, generate, load_config, required_clips
 
 
 class BrollTest(unittest.TestCase):
@@ -23,6 +25,43 @@ class BrollTest(unittest.TestCase):
         ]}
         self.assertEqual(best_file(video)["link"], "https://x/hd")
 
+    def test_pixabay_file_prefers_landscape_hd_near_1080p(self):
+        video = {"videos": {
+            "small": {"width": 640, "height": 360, "url": "https://x/small"},
+            "large": {"width": 1920, "height": 1080, "url": "https://x/large"},
+            "portrait": {"width": 1080, "height": 1920, "url": "https://x/portrait"},
+        }}
+        self.assertEqual(best_pixabay_file(video)["url"], "https://x/large")
+
+    def test_pixabay_search_is_cached_and_keeps_credit_fields(self):
+        payload = {"hits": [{
+            "id": 42, "duration": 8, "pageURL": "https://pixabay.com/videos/id-42/", "user": "Alice",
+            "videos": {"large": {"width": 1920, "height": 1080, "url": "https://cdn/x.mp4"}},
+        }]}
+        calls = []
+
+        def opener(request, timeout):
+            calls.append(request.full_url)
+            return io.BytesIO(json.dumps(payload).encode())
+
+        with tempfile.TemporaryDirectory() as temporary:
+            first = api_candidates("phone", "secret", 5, opener=opener,
+                                   cache_dir=temporary, now=time.time())
+            second = api_candidates("phone", "secret", 5, opener=opener,
+                                    cache_dir=temporary, now=time.time())
+        self.assertEqual(len(calls), 1)
+        self.assertEqual(first, second)
+        self.assertEqual(first[0]["page_url"], "https://pixabay.com/videos/id-42/")
+        self.assertEqual(first[0]["contributor"], "Alice")
+
+    def test_config_selects_pixabay(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            (root / "config").mkdir()
+            (root / "config/broll.yaml").write_text(
+                "provider: pixabay\nsearch_cache_hours: 24\n", encoding="utf-8")
+            self.assertEqual(load_config(root)["provider"], "pixabay")
+
     def test_missing_key_writes_fallback_manifest(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -35,7 +74,7 @@ class BrollTest(unittest.TestCase):
             (voice / "timeline.json").write_text(json.dumps(timeline), encoding="utf-8")
             manifest = generate("ep900_test", "", root=root)
             self.assertEqual(manifest["clips"][0]["status"], "fallback")
-            self.assertIn("PEXELS_API_KEY", manifest["clips"][0]["fallback_reason"])
+            self.assertIn("PIXABAY_API_KEY", manifest["clips"][0]["fallback_reason"])
             self.assertTrue((root / "output/ep900_test/broll/broll.json").is_file())
 
 
