@@ -6,8 +6,8 @@
       "note": "電話がつながらず待つ女性",
       "requested_id": 38084,
       "start": 0.0,
-      "end": 6.379791666666666,
-      "required_seconds": 6.38,
+      "end": 6.364416666666666,
+      "required_seconds": 6.364,
       "status": "ready",
       "candidates": [
         {
@@ -54,9 +54,9 @@
       "keyword": "calendar planner writing",
       "note": "家族の予定・カレンダー",
       "requested_id": 149986,
-      "start": 6.7297916666666655,
-      "end": 10.621416666666665,
-      "required_seconds": 3.892,
+      "start": 6.714416666666666,
+      "end": 10.537125,
+      "required_seconds": 3.823,
       "status": "ready",
       "candidates": [
         {
@@ -102,10 +102,10 @@
     {
       "keyword": "customer service",
       "note": "混み合うコールセンター",
-      "requested_id": null,
-      "start": 10.971416666666665,
-      "end": 24.041541666666667,
-      "required_seconds": 13.07,
+      "requested_id": 154829,
+      "start": 10.887125,
+      "end": 23.745583333333336,
+      "required_seconds": 12.858,
       "status": "ready",
       "candidates": [
         {
@@ -129,6 +129,17 @@
           "thumbnail_url": "https://cdn.pixabay.com/video/2023/03/15/154830-808562567_small.jpg",
           "download_url": "https://cdn.pixabay.com/video/2023/03/15/154830-808562567_small.mp4",
           "preview": "broll_candidates/03-2.jpg"
+        },
+        {
+          "id": 141672,
+          "duration": 13,
+          "page_url": "https://pixabay.com/videos/id-141672/",
+          "contributor": "WizArto",
+          "width": 2048,
+          "height": 1080,
+          "thumbnail_url": "https://cdn.pixabay.com/video/2022/12/05/141672-778334998_small.jpg",
+          "download_url": "https://cdn.pixabay.com/video/2022/12/05/141672-778334998_small.mp4",
+          "preview": "broll_candidates/03-3.jpg"
         }
       ],
       "id": 154829,
@@ -141,9 +152,9 @@
       "keyword": "smartphone chat app",
       "note": "スマホのAIチャット",
       "requested_id": 42408,
-      "start": 24.39154166666667,
-      "end": 31.979958333333336,
-      "required_seconds": 7.588,
+      "start": 24.095583333333337,
+      "end": 31.624500000000005,
+      "required_seconds": 7.529,
       "status": "ready",
       "candidates": [
         {
@@ -189,10 +200,10 @@
     {
       "keyword": "cottage",
       "note": "旅先の貸し家",
-      "requested_id": null,
-      "start": 32.32995833333334,
-      "end": 39.15129166666667,
-      "required_seconds": 6.821,
+      "requested_id": 178065,
+      "start": 31.974500000000006,
+      "end": 38.85612500000001,
+      "required_seconds": 6.882,
       "status": "ready",
       "candidates": [
         {
@@ -229,19 +240,19 @@
           "preview": "broll_candidates/05-3.jpg"
         }
       ],
-      "id": 144651,
-      "page_url": "https://pixabay.com/videos/id-144651/",
-      "contributor": "Shayea_Kim",
-      "duration": 52,
-      "file": "files/pixabay-144651.mp4"
+      "id": 178065,
+      "page_url": "https://pixabay.com/videos/id-178065/",
+      "contributor": "Monk_Vadim",
+      "duration": 79,
+      "file": "files/pixabay-178065.mp4"
     },
     {
       "keyword": "cozy living room interior",
       "note": "家に泊まる旅行のイメージ",
       "requested_id": 205351,
-      "start": 47.79375000000001,
-      "end": 55.27758333333335,
-      "required_seconds": 7.484,
+      "start": 47.43937500000001,
+      "end": 55.17966666666668,
+      "required_seconds": 7.74,
       "status": "ready",
       "candidates": [
         {
