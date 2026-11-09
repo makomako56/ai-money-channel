@@ -23,17 +23,17 @@ body[data-layout=scene] .mirai{left:560px;height:640px}body[data-layout=scene] .
 .credit{z-index:10;display:none;position:absolute;inset:0;align-items:center;justify-content:center;background:#080c16;color:#fff;font:900 44px Maru,sans-serif}
 body[data-credit="true"] .credit{display:flex}
 .whiteboard{display:none;position:absolute;z-index:1;inset:0;background:#fdf6dc;color:#171717;font-family:Maru,"Noto Sans JP",sans-serif;overflow:hidden}
-.wb-paper{position:absolute;inset:0 610px 0 0;background:linear-gradient(90deg,rgba(196,165,112,.08) 1px,transparent 1px),linear-gradient(rgba(196,165,112,.08) 1px,transparent 1px),#fdf6dc;background-size:36px 36px;box-shadow:inset -14px 0 28px rgba(84,63,28,.08)}
-.wb-heading{position:absolute;left:86px;top:72px;width:1080px;height:190px;font-size:76px;line-height:1.15;font-weight:900;border-bottom:8px solid #ed6e9d;letter-spacing:.01em}
+.wb-paper{position:absolute;inset:0;background:linear-gradient(90deg,rgba(196,165,112,.08) 1px,transparent 1px),linear-gradient(rgba(196,165,112,.08) 1px,transparent 1px),#fdf6dc;background-size:36px 36px}
+.wb-heading{position:absolute;left:86px;top:72px;width:1748px;height:190px;font-size:76px;line-height:1.15;font-weight:900;border-bottom:8px solid #ed6e9d;letter-spacing:.01em}
 .wb-heading span{display:block;width:0;overflow:hidden;white-space:nowrap;animation:writeTitle 1.15s steps(18,end) forwards}@keyframes writeTitle{to{width:100%}}
-.wb-grid{position:absolute;left:74px;top:292px;width:1120px;display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:330px;gap:26px 22px}
+.wb-grid{position:absolute;left:74px;top:292px;width:1772px;display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:330px;gap:26px 28px}
 .wb-item{opacity:0;transform:scale(.82) rotate(-2deg);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:4px 18px 12px;border-radius:28px;background:rgba(255,255,255,.5);box-shadow:0 8px 0 rgba(102,75,31,.08);transition:opacity .48s,transform .48s}.wb-item.drawn{opacity:1;transform:scale(1) rotate(0)}
-.wb-emoji{font-family:"Noto Color Emoji","Apple Color Emoji","Segoe UI Emoji",sans-serif;font-size:142px;line-height:1.22}.wb-caption{font-size:39px;line-height:1.18;text-align:center;font-weight:900}
-.wb-hand{position:absolute;z-index:3;width:260px;height:190px;left:90px;top:120px;filter:drop-shadow(8px 12px 9px rgba(44,28,14,.2));transition:left .34s ease-in-out,top .34s ease-in-out,transform .2s;transform:rotate(-5deg);pointer-events:none}
+.wb-emoji{font-family:"Noto Color Emoji","Apple Color Emoji","Segoe UI Emoji",sans-serif;font-size:142px;line-height:1.22}.wb-caption{max-width:100%;font-size:34px;line-height:1.18;text-align:center;font-weight:900;white-space:nowrap}
+.wb-hand{position:absolute;z-index:3;width:156px;height:114px;left:1920px;top:1080px;opacity:0;filter:drop-shadow(8px 12px 9px rgba(44,28,14,.2));transition:left .3s ease-in-out,top .3s ease-in-out,opacity .15s,transform .2s;transform:rotate(-5deg);pointer-events:none}.wb-hand.drawing{opacity:1}.wb-hand.leaving{left:1920px!important;top:1080px!important;opacity:0}
 .wb-turn{position:absolute;z-index:2;inset:0;background:#fff9e7;transform-origin:right center;animation:pageTurn .55s ease-in forwards}@keyframes pageTurn{to{transform:perspective(900px) rotateY(-88deg);opacity:.15}}
 .spotlight{display:none;z-index:6;position:absolute;left:0;right:0;bottom:0;height:126px;align-items:center;justify-content:center;background:#ed6e9d;color:#fff;font:900 66px Maru,sans-serif;letter-spacing:.04em;text-shadow:0 5px 0 #9e315a}
 body[data-video-style=whiteboard] .whiteboard{display:block}body[data-video-style=whiteboard] iframe,body[data-video-style=whiteboard] .slideimg{display:none!important}
-body[data-video-style=whiteboard] .ch{bottom:118px;height:345px}body[data-video-style=whiteboard] .mirai{left:1325px}body[data-video-style=whiteboard] .hinata{right:12px}
+body[data-video-style=whiteboard] .ch{bottom:108px;height:552px}body[data-video-style=whiteboard] .mirai{left:1060px}body[data-video-style=whiteboard] .hinata{right:-18px}
 body[data-video-style=whiteboard] .sub{left:1485px;bottom:485px;width:720px;min-height:180px;justify-content:center;padding:24px 34px;transform:translateX(-50%);border:7px solid #252525;border-radius:42px;background:#fff;box-shadow:0 12px 0 rgba(0,0,0,.12)}
 body[data-video-style=whiteboard] .sub:after{content:"";position:absolute;bottom:-42px;left:var(--tail-x,58%);border:22px solid transparent;border-top-color:#252525}
 body[data-video-style=whiteboard] .face{display:none}body[data-video-style=whiteboard] .txt{font-size:43px;line-height:1.25;color:#151515;text-align:center;-webkit-text-stroke:0;white-space:normal}
@@ -56,7 +56,7 @@ if(!/^[a-zA-Z0-9_-]+$/.test(ep||""))throw Error("invalid episode");
 const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 const IMG={ミライ:"../../assets/characters/mirai/transparent/",ひなた:"../../assets/characters/hinata/transparent/"};
 const normalTag=tag=>{const [expression,motion]=String(tag||"通常").split("|");return {expression:expression||"通常",motion:motion||"ぴょん"}};
-let CH,timeline=[],active=null,origin=null,whiteboardMode=false,whiteboardPage=1,whiteboardStep=0;
+let CH,timeline=[],active=null,origin=null,whiteboardMode=false,whiteboardPage=1,whiteboardStep=0,handTimer=null;
 // 確認用の静止画のために、画面・段階が切り替わった時刻（録画の0秒基準）を記録する
 window.__events=[];
 function mark(screen,step){window.__events.push({screen,step,t:(performance.now()-origin)/1000})}
@@ -70,19 +70,22 @@ async function loadPage({kind,n}){
  slideimg.style.display="none";pg.style.display="block";document.body.dataset.layout=pg.contentDocument.body.dataset.layout||"slide";setStep(1);mark(n,1)}
 function setText(value){value=String(value);if(!value.includes("／")&&value.length>16){const h=Math.ceil(value.length/2);value=value.slice(0,h)+"／"+value.slice(h)} // 旧書式は「／」がないので2行に折る
  txt.replaceChildren();String(value).split("／").forEach((part,index)=>{if(index)txt.append(document.createElement("br"));txt.append(document.createTextNode(part))})}
-function moveHand(left,top){wbHand.style.left=left+"px";wbHand.style.top=top+"px";wbHand.style.transform="rotate("+(left%2?-8:-3)+"deg)"}
+function drawWithHand(left,top,duration){
+ clearTimeout(handTimer);wbHand.classList.remove("leaving");wbHand.style.left=left+"px";wbHand.style.top=top+"px";wbHand.style.transform="rotate("+(left%2?-8:-3)+"deg)";wbHand.classList.add("drawing");
+ handTimer=setTimeout(()=>{wbHand.classList.remove("drawing");wbHand.classList.add("leaving")},duration)
+}
 function markWhiteboard(){whiteboardStep++;mark(String(whiteboardPage).padStart(2,"0"),whiteboardStep)}
 function applyWhiteboardMarker(marker){
  if(marker==="[消す]"){
   whiteboardPage++;whiteboardStep=0;wbHeading.replaceChildren();wbGrid.replaceChildren();
-  wbTurn.className="";void wbTurn.offsetWidth;wbTurn.className="wb-turn";moveHand(1030,760);markWhiteboard();return true}
+  wbTurn.className="";void wbTurn.offsetWidth;wbTurn.className="wb-turn";wbHand.classList.remove("drawing");wbHand.classList.add("leaving");markWhiteboard();return true}
  let m=marker.match(/^\[手書き:\s*(.+)\]$/);if(m){
-  const span=document.createElement("span");span.textContent=m[1].trim();wbHeading.replaceChildren(span);moveHand(900,105);markWhiteboard();return true}
+  const span=document.createElement("span");span.textContent=m[1].trim();wbHeading.replaceChildren(span);drawWithHand(1710,150,1450);markWhiteboard();return true}
  m=marker.match(/^\[絵:\s*([^|]+)\|\s*(.+)\]$/);if(m){
   const index=wbGrid.children.length;if(index>=6)throw Error("whiteboard has more than six pictures");
   const card=document.createElement("div"),emoji=document.createElement("div"),caption=document.createElement("div");
   card.className="wb-item";emoji.className="wb-emoji";caption.className="wb-caption";emoji.textContent=m[1].trim();caption.textContent=m[2].trim();card.append(emoji,caption);wbGrid.append(card);
-  moveHand(100+(index%3)*370,360+Math.floor(index/3)*330);setTimeout(()=>card.classList.add("drawn"),260);markWhiteboard();return true}
+  const column=index%3,row=Math.floor(index/3);drawWithHand(565+column*600,535+row*330,600);setTimeout(()=>card.classList.add("drawn"),260);markWhiteboard();return true}
  return false
 }
 async function waitUntil(seconds,origin){while((performance.now()-origin)/1000<seconds)await sleep(Math.min(25,Math.max(1,(seconds-(performance.now()-origin)/1000)*1000)))}
