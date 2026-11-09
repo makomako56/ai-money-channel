@@ -97,8 +97,17 @@ class ScriptParserTests(unittest.TestCase):
         self.assertEqual(lines[2]["screen_kind"], "画面")
         self.assertNotIn("broll_keyword", lines[2])
 
+    def test_broll_accepts_optional_material_id(self):
+        lines = self.parse(
+            '[映像: customer support | 問い合わせ対応 | id=12345]\nミライ「はい」',
+            check=False,
+        )
+        self.assertEqual(lines[0]["broll_id"], 12345)
+
     def test_invalid_broll_tags_and_emphasis(self):
         for invalid in ('[映像: keyword]\nミライ「はい」', '[テロップ: ]\nミライ「はい」',
+                        '[映像: keyword | メモ | id=abc]\nミライ「はい」',
+                        '[映像: keyword | メモ | id=0]\nミライ「はい」',
                         'ミライ「【】」', 'ミライ「【強調」'):
             with self.subTest(invalid=invalid), self.assertRaisesRegex(ScriptError, "script.txt"):
                 self.parse(invalid, check=False)

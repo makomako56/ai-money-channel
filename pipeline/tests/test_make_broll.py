@@ -4,8 +4,15 @@ from pathlib import Path
 import tempfile
 import time
 import unittest
+from unittest.mock import patch
 
-from pipeline.make_broll import api_candidates, best_file, best_pixabay_file, download, generate, load_config, required_clips
+from pipeline.make_broll import (api_candidate_by_id, api_candidates, best_file, best_pixabay_file,
+                                 download, generate, load_config, make_candidate_preview, required_clips)
+
+
+def fake_download(url, target, opener):
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_bytes(b"video")
 
 
 class BrollTest(unittest.TestCase):
@@ -56,6 +63,22 @@ class BrollTest(unittest.TestCase):
         self.assertEqual(first[0]["page_url"], "https://pixabay.com/videos/id-42/")
         self.assertEqual(first[0]["contributor"], "Alice")
 
+    def test_pixabay_id_lookup_uses_id_parameter(self):
+        payload = {"hits": [{
+            "id": 99, "duration": 8, "pageURL": "https://pixabay.com/videos/id-99/", "user": "Bob",
+            "videos": {"medium": {"width": 1920, "height": 1080,
+                                    "url": "https://cdn/99.mp4", "thumbnail": "https://cdn/99.jpg"}},
+        }]}
+
+        def opener(request, timeout):
+            self.assertIn("id=99", request.full_url)
+            return io.BytesIO(json.dumps(payload).encode())
+
+        with tempfile.TemporaryDirectory() as temporary:
+            result = api_candidate_by_id(99, "secret", 5, opener=opener, cache_dir=temporary)
+        self.assertEqual(result["id"], 99)
+        self.assertEqual(result["thumbnail_url"], "https://cdn/99.jpg")
+
     def test_config_selects_pixabay(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -74,6 +97,20 @@ class BrollTest(unittest.TestCase):
             download("https://cdn.example/clip.mp4", target, opener=opener)
             self.assertEqual(target.read_bytes(), b"video")
 
+    def test_candidate_preview_is_320px_jpeg_under_limit(self):
+        commands = []
+
+        def runner(command, check):
+            commands.append(command)
+            Path(command[-1]).write_bytes(b"jpeg")
+
+        with tempfile.TemporaryDirectory() as temporary:
+            target = Path(temporary) / "01-1.jpg"
+            make_candidate_preview({"download_url": "https://cdn/video.mp4"}, target, runner=runner)
+            self.assertLess(target.stat().st_size, 100_000)
+        self.assertIn("scale=320:-2", commands[0])
+        self.assertIn("https://cdn/video.mp4", commands[0])
+
     def test_missing_key_writes_fallback_manifest(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -88,6 +125,62 @@ class BrollTest(unittest.TestCase):
             self.assertEqual(manifest["clips"][0]["status"], "fallback")
             self.assertIn("PIXABAY_API_KEY", manifest["clips"][0]["fallback_reason"])
             self.assertTrue((root / "output/ep900_test/broll/broll.json").is_file())
+
+    def test_generate_does_not_reuse_material_id(self):
+        first = self.candidate(1)
+        second = self.candidate(2)
+        timeline = [
+            {"start": 0, "end": 2, "broll_keyword": "phone", "broll_note": "電話"},
+            {"start": 2, "end": 4, "broll_keyword": "chat", "broll_note": "チャット"},
+        ]
+        with self.episode_root(timeline) as root:
+            with patch("pipeline.make_broll.api_candidates", side_effect=[[first, second], [second]]) as search, \
+                    patch("pipeline.make_broll.make_candidate_preview"), \
+                    patch("pipeline.make_broll.download", side_effect=fake_download):
+                manifest = generate("ep900_test", "secret", root=root, cache_dir=root / "cache")
+            self.assertEqual([clip["id"] for clip in manifest["clips"]], [1, 2])
+            self.assertEqual(search.call_args_list[1].kwargs["exclude_ids"], {"1"})
+
+    def test_generate_prefers_requested_id_not_in_search_results(self):
+        timeline = [{"start": 0, "end": 2, "broll_keyword": "phone", "broll_note": "電話", "broll_id": 99}]
+        with self.episode_root(timeline) as root:
+            with patch("pipeline.make_broll.api_candidates", return_value=[self.candidate(1)]), \
+                    patch("pipeline.make_broll.api_candidate_by_id", return_value=self.candidate(99)), \
+                    patch("pipeline.make_broll.make_candidate_preview"), \
+                    patch("pipeline.make_broll.download", side_effect=fake_download):
+                manifest = generate("ep900_test", "secret", root=root, cache_dir=root / "cache")
+        self.assertEqual(manifest["clips"][0]["id"], 99)
+        self.assertEqual(manifest["clips"][0]["candidates"][0]["id"], 99)
+
+    @staticmethod
+    def candidate(material_id):
+        return {"id": material_id, "duration": 8, "page_url": f"https://pixabay/{material_id}",
+                "contributor": "Alice", "width": 1920, "height": 1080,
+                "thumbnail_url": f"https://cdn/{material_id}.jpg",
+                "download_url": f"https://cdn/{material_id}.mp4"}
+
+    def episode_root(self, timeline):
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        root = Path(temporary.name)
+        episode = root / "episodes" / "ep900_test"
+        voice = root / "output" / "ep900_test" / "voice"
+        episode.mkdir(parents=True)
+        voice.mkdir(parents=True)
+        (episode / "meta.json").write_text('{"video_style":"broll"}', encoding="utf-8")
+        (voice / "timeline.json").write_text(json.dumps(timeline), encoding="utf-8")
+        return _PathContext(root)
+
+
+class _PathContext:
+    def __init__(self, path):
+        self.path = path
+
+    def __enter__(self):
+        return self.path
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        return False
 
 
 if __name__ == "__main__":

@@ -42,6 +42,7 @@ def parse_script(path, characters, *, check_slides=True):
     screen_kind = None
     broll_keyword = None
     broll_note = None
+    broll_id = None
     telop = None
     chapter = None
     for line_number, raw in enumerate(path.read_text(encoding="utf-8-sig").splitlines(), 1):
@@ -67,13 +68,22 @@ def parse_script(path, characters, *, check_slides=True):
             if check_slides and not (path.parent / asset).is_file():
                 fail(f"{kind}ファイルがありません: {asset}")
             screen_kind = kind
-            broll_keyword = broll_note = None
+            broll_keyword = broll_note = broll_id = None
             continue
-        match = re.fullmatch(r"\[映像:\s*([^|\]]+?)\s*\|\s*([^\]]+?)\s*\]", line)
+        match = re.fullmatch(r"\[映像:\s*(.*?)\s*\]", line)
         if match:
-            broll_keyword, broll_note = (part.strip() for part in match.groups())
+            parts = [part.strip() for part in match.group(1).split("|")]
+            if len(parts) not in (2, 3):
+                fail("映像タグには英語キーワードと日本語メモ、任意で id=数字 が必要です")
+            broll_keyword, broll_note = parts[:2]
+            broll_id = None
             if not broll_keyword or not broll_note:
                 fail("映像タグには英語キーワードと日本語メモが必要です")
+            if len(parts) == 3:
+                id_match = re.fullmatch(r"id=([1-9][0-9]*)", parts[2])
+                if not id_match:
+                    fail("映像タグの素材指定は id=数字 にしてください")
+                broll_id = int(id_match.group(1))
             slide = None
             screen_kind = "映像"
             continue
@@ -112,6 +122,8 @@ def parse_script(path, characters, *, check_slides=True):
             item["screen_kind"] = screen_kind
         if broll_keyword:
             item.update(broll_keyword=broll_keyword, broll_note=broll_note)
+            if broll_id is not None:
+                item["broll_id"] = broll_id
         if telop:
             item["telop"] = telop
         if chapter:

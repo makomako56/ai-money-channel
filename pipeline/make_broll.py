@@ -4,6 +4,7 @@ import hashlib
 import json
 import os
 import shutil
+import subprocess
 import time
 import urllib.error
 import urllib.parse
@@ -44,8 +45,11 @@ def required_clips(timeline):
         if not keyword:
             current = None
             continue
-        if current is None or current["keyword"] != keyword:
+        requested_id = item.get("broll_id")
+        if (current is None or current["keyword"] != keyword
+                or current.get("requested_id") != requested_id):
             current = {"keyword": keyword, "note": item.get("broll_note", ""),
+                       "requested_id": requested_id,
                        "start": float(item["start"]), "end": float(item["end"])}
             sections.append(current)
         else:
@@ -84,12 +88,14 @@ def candidate_info(video, provider):
                 "page_url": video.get("pageURL"), "contributor": video.get("user"),
                 "width": selected.get("width") if selected else None,
                 "height": selected.get("height") if selected else None,
+                "thumbnail_url": selected.get("thumbnail") if selected else None,
                 "download_url": selected.get("url") if selected else None}
     selected = best_file(video)
     return {"id": video.get("id"), "duration": video.get("duration"),
             "page_url": video.get("url"), "contributor": video.get("user", {}).get("name"),
             "width": selected.get("width") if selected else None,
             "height": selected.get("height") if selected else None,
+            "thumbnail_url": video.get("image"),
             "download_url": selected.get("link") if selected else None}
 
 
@@ -115,7 +121,8 @@ def _request_candidates(keyword, api_key, provider, opener):
 
 
 def api_candidates(keyword, api_key, minimum_duration, provider="pixabay", *,
-                   opener=urllib.request.urlopen, cache_dir=None, cache_hours=24, now=None):
+                   opener=urllib.request.urlopen, cache_dir=None, cache_hours=24, now=None,
+                   exclude_ids=()):
     """Return up to three candidates, caching key-free search results for 24 hours."""
     now = time.time() if now is None else now
     cache_dir = Path(cache_dir) if cache_dir else ROOT / ".cache" / "broll"
@@ -128,8 +135,43 @@ def api_candidates(keyword, api_key, minimum_duration, provider="pixabay", *,
         candidates = _request_candidates(keyword, api_key, provider, opener)
         cache_file.parent.mkdir(parents=True, exist_ok=True)
         cache_file.write_text(json.dumps(candidates, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    excluded = {str(item) for item in exclude_ids}
     return [item for item in candidates if item["download_url"]
+            and str(item.get("id")) not in excluded
             and float(item.get("duration") or 0) >= minimum_duration][:3]
+
+
+def api_candidate_by_id(video_id, api_key, minimum_duration, provider="pixabay", *,
+                        opener=urllib.request.urlopen, cache_dir=None, cache_hours=24, now=None):
+    """Retrieve one requested material by provider ID, with the same 24-hour cache."""
+    now = time.time() if now is None else now
+    cache_dir = Path(cache_dir) if cache_dir else ROOT / ".cache" / "broll"
+    cache_file = cache_dir / "id" / f"{provider}-{video_id}.json"
+    fresh = cache_file.is_file() and now - cache_file.stat().st_mtime < cache_hours * 3600
+    if fresh:
+        candidate = json.loads(cache_file.read_text(encoding="utf-8"))
+    else:
+        settings = PROVIDERS[provider]
+        if provider == "pixabay":
+            query = urllib.parse.urlencode({"key": api_key, "id": str(video_id)})
+            request = urllib.request.Request(f'{settings["api_url"]}?{query}', headers=REQUEST_HEADERS)
+            with opener(request, timeout=30) as response:
+                payload = json.loads(response.read())
+            videos = payload.get("hits", [])
+            candidate = candidate_info(videos[0], provider) if videos else None
+        else:
+            request = urllib.request.Request(
+                f'{settings["api_url"].removesuffix("/search")}/{video_id}',
+                headers={**REQUEST_HEADERS, "Authorization": api_key},
+            )
+            with opener(request, timeout=30) as response:
+                candidate = candidate_info(json.loads(response.read()), provider)
+        cache_file.parent.mkdir(parents=True, exist_ok=True)
+        cache_file.write_text(json.dumps(candidate, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    if (not candidate or not candidate.get("download_url")
+            or float(candidate.get("duration") or 0) < minimum_duration):
+        return None
+    return candidate
 
 
 def download(url, target, opener=urllib.request.urlopen):
@@ -146,6 +188,31 @@ def download(url, target, opener=urllib.request.urlopen):
         temporary.unlink(missing_ok=True)
 
 
+def make_candidate_preview(candidate, target, *, opener=urllib.request.urlopen,
+                           runner=subprocess.run):
+    """Read the first video frame and write a review JPEG no wider than 320px/100KB."""
+    del opener  # Kept injectable for API compatibility with the other network helpers.
+    source_url = candidate.get("download_url")
+    if not str(source_url).startswith("https://"):
+        raise ValueError("候補動画の取得元はhttpsが必要です")
+    target = Path(target)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        for quality in (5, 10, 15):
+            runner([
+                "ffmpeg", "-hide_banner", "-loglevel", "error", "-nostdin", "-y",
+                "-user_agent", REQUEST_HEADERS["User-Agent"], "-i", source_url,
+                "-frames:v", "1", "-vf", "scale=320:-2",
+                "-q:v", str(quality), str(target),
+            ], check=True)
+            if target.is_file() and target.stat().st_size < 100_000:
+                return
+        raise ValueError("候補画像を100KB未満にできません")
+    finally:
+        if target.is_file() and target.stat().st_size >= 100_000:
+            target.unlink()
+
+
 def generate(episode, api_key, *, provider="pixabay", root=ROOT,
              opener=urllib.request.urlopen, cache_dir=None, cache_hours=24):
     episode_dir = root / "episodes" / episode
@@ -158,7 +225,8 @@ def generate(episode, api_key, *, provider="pixabay", root=ROOT,
     output.mkdir(parents=True, exist_ok=True)
     cache_dir = Path(cache_dir) if cache_dir else root / ".cache" / "broll"
     clips = []
-    for section in required_clips(timeline):
+    used_ids = set()
+    for section_index, section in enumerate(required_clips(timeline), 1):
         record = {**section, "status": "fallback", "candidates": []}
         if not api_key:
             record["fallback_reason"] = f'{PROVIDERS[provider]["api_key_env"]} is not configured'
@@ -166,13 +234,40 @@ def generate(episode, api_key, *, provider="pixabay", root=ROOT,
             continue
         try:
             candidates = api_candidates(section["keyword"], api_key, section["required_seconds"], provider,
-                                        opener=opener, cache_dir=cache_dir, cache_hours=cache_hours)
+                                        opener=opener, cache_dir=cache_dir, cache_hours=cache_hours,
+                                        exclude_ids=used_ids.copy())
+            chosen = None
+            requested_id = section.get("requested_id")
+            if requested_id is not None and str(requested_id) not in used_ids:
+                chosen = next((item for item in candidates if str(item.get("id")) == str(requested_id)), None)
+                if chosen is None:
+                    try:
+                        chosen = api_candidate_by_id(
+                            requested_id, api_key, section["required_seconds"], provider,
+                            opener=opener, cache_dir=cache_dir, cache_hours=cache_hours,
+                        )
+                    except (OSError, ValueError, KeyError, TypeError, json.JSONDecodeError,
+                            urllib.error.URLError, urllib.error.HTTPError, TimeoutError):
+                        chosen = None
+                    if chosen is not None:
+                        candidates = [chosen] + [
+                            item for item in candidates if str(item.get("id")) != str(chosen.get("id"))
+                        ][:2]
             record["candidates"] = candidates
             if not candidates:
                 record["fallback_reason"] = "no landscape HD clip long enough"
                 clips.append(record)
                 continue
-            chosen = candidates[0]
+            preview_dir = output / "broll_candidates"
+            for candidate_index, candidate in enumerate(candidates, 1):
+                preview = preview_dir / f"{section_index:02d}-{candidate_index}.jpg"
+                try:
+                    make_candidate_preview(candidate, preview, opener=opener)
+                    candidate["preview"] = str(Path("broll_candidates") / preview.name)
+                except (OSError, ValueError, subprocess.CalledProcessError,
+                        urllib.error.URLError, urllib.error.HTTPError, TimeoutError) as exc:
+                    candidate["preview_error"] = type(exc).__name__
+            chosen = chosen or candidates[0]
             cached = cache_dir / "videos" / f'{provider}-{chosen["id"]}.mp4'
             if not cached.is_file():
                 download(chosen["download_url"], cached, opener)
@@ -181,6 +276,7 @@ def generate(episode, api_key, *, provider="pixabay", root=ROOT,
             shutil.copy2(cached, output / relative)
             record.update(status="ready", id=chosen["id"], page_url=chosen["page_url"],
                           contributor=chosen["contributor"], duration=chosen["duration"], file=str(relative))
+            used_ids.add(str(chosen["id"]))
         except (OSError, ValueError, KeyError, TypeError, json.JSONDecodeError,
                 urllib.error.URLError, urllib.error.HTTPError, TimeoutError) as exc:
             status = f" HTTP {exc.code}" if isinstance(exc, urllib.error.HTTPError) else ""

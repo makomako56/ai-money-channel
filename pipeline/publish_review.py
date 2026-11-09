@@ -39,10 +39,12 @@ def validate_source(source, episode, stage):
                 name = path.relative_to(source).as_posix()
                 limit = (100_000_000 if name == "video.mp4" else
                          2_000_000 if re.fullmatch(r"frames/[0-9]{2,3}-[0-9]{1,2}\.png", name) else
+                         100_000 if re.fullmatch(r"broll_candidates/[0-9]{2,3}-[1-3]\.jpg", name) else
                          200_000 if name == "broll.json" else 0)
                 if not limit or path.stat().st_size >= limit:
                     raise ValueError(
                         "動画確認用コピーは100MB未満のvideo.mp4、2MB未満のframes/NN-S.png、"
+                        "100KB未満のbroll_candidates/NN-k.jpg、"
                         f"200KB未満のbroll.jsonだけ許可します: {name}"
                     )
                 if name == "broll.json":
