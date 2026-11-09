@@ -66,13 +66,21 @@ class EncodeTest(unittest.TestCase):
 
 
 class PublishVideoTest(unittest.TestCase):
-    def test_video_with_frames_only(self):
+    def test_video_accepts_small_broll_manifest(self):
         with tempfile.TemporaryDirectory() as temporary:
             source = Path(temporary)
             (source / "video.mp4").write_bytes(b"x")
             (source / "frames").mkdir()
             (source / "frames" / "01-2.png").write_bytes(b"x")
+            (source / "broll.json").write_text(json.dumps({"provider": "pixabay"}), encoding="utf-8")
             validate_source(source, "ep001_disco", "video")
+
+    def test_video_rejects_other_extra_files(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            source = Path(temporary)
+            (source / "video.mp4").write_bytes(b"x")
+            (source / "frames").mkdir()
+            (source / "frames" / "01-2.png").write_bytes(b"x")
             (source / "frames" / "notes.txt").write_text("x")
             with self.assertRaises(ValueError):
                 validate_source(source, "ep001_disco", "video")

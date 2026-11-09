@@ -37,9 +37,21 @@ def validate_source(source, episode, stage):
                     raise ValueError(f"サムネ確認用コピーは2MB未満のthumbnail.pngだけ許可します: {path.name}")
             elif stage == "video":
                 name = path.relative_to(source).as_posix()
-                if not (name == "video.mp4" or re.fullmatch(r"frames/[0-9]{2,3}-[0-9]{1,2}\.png", name)) \
-                        or path.stat().st_size >= (100_000_000 if name == "video.mp4" else 2_000_000):
-                    raise ValueError(f"動画確認用コピーは100MB未満のvideo.mp4と2MB未満のframes/NN-S.pngだけ許可します: {name}")
+                limit = (100_000_000 if name == "video.mp4" else
+                         2_000_000 if re.fullmatch(r"frames/[0-9]{2,3}-[0-9]{1,2}\.png", name) else
+                         200_000 if name == "broll.json" else 0)
+                if not limit or path.stat().st_size >= limit:
+                    raise ValueError(
+                        "動画確認用コピーは100MB未満のvideo.mp4、2MB未満のframes/NN-S.png、"
+                        f"200KB未満のbroll.jsonだけ許可します: {name}"
+                    )
+                if name == "broll.json":
+                    try:
+                        manifest = json.loads(path.read_text(encoding="utf-8"))
+                    except (OSError, ValueError) as exc:
+                        raise ValueError("broll.jsonが不正です") from exc
+                    if not isinstance(manifest, dict):
+                        raise ValueError("broll.jsonが不正です")
             elif path.suffix not in (".mp3", ".json") or path.stat().st_size >= 100_000_000:
                 raise ValueError(f"確認用コピーに許可されないファイルがあります: {path.name}")
             files.append(path)
