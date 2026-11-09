@@ -97,6 +97,17 @@ class VoiceTests(unittest.TestCase):
         self.assertEqual(len(list(self.root.glob("wav/*.wav"))), 3)
         client.synthesize.assert_called_with("はい", 29, 1.1, -0.02, intonation=1.2, volume=1.0, pre_phoneme=0.05, post_phoneme=0.05, pause_scale=1.4)
 
+    def test_emphasis_delimiters_are_not_spoken(self):
+        client = Mock()
+        client.synthesize.return_value = audio()
+        characters = load_characters(ROOT / "config/characters.yaml")
+        lines = [dict(line=1, speaker="ミライ", text="【AIが】回答", speech_text="AIが回答",
+                      expression="通常", slide=None)]
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            make_voice(lines, characters, self.catalog, client, self.root, (0.25, 0.6))
+        self.assertEqual(client.synthesize.call_args.args[0], "AIが回答")
+
 
 if __name__ == "__main__":
     unittest.main()

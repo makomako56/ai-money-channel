@@ -200,6 +200,14 @@ def main():
         frames = frame_times(events, duration)
         extract_frames(video, frames, output_dir / "frames")
         shutil.copytree(output_dir / "frames", review_dir / "frames", dirs_exist_ok=True)
+        broll_manifest = ROOT / "output" / args.episode / "broll" / "broll.json"
+        if broll_manifest.is_file():
+            shutil.copy2(broll_manifest, output_dir / "broll.json")
+            shutil.copy2(broll_manifest, review_dir / "broll.json")
+            broll_candidates = broll_manifest.parent / "broll_candidates"
+            if broll_candidates.is_dir():
+                shutil.copytree(broll_candidates, output_dir / "broll_candidates", dirs_exist_ok=True)
+                shutil.copytree(broll_candidates, review_dir / "broll_candidates", dirs_exist_ok=True)
         if review.stat().st_size >= REVIEW_LIMIT:
             raise RuntimeError(f"確認用の動画が100MB以上です: {review.stat().st_size} bytes")
         print(f"確認用の静止画: {len(frames)}枚", flush=True)

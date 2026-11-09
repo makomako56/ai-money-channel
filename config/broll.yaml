@@ -1,0 +1,5 @@
+# 素材取得元。将来 Pexels に戻す場合は pexels に変更する。
+provider: pixabay
+
+# API検索結果の再利用時間。採用動画は別途キャッシュする。
+search_cache_hours: 24

@@ -49,6 +49,10 @@ on:
         type: boolean
         default: false
     secrets:
+      PIXABAY_API_KEY:
+        required: false
+      PEXELS_API_KEY:
+        required: false
       YT_CLIENT_ID:
         required: false
       YT_CLIENT_SECRET:
@@ -188,6 +192,20 @@ jobs:
         id: voice
         if: (env.STAGE == 'video' || env.STAGE == 'all')
         run: python -m pipeline.make_voice --episode "$EPISODE" --stage voice
+      - name: Restore stock video cache
+        if: (env.STAGE == 'video' || env.STAGE == 'all')
+        uses: actions/cache@v4
+        with:
+          path: .cache/broll
+          key: broll-v2-${{ inputs.episode }}-${{ hashFiles('episodes/**/script.txt', 'config/broll.yaml') }}
+          restore-keys: broll-v2-${{ inputs.episode }}-
+      - name: Fetch b-roll clips
+        id: broll
+        if: (env.STAGE == 'video' || env.STAGE == 'all')
+        env:
+          PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+        run: python -m pipeline.make_broll --episode "$EPISODE"
       - name: Record and assemble video
         id: video
         if: (env.STAGE == 'video' || env.STAGE == 'all')
