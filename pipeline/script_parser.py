@@ -39,8 +39,16 @@ def parse_script(path, characters, *, check_slides=True):
     path = Path(path)
     result = []
     slide = None
+    screen_kind = None
+    broll_keyword = None
+    broll_note = None
+    telop = None
+    chapter = None
     for line_number, raw in enumerate(path.read_text(encoding="utf-8-sig").splitlines(), 1):
         line = raw.strip()
+        if line.startswith("# ── "):
+            chapter = line.removeprefix("# ── ").strip()
+            continue
         if not line or line.startswith("#"):
             continue
 
@@ -58,6 +66,22 @@ def parse_script(path, characters, *, check_slides=True):
                      else Path("pages") / f"{slide}.html")
             if check_slides and not (path.parent / asset).is_file():
                 fail(f"{kind}ファイルがありません: {asset}")
+            screen_kind = kind
+            broll_keyword = broll_note = None
+            continue
+        match = re.fullmatch(r"\[映像:\s*([^|\]]+?)\s*\|\s*([^\]]+?)\s*\]", line)
+        if match:
+            broll_keyword, broll_note = (part.strip() for part in match.groups())
+            if not broll_keyword or not broll_note:
+                fail("映像タグには英語キーワードと日本語メモが必要です")
+            slide = None
+            screen_kind = "映像"
+            continue
+        match = re.fullmatch(r"\[テロップ:\s*([^\]]+?)\s*\]", line)
+        if match:
+            telop = match.group(1).strip()
+            if not telop:
+                fail("テロップの言葉が空です")
             continue
         if line == "[表示]":
             continue
@@ -74,11 +98,26 @@ def parse_script(path, characters, *, check_slides=True):
             fail(f"不明な話者: {speaker}")
         if not text.strip():
             fail("セリフが空です")
+        speech_text = re.sub(r"【([^【】]+)】", r"\1", text)
+        if "【" in speech_text or "】" in speech_text:
+            fail("強調は空でない文字を【】で囲んでください")
         if expression not in characters[speaker]["expressions"]:
             fail(f"{speaker} の未定義の表情: {expression}")
         if len(text) > 40:
             warnings.warn(f"{path}:{line_number}: セリフが40字を超えています（{len(text)}字）", stacklevel=2)
-        result.append(dict(line=line_number, speaker=speaker, text=text, expression=expression, slide=slide))
+        item = dict(line=line_number, speaker=speaker, text=text, expression=expression, slide=slide)
+        if speech_text != text:
+            item["speech_text"] = speech_text
+        if screen_kind:
+            item["screen_kind"] = screen_kind
+        if broll_keyword:
+            item.update(broll_keyword=broll_keyword, broll_note=broll_note)
+        if telop:
+            item["telop"] = telop
+        if chapter:
+            item["chapter"] = chapter
+        result.append(item)
+        telop = None
     if not result:
         raise ScriptError(f"{path}:1: セリフがありません")
     return result

@@ -200,7 +200,7 @@ def make_voice(lines, characters, catalog, client, output, gaps, engine="voicevo
         gap = 0 if index == 1 else gaps[int(line["slide"] != previous_slide)]
         start = end + gap
         try:
-            audio = client.synthesize(line["text"], voice["id"], speed, pitch, **settings)
+            audio = client.synthesize(line.get("speech_text", line["text"]), voice["id"], speed, pitch, **settings)
             duration, envelope = inspect_wav(audio)
         except (ValueError, RuntimeError, wave.Error) as exc:
             raise RuntimeError(f'script.txt:{line["line"]}: 音声生成失敗: {exc}') from exc

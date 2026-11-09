@@ -83,6 +83,26 @@ class ScriptParserTests(unittest.TestCase):
         lines = self.parse('\ufeff # コメント\r\n\r\n  ミライ「はい」  \r\n')
         self.assertEqual(lines[0]["line"], 3)
 
+    def test_broll_telop_chapter_and_emphasis(self):
+        lines = self.parse(
+            '# ── 導入\n[映像: busy call center | 混雑した窓口]\n'
+            '[テロップ: 30分待ち]\nミライ「【AIが】答えます」\nひなた「本当？」\n'
+            '[画面: 02]\nミライ「図解です」', check=False)
+        self.assertEqual(lines[0]["broll_keyword"], "busy call center")
+        self.assertEqual(lines[0]["broll_note"], "混雑した窓口")
+        self.assertEqual(lines[0]["telop"], "30分待ち")
+        self.assertEqual(lines[0]["speech_text"], "AIが答えます")
+        self.assertEqual(lines[0]["chapter"], "導入")
+        self.assertNotIn("telop", lines[1])
+        self.assertEqual(lines[2]["screen_kind"], "画面")
+        self.assertNotIn("broll_keyword", lines[2])
+
+    def test_invalid_broll_tags_and_emphasis(self):
+        for invalid in ('[映像: keyword]\nミライ「はい」', '[テロップ: ]\nミライ「はい」',
+                        'ミライ「【】」', 'ミライ「【強調」'):
+            with self.subTest(invalid=invalid), self.assertRaisesRegex(ScriptError, "script.txt"):
+                self.parse(invalid, check=False)
+
     def test_empty_script_fails(self):
         with self.assertRaisesRegex(ScriptError, r"script.txt:1:"):
             self.parse('# comment\n')

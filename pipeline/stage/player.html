@@ -5,7 +5,13 @@
 <style>
 @font-face{font-family:Maru;src:url(../../assets/fonts/zen-maru-gothic-japanese-900-normal.woff2);font-weight:900}
 *{box-sizing:border-box}html,body{margin:0;width:1920px;height:1080px;overflow:hidden;background:#000}
-iframe,.slideimg{position:absolute;inset:0;width:1920px;height:1080px;border:0}.slideimg{display:none;object-fit:contain;background:#fff}
+iframe,.slideimg{position:absolute;z-index:2;inset:0;width:1920px;height:1080px;border:0}.slideimg{display:none;object-fit:contain;background:#fff}
+.brollvideo{position:absolute;z-index:0;inset:-35px;width:1990px;height:1150px;object-fit:cover;opacity:0;transition:opacity .4s ease;animation:slowzoom 14s ease-in-out infinite alternate}
+.brollvideo.active{opacity:1}@keyframes slowzoom{to{transform:scale(1.055)}}
+.shade{display:none;position:absolute;z-index:1;inset:0;background:rgba(0,0,0,.28)}
+.chapter{display:none;position:absolute;z-index:5;left:38px;top:32px;padding:14px 30px;background:rgba(13,25,50,.86);border-left:12px solid #ffd43b;color:#fff;font:900 36px Maru,sans-serif;border-radius:6px}
+.telop{display:none;position:absolute;z-index:7;left:50%;top:43%;transform:translate(-50%,-50%);padding:20px 42px;background:#ffd43b;color:#101828;font:900 74px Maru,sans-serif;box-shadow:12px 14px 0 rgba(0,0,0,.28)}
+.telop.show{display:block;animation:telop-in .3s ease-out both}@keyframes telop-in{from{transform:translate(-70%,-70%) rotate(-14deg) scale(.55)}to{transform:translate(-50%,-50%) rotate(0) scale(1)}}
 .ch{position:absolute;bottom:0;height:560px;transition:filter .2s}.dim{filter:brightness(.82)}
 .mirai{left:-10px}.hinata{right:0}
 body[data-layout=scene] .mirai{left:560px;height:640px}body[data-layout=scene] .hinata{right:520px;height:640px}
@@ -16,41 +22,59 @@ body[data-layout=scene] .mirai{left:560px;height:640px}body[data-layout=scene] .
 .m-かしげ{animation:tilt 1.2s forwards}@keyframes tilt{to{transform:rotate(-4deg)}}
 .m-ずいっ{animation:lean .5s forwards}@keyframes lean{to{transform:translateY(-10px) scale(1.06)}}
 .m-しょんぼり{animation:sag 1s forwards;filter:brightness(.75)}@keyframes sag{to{transform:translateY(16px)}}
-.sub{position:absolute;bottom:42px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:22px}
+.sub{position:absolute;z-index:6;bottom:42px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:22px}
 .face{width:120px;height:120px;border-radius:50%;border:7px solid #fff;overflow:hidden;background:#fff;box-shadow:0 0 0 6px var(--c)}
 .face img{width:100%;height:100%;display:block}
 .txt{font-family:Maru,sans-serif;font-size:62px;font-weight:900;color:#fff;line-height:1.2;-webkit-text-stroke:14px var(--c);paint-order:stroke fill;white-space:nowrap}
-.credit{display:none;position:absolute;inset:0;align-items:center;justify-content:center;background:#080c16;color:#fff;font:900 44px Maru,sans-serif}
+.credit{display:none;position:absolute;z-index:10;inset:0;align-items:center;justify-content:center;background:#080c16;color:#fff;font:900 44px Maru,sans-serif}
 body[data-credit="true"] .credit{display:flex}
+body[data-video-style=broll][data-background=broll] .shade,body[data-video-style=broll] .chapter{display:block}
+body[data-video-style=broll] .ch{display:none}
+body[data-video-style=broll] .sub{left:34px;right:34px;bottom:28px;transform:none;min-height:184px;padding:20px 34px;background:rgba(255,255,255,.96);border-radius:24px;box-shadow:0 8px 30px rgba(0,0,0,.3)}
+body[data-video-style=broll] .face{flex:0 0 auto;width:132px;height:132px}
+body[data-video-style=broll] .txt{font-size:50px;color:#111827;line-height:1.25;-webkit-text-stroke:0;white-space:normal}
+.highlight{background:#ffd43b;color:#111827;padding:0 .15em;border-radius:.12em}
 </style>
 <body>
+<video class="brollvideo" id="broll0" muted loop playsinline></video><video class="brollvideo" id="broll1" muted loop playsinline></video><div class="shade"></div>
 <iframe id="pg"></iframe><img class="slideimg" id="slideimg" alt="">
 <img class="ch mirai bob" id="mirai"><img class="ch hinata bob" id="hinata">
+<div class="chapter" id="chapter"></div><div class="telop" id="telop"></div>
 <div class="sub" id="sub"><div class="face"><img id="face"></div><div class="txt" id="txt"></div></div>
 <div class="credit" id="credit"></div>
 <script>
 "use strict";
 const params=new URLSearchParams(location.search),ep=params.get("ep");
 const pg=document.getElementById("pg"),slideimg=document.getElementById("slideimg"),mirai=document.getElementById("mirai"),hinata=document.getElementById("hinata");
-const sub=document.getElementById("sub"),face=document.getElementById("face"),txt=document.getElementById("txt"),credit=document.getElementById("credit");
+const sub=document.getElementById("sub"),face=document.getElementById("face"),txt=document.getElementById("txt"),credit=document.getElementById("credit"),chapter=document.getElementById("chapter"),telop=document.getElementById("telop");
+const brollVideos=[document.getElementById("broll0"),document.getElementById("broll1")];
 if(!/^[a-zA-Z0-9_-]+$/.test(ep||""))throw Error("invalid episode");
 const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 const IMG={ミライ:"../../assets/characters/mirai/transparent/",ひなた:"../../assets/characters/hinata/transparent/"};
 const normalTag=tag=>{const [expression,motion]=String(tag||"通常").split("|");return {expression:expression||"通常",motion:motion||"ぴょん"}};
-let CH,timeline=[],active=null,origin=null;
+let CH,timeline=[],active=null,origin=null,BROLL=new Map(),brollIndex=0,currentBroll=null,defaultPage=null;
 // 確認用の静止画のために、画面・段階が切り替わった時刻（録画の0秒基準）を記録する
 window.__events=[];
 function mark(screen,step){window.__events.push({screen,step,t:(performance.now()-origin)/1000})}
 const chars={ミライ:document.getElementById("mirai"),ひなた:document.getElementById("hinata")};
 function setStep(k){if(pg.style.display==="none")return;pg.contentDocument.querySelectorAll("[data-step]").forEach(e=>{if(+e.dataset.step<=k&&!e.classList.contains("show"))e.classList.add("show")})}
 async function loadPage({kind,n}){
+ document.body.dataset.background="page";brollVideos.forEach(video=>video.classList.remove("active"));
  if(kind==="スライド"){ // 旧書式：slides/NN.png を全面に表示（段階表示なし）
   slideimg.src=`../../episodes/${ep}/slides/${n}.png`;await slideimg.decode().catch(()=>{throw Error("slide load failed: "+n)});
   pg.style.display="none";slideimg.style.display="block";document.body.dataset.layout="slide";mark(n,1);return}
  pg.src=`../../episodes/${ep}/pages/${n}.html`;await new Promise((resolve,reject)=>{pg.onload=resolve;pg.onerror=()=>reject(Error("page load failed: "+n))});await pg.contentDocument.fonts.ready;
  slideimg.style.display="none";pg.style.display="block";document.body.dataset.layout=pg.contentDocument.body.dataset.layout||"slide";setStep(1);mark(n,1)}
-function setText(value){value=String(value);if(!value.includes("／")&&value.length>16){const h=Math.ceil(value.length/2);value=value.slice(0,h)+"／"+value.slice(h)} // 旧書式は「／」がないので2行に折る
- txt.replaceChildren();String(value).split("／").forEach((part,index)=>{if(index)txt.append(document.createElement("br"));txt.append(document.createTextNode(part))})}
+function appendHighlighted(value){for(const part of String(value).split(/(【[^【】]+】)/)){if(!part)continue;if(part.startsWith("【")){const mark=document.createElement("span");mark.className="highlight";mark.textContent=part.slice(1,-1);txt.append(mark)}else txt.append(document.createTextNode(part))}}
+function setText(value){value=String(value);const plain=value.replace(/[【】]/g,"");if(!value.includes("／")&&plain.length>16){let seen=0,cut=Math.ceil(plain.length/2),at=value.length;for(let i=0;i<value.length;i++){if(!"【】".includes(value[i]))seen++;if(seen===cut){at=i+1;break}}value=value.slice(0,at)+"／"+value.slice(at)}
+ txt.replaceChildren();String(value).split("／").forEach((part,index)=>{if(index)txt.append(document.createElement("br"));appendHighlighted(part)})}
+async function setBroll(item){
+ const clip=BROLL.get(item.broll_keyword);currentBroll=item.broll_keyword;
+ if(!clip||clip.status!=="ready"){if(defaultPage)await loadPage(defaultPage);return}
+ const next=brollVideos[brollIndex=1-brollIndex],previous=brollVideos[1-brollIndex];
+ next.src=`../../output/${ep}/broll/${clip.file}`;await next.play();pg.style.display="none";slideimg.style.display="none";document.body.dataset.background="broll";
+ next.classList.add("active");previous.classList.remove("active");
+}
 async function waitUntil(seconds,origin){while((performance.now()-origin)/1000<seconds)await sleep(Math.min(25,Math.max(1,(seconds-(performance.now()-origin)/1000)*1000)))}
 function showLine(item,source){
  const match=source.match(/^(ミライ|ひなた)「(.*)」(?:\{(.*)\})?$/);if(!match)throw Error("script line does not match timeline line "+item.line);
@@ -61,17 +85,23 @@ function showLine(item,source){
  me.classList.remove("dim");other.classList.add("dim");me.className=me.className.replace(/ m-\S+/g,"");void me.offsetWidth;me.classList.add("m-"+motion);
  me.src=IMG[who]+CH[who].expressions[safeExpression];sub.style.setProperty("--c",who==="ミライ"?"#2f4a8a":"#f08a3c");
  face.src=me.src.replace('/transparent/','/face/');setText(text);
+ chapter.textContent=item.chapter||"";telop.textContent=item.telop||"";telop.classList.toggle("show",Boolean(item.telop));
 }
 function animate(){if(active){const {item,who,expression,started}=active,elapsed=(performance.now()-started)/1000,env=item.envelope;
  if(expression==="通常"){let open;if(Array.isArray(env)&&env.length){const fps=Number(item.envelope_fps)||30;open=Number(env[Math.min(env.length-1,Math.floor(elapsed*fps))]||0)>.012}else open=Math.floor(elapsed*7)%2===0;
  chars[who].src=IMG[who]+CH[who].mouth[open?"open":"closed"]}}
  requestAnimationFrame(animate)}
 (async()=>{
- const [characterResponse,timelineResponse,scriptResponse,engineResponse]=await Promise.all([
- fetch("../../tools/preview/characters.json"),fetch(`../../output/${ep}/voice/timeline.json`),fetch(`../../episodes/${ep}/script.txt`),fetch(`../../output/${ep}/voice/engine.json`)]);
- for(const response of [characterResponse,timelineResponse,scriptResponse,engineResponse])if(!response.ok)throw Error("required recording input is missing: "+response.url);
+ const [characterResponse,timelineResponse,scriptResponse,engineResponse,metaResponse]=await Promise.all([
+ fetch("../../tools/preview/characters.json"),fetch(`../../output/${ep}/voice/timeline.json`),fetch(`../../episodes/${ep}/script.txt`),fetch(`../../output/${ep}/voice/engine.json`),fetch(`../../episodes/${ep}/meta.json`)]);
+ for(const response of [characterResponse,timelineResponse,scriptResponse,engineResponse,metaResponse])if(!response.ok)throw Error("required recording input is missing: "+response.url);
  CH=await characterResponse.json();timeline=await timelineResponse.json();
- const script=(await scriptResponse.text()).split(/\r?\n/),engine=await engineResponse.json();
+ const script=(await scriptResponse.text()).split(/\r?\n/),engine=await engineResponse.json(),meta=await metaResponse.json();
+ document.body.dataset.videoStyle=meta.video_style==="broll"?"broll":"standard";
+ if(meta.video_style==="broll"){
+  const response=await fetch(`../../output/${ep}/broll/broll.json`);if(response.ok){const manifest=await response.json();BROLL=new Map(manifest.clips.map(clip=>[clip.keyword,clip]))}
+  const match=script.join("\n").match(/^\[画面:\s*(\d+)\]$/m);if(match)defaultPage={kind:"画面",n:String(+match[1]).padStart(2,"0")};
+ }
  if(!timeline.length)throw Error("timeline is empty");
  mirai.src=IMG.ミライ+CH.ミライ.expressions["通常"];hinata.src=IMG.ひなた+CH.ひなた.expressions["通常"];
  requestAnimationFrame(animate);
@@ -81,10 +111,11 @@ function animate(){if(active){const {item,who,expression,started}=active,elapsed
    await waitUntil(Number(item.start),origin);
    let shows=0;
    for(;cursor<line-1;cursor++){const marker=script[cursor].trim(),m=marker.match(/^\[(画面|スライド):\s*(\d+)\]$/);if(m){page={kind:m[1],n:String(+m[2]).padStart(2,"0")};shows=0}if(/^\[表示\]$/.test(marker))shows++}
-   if(page!==null){await loadPage(page);screen=page;page=null;step=1}
+   if(page!==null){currentBroll=null;await loadPage(page);screen=page;page=null;step=1}
    if(shows&&screen&&screen.kind==="画面"){step+=shows;setStep(step);mark(screen.n,step)}
+   if(meta.video_style==="broll"&&item.broll_keyword&&item.broll_keyword!==currentBroll)await setBroll(item);
    showLine(item,source);
-   await waitUntil(Number(item.end),origin);active=null;
+   await waitUntil(Number(item.end),origin);active=null;telop.classList.remove("show");
  }
  const end=Math.max(...timeline.map(item=>Number(item.end)));
  await waitUntil(end,origin);document.body.dataset.credit="true";credit.textContent="音声：AivisSpeech（まお・コハク）";
