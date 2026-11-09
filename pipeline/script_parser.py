@@ -15,6 +15,15 @@ class ScriptError(ValueError):
     """Invalid script, with source path and line number."""
 
 
+def episode_video_style(episode_dir):
+    """Return an optional video_style without making meta.json mandatory for old stages."""
+    try:
+        data = json.loads((Path(episode_dir) / "meta.json").read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    return data.get("video_style") if isinstance(data, dict) else None
+
+
 def load_characters(path):
     with Path(path).open(encoding="utf-8") as stream:
         data = yaml.safe_load(stream)
@@ -30,7 +39,7 @@ def load_characters(path):
     return result
 
 
-def parse_script(path, characters, *, check_slides=True):
+def parse_script(path, characters, *, check_slides=True, video_style=None):
     """Return dialogue dicts; slide directives apply to following dialogue.
 
     slide is a zero-padded string, or None before the first directive.
@@ -39,6 +48,7 @@ def parse_script(path, characters, *, check_slides=True):
     path = Path(path)
     result = []
     slide = None
+    whiteboard_items = 0
     for line_number, raw in enumerate(path.read_text(encoding="utf-8-sig").splitlines(), 1):
         line = raw.strip()
         if not line or line.startswith("#"):
@@ -61,10 +71,29 @@ def parse_script(path, characters, *, check_slides=True):
             continue
         if line == "[表示]":
             continue
+        if video_style == "whiteboard":
+            if line == "[消す]":
+                whiteboard_items = 0
+                continue
+            if re.fullmatch(r"\[手書き:\s*[^\[\]]+\]", line):
+                continue
+            illustration = re.fullmatch(r"\[絵:\s*([^|\[\]]+)\|\s*([^\[\]]+)\]", line)
+            if illustration:
+                if not all(part.strip() for part in illustration.groups()):
+                    fail("[絵] は絵文字と説明文の両方が必要です")
+                whiteboard_items += 1
+                if whiteboard_items > 6:
+                    fail("[絵] は1ページ6つまでです")
+                continue
         match = re.fullmatch(r"([^「]+)「(.+)」(?:\{([^{}]+)\})?", line)
         if not match:
             fail("形式が不正です。話者「セリフ」{表情} または [スライド: 03] を使ってください")
-        speaker, text, tag = match.groups()
+        speaker, display_text, tag = match.groups()
+        text = display_text
+        if video_style == "whiteboard":
+            if text.count("【") != text.count("】") or re.search(r"【】|【[^】]*【|】[^【]*】", text):
+                fail("【】の対応が不正です")
+            text = re.sub(r"【([^【】]+)】", r"\1", text)
         expression = tag or "通常"
         if "|" in expression:
             expression, motion = expression.split("|", 1)
@@ -78,7 +107,10 @@ def parse_script(path, characters, *, check_slides=True):
             fail(f"{speaker} の未定義の表情: {expression}")
         if len(text) > 40:
             warnings.warn(f"{path}:{line_number}: セリフが40字を超えています（{len(text)}字）", stacklevel=2)
-        result.append(dict(line=line_number, speaker=speaker, text=text, expression=expression, slide=slide))
+        item = dict(line=line_number, speaker=speaker, text=text, expression=expression, slide=slide)
+        if video_style == "whiteboard":
+            item["display_text"] = display_text
+        result.append(item)
     if not result:
         raise ScriptError(f"{path}:1: セリフがありません")
     return result

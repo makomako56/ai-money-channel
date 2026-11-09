@@ -15,9 +15,9 @@ class ScriptParserTests(unittest.TestCase):
         self.script = Path(self.temp.name) / "script.txt"
         self.characters = load_characters(ROOT / "config/characters.yaml")
 
-    def parse(self, text, check=True):
+    def parse(self, text, check=True, video_style=None):
         self.script.write_text(text, encoding="utf-8")
-        return parse_script(self.script, self.characters, check_slides=check)
+        return parse_script(self.script, self.characters, check_slides=check, video_style=video_style)
 
     def test_dialogue_defaults_and_nested_quotes(self):
         lines = self.parse('ミライ「「AI」の話です」\nひなた「はい！」{笑顔}')
@@ -67,6 +67,24 @@ class ScriptParserTests(unittest.TestCase):
     def test_null_expression_assets_are_valid(self):
         self.characters["ミライ"]["expressions"]["驚き"] = None
         self.assertEqual(self.parse('ミライ「え！」{驚き}')[0]["expression"], "驚き")
+
+    def test_whiteboard_tags_and_spotlight_are_opt_in(self):
+        text = ('[手書き: 見出し]\n[絵: 📞 | 電話がつながらない]\n'
+                'ミライ「【AIが問い合わせに】／答えます」\n[消す]\n'
+                '[絵: 🤖 | AIの窓口]\nひなた「本当？」')
+        lines = self.parse(text, video_style="whiteboard")
+        self.assertEqual(lines[0]["text"], "AIが問い合わせに／答えます")
+        self.assertEqual(lines[0]["display_text"], "【AIが問い合わせに】／答えます")
+        self.assertEqual(lines[1]["text"], "本当？")
+        with self.assertRaisesRegex(ScriptError, "形式が不正"):
+            self.parse(text)
+
+    def test_whiteboard_rejects_more_than_six_pictures_and_bad_brackets(self):
+        pictures = "\n".join(f"[絵: {i} | 説明{i}]" for i in range(7))
+        with self.assertRaisesRegex(ScriptError, "6つまで"):
+            self.parse(pictures + '\nミライ「はい」', video_style="whiteboard")
+        with self.assertRaisesRegex(ScriptError, "【】"):
+            self.parse('ミライ「【閉じない」', video_style="whiteboard")
 
     def test_long_dialogue_warns_without_truncation(self):
         for length in (40, 41):

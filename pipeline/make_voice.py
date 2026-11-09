@@ -19,7 +19,7 @@ from pathlib import Path
 import yaml
 
 from pipeline.engine_config import load_engine, validate_episode
-from pipeline.script_parser import load_characters, parse_script
+from pipeline.script_parser import episode_video_style, load_characters, parse_script
 
 SAMPLE_TEXTS = (
     "結論から言うと、この会社はAIを売っているんじゃなくて、AIを動かす場所を貸しているんです",
@@ -259,7 +259,9 @@ def main():
             raise ValueError(f"エピソードがありません: {episode}")
         characters = load_characters("config/characters.yaml")
         gaps = load_gaps("config/style.yaml")
-        lines = parse_script(episode / "script.txt", characters, check_slides=not args.no_slide_check) if args.stage == "voice" else None
+        lines = parse_script(episode / "script.txt", characters,
+                             check_slides=not args.no_slide_check,
+                             video_style=episode_video_style(episode)) if args.stage == "voice" else None
         engine = load_engine()
         client = SpeechEngine(args.engine_url or engine["url"], engine["engine"])
         catalog = voice_catalog(client.request("/speakers"))
