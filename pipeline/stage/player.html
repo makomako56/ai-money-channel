@@ -31,7 +31,7 @@ body[data-credit="true"] .credit{display:flex}
 .wb-emoji{font-family:"Noto Color Emoji","Apple Color Emoji","Segoe UI Emoji",sans-serif;font-size:224px;line-height:1.12}.wb-caption{max-width:100%;font-size:38px;line-height:1.15;text-align:center;font-weight:900;white-space:nowrap}
 .wb-hand{position:absolute;z-index:3;width:156px;height:114px;left:1920px;top:1080px;opacity:0;filter:drop-shadow(8px 12px 9px rgba(44,28,14,.2));transition:left .3s ease-in-out,top .3s ease-in-out,opacity .15s,transform .2s;transform:rotate(-5deg);pointer-events:none}.wb-hand.drawing{opacity:1}.wb-hand.leaving{left:1920px!important;top:1080px!important;opacity:0}
 .wb-turn{position:absolute;z-index:2;inset:0;background:#fff9e7;transform-origin:right center;animation:pageTurn .55s ease-in forwards}@keyframes pageTurn{to{transform:perspective(900px) rotateY(-88deg);opacity:.15}}
-.spotlight{display:none;z-index:6;position:absolute;left:0;right:0;bottom:0;height:126px;align-items:center;justify-content:center;background:#ed6e9d;color:#fff;font:900 66px Maru,sans-serif;letter-spacing:.04em;text-shadow:0 5px 0 #9e315a}
+.spotlight{display:none;z-index:6;position:absolute;left:58px;bottom:75px;width:972px;height:168px;box-sizing:border-box;padding:36px 42px;align-items:center;justify-content:center;border-radius:30px;background:#ed6e9d;color:#fff;font:900 66px/1.08 Maru,sans-serif;letter-spacing:.04em;text-align:center;text-shadow:0 5px 0 #9e315a;white-space:nowrap;overflow:hidden}
 body[data-video-style=whiteboard] .whiteboard{display:block}body[data-video-style=whiteboard] iframe,body[data-video-style=whiteboard] .slideimg{display:none!important}
 body[data-video-style=whiteboard] .ch{bottom:108px;height:552px}body[data-video-style=whiteboard] .mirai{left:1060px}body[data-video-style=whiteboard] .hinata{right:-18px}
 body[data-video-style=whiteboard] .sub{left:1490px;top:274px;bottom:auto;width:730px;height:132px;justify-content:center;padding:12px 28px;transform:translateX(-50%);border:7px solid #252525;border-radius:38px;background:#fff;box-shadow:0 10px 0 rgba(0,0,0,.12)}
@@ -84,6 +84,16 @@ function layoutRect(el){
  const card=el.closest(".wb-item"),target=card||el,transform=target.style.transform;target.style.transform="none";
  const rect=el.getBoundingClientRect();target.style.transform=transform;return rect
 }
+function fitSpotlightText(){
+ if(spotlight.hidden||!spotlight.textContent)return;
+ spotlight.style.fontSize="66px";spotlight.style.whiteSpace="nowrap";
+ for(let size=66;size>=38&&spotlight.scrollWidth>spotlight.clientWidth;size-=2)spotlight.style.fontSize=size+"px";
+ if(spotlight.scrollWidth<=spotlight.clientWidth)return;
+ spotlight.style.whiteSpace="normal";
+ for(let size=38;size>=30&&(spotlight.scrollWidth>spotlight.clientWidth||spotlight.scrollHeight>spotlight.clientHeight);size-=2)spotlight.style.fontSize=size+"px";
+ const lineHeight=parseFloat(getComputedStyle(spotlight).lineHeight);
+ if(spotlight.scrollWidth>spotlight.clientWidth||spotlight.scrollHeight>spotlight.clientHeight||spotlight.scrollHeight>lineHeight*2.1)throw Error("whiteboard spotlight text does not fit in two lines");
+}
 function assertWhiteboardLayout(){
  if(!whiteboardMode)return;
  const cards=[...wbGrid.children],captions=cards.map(card=>card.querySelector(".wb-caption")),faces=[mirai,hinata].map(el=>({name:el.id+"の顔",rect:faceRect(el)}));
@@ -97,6 +107,12 @@ function assertWhiteboardLayout(){
   const caption={name:"説明文"+(index+1),rect:layoutRect(captions[index])};bubbleParts.forEach(bubble=>fail(caption,bubble));faces.forEach(face=>fail(caption,face));
  });
  faces.forEach(face=>bubbleParts.forEach(bubble=>fail(bubble,face)));
+ if(!spotlight.hidden){
+  const band={name:"強調字幕帯",rect:spotlight.getBoundingClientRect()};
+  cards.forEach((card,index)=>fail(band,{name:"絵カード"+(index+1),rect:layoutRect(card)}));
+  bubbleParts.forEach(bubble=>fail(band,bubble));
+  [mirai,hinata].forEach(character=>fail(band,{name:character.id+"のキャラ",rect:character.getBoundingClientRect()}));
+ }
 }
 function markWhiteboard(){whiteboardStep++;mark(String(whiteboardPage).padStart(2,"0"),whiteboardStep)}
 function applyWhiteboardMarker(marker){
@@ -122,7 +138,7 @@ function showLine(item,source){
  me.classList.remove("dim");other.classList.add("dim");me.className=me.className.replace(/ m-\S+/g,"");void me.offsetWidth;me.classList.add("m-"+motion);
  me.src=IMG[who]+CH[who].expressions[safeExpression];sub.style.setProperty("--c",who==="ミライ"?"#2f4a8a":"#f08a3c");
  face.src=me.src.replace('/transparent/','/face/');
- if(whiteboardMode){const hits=[...display.matchAll(/【([^【】]+)】/g)].map(m=>m[1]);spotlight.textContent=hits.join("　");spotlight.hidden=!hits.length;sub.style.setProperty("--tail-x",who==="ミライ"?"42%":"58%");setText(display.replace(/[【】]/g,""));assertWhiteboardLayout()}else setText(display);
+ if(whiteboardMode){const hits=[...display.matchAll(/【([^【】]+)】/g)].map(m=>m[1]);spotlight.textContent=hits.join("　");spotlight.hidden=!hits.length;fitSpotlightText();sub.style.setProperty("--tail-x",who==="ミライ"?"42%":"58%");setText(display.replace(/[【】]/g,""));assertWhiteboardLayout()}else setText(display);
 }
 function animate(){if(active){const {item,who,expression,started}=active,elapsed=(performance.now()-started)/1000,env=item.envelope;
  if(expression==="通常"){let open;if(Array.isArray(env)&&env.length){const fps=Number(item.envelope_fps)||30;open=Number(env[Math.min(env.length-1,Math.floor(elapsed*fps))]||0)>.012}else open=Math.floor(elapsed*7)%2===0;
