@@ -27,7 +27,7 @@ body[data-credit="true"] .credit{display:flex}
 .wb-heading{position:absolute;left:86px;top:72px;width:1748px;height:190px;font-size:76px;line-height:1.15;font-weight:900;border-bottom:8px solid #ed6e9d;letter-spacing:.01em}
 .wb-heading span{display:block;width:0;overflow:hidden;white-space:nowrap;animation:writeTitle 1.15s steps(18,end) forwards}@keyframes writeTitle{to{width:100%}}
 .wb-grid{position:absolute;left:58px;top:292px;width:1018px;display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:342px;gap:24px 18px}
-.wb-item{opacity:0;transform:scale(.82) rotate(-2deg);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:10px 10px 14px;border-radius:28px;background:rgba(255,255,255,.5);box-shadow:0 8px 0 rgba(102,75,31,.08);transition:opacity .48s,transform .48s}.wb-item.drawn{opacity:1;transform:scale(1) rotate(0)}
+.wb-item{opacity:0;transform:scale(.82) rotate(-2deg);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:10px 10px 14px;border-radius:28px;background:rgba(255,255,255,.5);box-shadow:0 8px 0 rgba(102,75,31,.08)}.wb-item.drawn{animation:picturePop .42s ease-out forwards}@keyframes picturePop{0%{opacity:0;transform:scale(.82) rotate(-2deg)}72%{opacity:1;transform:scale(1.04) rotate(.5deg)}100%{opacity:1;transform:scale(1) rotate(0)}}
 .wb-emoji{font-family:"Noto Color Emoji","Apple Color Emoji","Segoe UI Emoji",sans-serif;font-size:224px;line-height:1.12}.wb-caption{max-width:100%;font-size:38px;line-height:1.15;text-align:center;font-weight:900;white-space:nowrap}
 .wb-hand{position:absolute;z-index:3;width:156px;height:114px;left:1920px;top:1080px;opacity:0;filter:drop-shadow(8px 12px 9px rgba(44,28,14,.2));transition:left .3s ease-in-out,top .3s ease-in-out,opacity .15s,transform .2s;transform:rotate(-5deg);pointer-events:none}.wb-hand.drawing{opacity:1}.wb-hand.leaving{left:1920px!important;top:1080px!important;opacity:0}
 .wb-turn{position:absolute;z-index:2;inset:0;background:#fff9e7;transform-origin:right center;animation:pageTurn .55s ease-in forwards}@keyframes pageTurn{to{transform:perspective(900px) rotateY(-88deg);opacity:.15}}
@@ -109,7 +109,7 @@ function applyWhiteboardMarker(marker){
   const index=wbGrid.children.length;if(index>=6)throw Error("whiteboard has more than six pictures");
   const card=document.createElement("div"),emoji=document.createElement("div"),caption=document.createElement("div");
   card.className="wb-item";emoji.className="wb-emoji";caption.className="wb-caption";emoji.textContent=m[1].trim();caption.textContent=m[2].trim();card.append(emoji,caption);wbGrid.append(card);
-  const box=card.getBoundingClientRect();drawWithHand(box.right-120,box.top+155,600);setTimeout(()=>card.classList.add("drawn"),260);assertWhiteboardLayout();markWhiteboard();return true}
+  void card.offsetWidth;card.classList.add("drawn");assertWhiteboardLayout();markWhiteboard();return true}
  return false
 }
 async function waitUntil(seconds,origin){while((performance.now()-origin)/1000<seconds)await sleep(Math.min(25,Math.max(1,(seconds-(performance.now()-origin)/1000)*1000)))}
