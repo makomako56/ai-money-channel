@@ -1,0 +1,62 @@
+{
+  "main_text": "売上2.7倍\nなのに赤字!?",
+  "sub_text": "コアウィーブ",
+  "character": "mirai",
+  "expression": "驚き",
+  "accent": "#e5322d",
+  "lines": [
+    {
+      "segments": [
+        {
+          "text": "AIの計算を貸す"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "売上"
+        },
+        {
+          "text": "2.7倍",
+          "color": "#ffe14a"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "なのに"
+        },
+        {
+          "text": "赤字",
+          "color": "#ff3d8b"
+        },
+        {
+          "text": "!?"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "借金で"
+        },
+        {
+          "text": "大丈夫？",
+          "color": "#ffe14a"
+        }
+      ]
+    }
+  ],
+  "characters": [
+    {
+      "character": "mirai",
+      "expression": "驚き"
+    },
+    {
+      "character": "hinata",
+      "expression": "衝撃"
+    }
+  ]
+}
