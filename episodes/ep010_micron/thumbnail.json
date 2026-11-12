@@ -1,0 +1,62 @@
+{
+  "main_text": "パソコンが\n高い犯人!?",
+  "sub_text": "マイクロン",
+  "character": "mirai",
+  "expression": "驚き",
+  "accent": "#e5322d",
+  "lines": [
+    {
+      "segments": [
+        {
+          "text": "パソコンが"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "高い"
+        },
+        {
+          "text": "犯人",
+          "color": "#ff3d8b"
+        },
+        {
+          "text": "!?"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "売上"
+        },
+        {
+          "text": "4.8倍",
+          "color": "#ffe14a"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "AIがメモリー"
+        },
+        {
+          "text": "爆買い",
+          "color": "#ffe14a"
+        }
+      ]
+    }
+  ],
+  "characters": [
+    {
+      "character": "mirai",
+      "expression": "ドヤ顔"
+    },
+    {
+      "character": "hinata",
+      "expression": "衝撃"
+    }
+  ]
+}
