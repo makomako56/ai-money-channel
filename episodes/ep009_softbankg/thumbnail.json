@@ -1,0 +1,59 @@
+{
+  "main_text": "7,680億円\nの赤字!?",
+  "sub_text": "ソフトバンクG",
+  "character": "mirai",
+  "expression": "驚き",
+  "accent": "#e5322d",
+  "lines": [
+    {
+      "segments": [
+        {
+          "text": "AIに賭けた"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "7680億円",
+          "color": "#ffe14a"
+        },
+        {
+          "text": "の"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "赤字",
+          "color": "#ff3d8b"
+        },
+        {
+          "text": "!?"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "原因は"
+        },
+        {
+          "text": "電気",
+          "color": "#ffe14a"
+        }
+      ]
+    }
+  ],
+  "characters": [
+    {
+      "character": "mirai",
+      "expression": "驚き"
+    },
+    {
+      "character": "hinata",
+      "expression": "衝撃"
+    }
+  ]
+}
