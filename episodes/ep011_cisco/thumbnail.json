@@ -1,0 +1,69 @@
+{
+  "main_text": "AIの道路で\n稼ぐ会社",
+  "sub_text": "シスコ",
+  "character": "mirai",
+  "expression": "ドヤ顔",
+  "accent": "#e5322d",
+  "lines": [
+    {
+      "segments": [
+        {
+          "text": "Wi-Fiが遅い"
+        },
+        {
+          "text": "!?",
+          "color": "#ff3d8b"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "AIの"
+        },
+        {
+          "text": "道路",
+          "color": "#ffe14a"
+        },
+        {
+          "text": "で稼ぐ"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "売上"
+        },
+        {
+          "text": "24%増",
+          "color": "#ffe14a"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "AI向け"
+        },
+        {
+          "text": "2倍超",
+          "color": "#ffe14a"
+        },
+        {
+          "text": "へ"
+        }
+      ]
+    }
+  ],
+  "characters": [
+    {
+      "character": "mirai",
+      "expression": "ドヤ顔"
+    },
+    {
+      "character": "hinata",
+      "expression": "衝撃"
+    }
+  ]
+}
