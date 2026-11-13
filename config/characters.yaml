@@ -32,6 +32,9 @@ mirai:
     冷静: mirai_04_calm.png
     励まし: mirai_14_cheer.png
     落胆: mirai_15_sigh.png
+    ジト目: mirai_21_jitome.png
+    キラキラ: mirai_22_sparkle.png
+    絶叫: mirai_23_scream.png
   mouth: { closed: mirai_01_normal_closed.png, half: null, open: mirai_02_normal_open.png }
   blink: mirai_05_blink.png
 hinata:
