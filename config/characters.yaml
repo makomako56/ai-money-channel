@@ -71,5 +71,7 @@ hinata:
     絶叫: hinata_22_scream.png
     キラキラ: hinata_23_sparkle.png
     号泣: hinata_24_cry.png
+    ぷんぷん: hinata_25_puff.png
+    ジト目: hinata_26_jitome.png
   mouth: { closed: hinata_01_normal_closed.png, half: null, open: hinata_02_normal_open.png }
   blink: hinata_04_blink.png
