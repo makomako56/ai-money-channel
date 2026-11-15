@@ -1,0 +1,65 @@
+{
+  "main_text": "Claudeの会社\nついに上場",
+  "sub_text": "アンソロピック",
+  "character": "mirai",
+  "expression": "驚き",
+  "accent": "#e5322d",
+  "lines": [
+    {
+      "segments": [
+        {
+          "text": "Claudeの会社"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "ついに"
+        },
+        {
+          "text": "上場",
+          "color": "#ff3d8b"
+        },
+        {
+          "text": "!?"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "売上"
+        },
+        {
+          "text": "12倍",
+          "color": "#ffe14a"
+        },
+        {
+          "text": "超え"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "でも本業は"
+        },
+        {
+          "text": "赤字",
+          "color": "#ffe14a"
+        }
+      ]
+    }
+  ],
+  "characters": [
+    {
+      "character": "mirai",
+      "expression": "キラキラ"
+    },
+    {
+      "character": "hinata",
+      "expression": "衝撃"
+    }
+  ]
+}
