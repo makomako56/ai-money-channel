@@ -1,0 +1,59 @@
+{
+  "main_text": "AIが代わりに\n買い物",
+  "sub_text": "ビザ",
+  "character": "mirai",
+  "expression": "ドヤ顔",
+  "accent": "#e5322d",
+  "lines": [
+    {
+      "segments": [
+        {
+          "text": "AIが代わりに"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "買い物",
+          "color": "#ff3d8b"
+        },
+        {
+          "text": "!?"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "カード番号は"
+        },
+        {
+          "text": "見せない",
+          "color": "#ffe14a"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "もうかるのは"
+        },
+        {
+          "text": "誰？",
+          "color": "#ffe14a"
+        }
+      ]
+    }
+  ],
+  "characters": [
+    {
+      "character": "mirai",
+      "expression": "ドヤ顔"
+    },
+    {
+      "character": "hinata",
+      "expression": "驚き"
+    }
+  ]
+}
