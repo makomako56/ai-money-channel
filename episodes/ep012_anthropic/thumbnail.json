@@ -2,7 +2,7 @@
   "main_text": "Claudeの会社\nついに上場",
   "sub_text": "アンソロピック",
   "character": "mirai",
-  "expression": "驚き",
+  "expression": "ドヤ顔",
   "accent": "#e5322d",
   "lines": [
     {
@@ -55,7 +55,7 @@
   "characters": [
     {
       "character": "mirai",
-      "expression": "キラキラ"
+      "expression": "ドヤ顔"
     },
     {
       "character": "hinata",
