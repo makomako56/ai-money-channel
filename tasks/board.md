@@ -44,7 +44,7 @@
 | T025 | ep000 | サンプル用スライド3枚 | Claude | 完了 | Codex | episodes/ep000_sample/slides/ |
 | T026 | 共通 | 声の選定 | 人 | 完了 | | AivisSpeech。ミライ＝まい（ノーマル・2026-11-03 決定、まおから変更）、ひなた＝コハク |
 | T030 | 共通 | YouTubeチャンネル開設・中級者向け機能（カスタムサムネ）を有効化 | 人 | 完了 | | 2026-10-27 |
-| T031 | 共通 | YouTubeの鍵を作り直す（ブランドアカウント「AI企業ニュース」で認可） | 人 | 完了 | | 2026-10-28。テストユーザーにブランドアカウントのアドレスと tenissanalysis@gmail.com を追加。upload_check 成功（run 40705702609）。鍵は「テスト中」のため約7日で失効→11/4ごろ更新が必要。client_secret がチャットのスクショに写ったため取り替えを案内 |
+| T031 | 共通 | YouTubeの鍵を作り直す（ブランドアカウント「AI企業ニュース」で認可） | 人 | 完了 | | 2026-10-28。テストユーザーにブランドアカウントのアドレスと （オーナーの別アドレス） を追加。upload_check 成功（run 40705702609）。鍵は「テスト中」のため約7日で失効→11/4ごろ更新が必要。client_secret がチャットのスクショに写ったため取り替えを案内 |
 | T041 | ep002_amd | 11/5分：AMD（オーナーが1を選択 2026-11-04） | Claude | 完了 | 人(Studioで確認) | 2026-11-05 10:25 JST オーナーOK（#15）。stage=upload（run 41952641061、source 41819433521）成功、11/5 18:00 JST 予約 https://www.youtube.com/watch?v=i9BcRbQXQl0 。**ep002 の upload は再実行しない**。予備 ep102 は未使用 |
 | T042 | ep003_qualcomm | 11/7分：クアルコム（オーナーが3を選択 2026-11-05 10:24 JST） | Claude | 完了 | 人(Studioでサムネ差し替え) | 2026-11-06 12:58 JST オーナーOK（#15「クアルコムはオッケー」）。approval.json（11/7 18:00 JST）→ stage=upload（run 42160185597、source 41954103288）成功 https://www.youtube.com/watch?v=SkrEfTHaHiw 。**ep003 の upload は再実行しない**。サムネは旧デザインで投稿→新しい型 episodes/ep003_qualcomm/thumbnail_v3.png の Studio 差し替えをオーナーに依頼 |
 | T043 | ep004_duolingo | 11/8分：Duolingo（オーナーが1を選択 2026-11-06 12:58 JST） | Claude | 完了 | 人(Studioで確認) | 2026-11-07 オーナーがチャットで「青い型のサムネで作り直して投稿」を選択。再実行 run 42358607717 → stage=upload（run 42360626397）成功、11/8 18:00 JST 予約 https://www.youtube.com/watch?v=apPrXWmpdDo |
