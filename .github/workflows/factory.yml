@@ -206,7 +206,7 @@ jobs:
           name: ${{ inputs.episode }}-${{ inputs.stage }}
           path: output/${{ inputs.episode }}/${{ inputs.stage }}/
           if-no-files-found: error
-          retention-days: 7
+          retention-days: 2
       # The upload job (04) downloads <ep>-video and <ep>-thumbnail by run id, for stage=all too.
       - name: Upload original video
         if: (env.STAGE == 'video' || env.STAGE == 'all')
@@ -247,7 +247,7 @@ jobs:
           # stage=all keeps video/ and thumbnail/ side by side; single stages upload their own folder.
           path: output/review/${{ inputs.episode }}/${{ inputs.stage != 'all' && inputs.stage || '' }}
           if-no-files-found: error
-          retention-days: 7
+          retention-days: 1
       - name: Write temporary approval for stage=all upload
         if: env.STAGE == 'all' && inputs.do_upload
         env:
