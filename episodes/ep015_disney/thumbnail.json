@@ -1,0 +1,59 @@
+{
+  "main_text": "子どものアニメも\nAIで作る!?",
+  "sub_text": "ディズニー",
+  "character": "mirai",
+  "expression": "驚き",
+  "accent": "#e5322d",
+  "lines": [
+    {
+      "segments": [
+        {
+          "text": "子どものアニメも"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "AI",
+          "color": "#ff3d8b"
+        },
+        {
+          "text": "で作る!?"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "ディズニーが"
+        },
+        {
+          "text": "方針転換",
+          "color": "#ffe14a"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "夢の国に"
+        },
+        {
+          "text": "何が？",
+          "color": "#ffe14a"
+        }
+      ]
+    }
+  ],
+  "characters": [
+    {
+      "character": "mirai",
+      "expression": "驚き"
+    },
+    {
+      "character": "hinata",
+      "expression": "衝撃"
+    }
+  ]
+}

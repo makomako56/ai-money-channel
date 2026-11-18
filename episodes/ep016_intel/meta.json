@@ -1,0 +1,19 @@
+{
+  "title": "AIを使うとパソコンが重い…AIはGPUだけじゃない？CPUの出番とインテルの稼ぎ方【ミライ先生のAIマネー教室】",
+  "short_title": "AIはGPUだけじゃない インテル",
+  "description": "AIを使うと、パソコンが重くなる。ファンもブーンとうるさい…。実はそれ、「AIがGPUとほぼ同じ数のCPUを買っている」というインテルの社長の話とつながっています。CPUとGPUの違い、AIの「学習」と「使う段階（推論）」、インテルの稼ぎ方、最新の数字、弱点まで、ミライ先生とひなたが解説します。\n\n■ この動画でわかること\n・パソコンの頭脳は2つ。CPU＝何でもこなす司令塔、GPU＝同じ計算を大勢で一気にやる。AIは計算が多く、熱が出てファンが回る\n・AIは「学習」から「使う段階（推論）」へ。インテルのタン社長は、AIの仕組みの中のCPUとGPUの数が、以前のGPU8個にCPU1個から、今はほぼ同じになったと話す（インタビュー。社長の見立てで、販売データは出ていない）\n・インテルは、パソコンやサーバーのCPUで有名なアメリカ（サンタクララ）の会社。事業は「製品」と「工場」の2本立て\n・SC26（2026年11月16日〜）で、最大256コアの次世代サーバー用CPU「ダイヤモンド・ラピッズ」を紹介。自社の作り方 Intel 18A-P で作る\n・2026年7〜9月（2026年第3四半期）：売上165億ドル（21%増）。パソコン向けなど81億ドル（5%減）、データセンターとAI 73億ドル（78%増）。10〜12月の売上の見通しは150〜160億ドル\n・弱点：工場の事業の赤字（7〜9月で18.5億ドル。1年前は23.2億ドル）、パソコンの減速（来年前半まで続く見方）、ライバル（AMDも256コアのCPUを予定。報道）\n\n■ 出典\n・Intel「Intel Reports Third-Quarter 2026 Financial Results」（2026年10月29日）https://www.sec.gov/Archives/edgar/data/0000050863/000005086326000188/q326earningsrelease.htm\n・Intel「Intel Outlines Architectures for Agentic AI at Hot Chips 2026」（2026年8月24日）https://www.intel.com/content/www/us/en/newsroom/news/client-computing/intel-outlines-architectures-for-agentic-ai-at-hot-chips-2026.html\n・24/7 Wall St.「Intel's CEO Says AI Is Now Buying Almost as Many CPUs as GPUs」（2026年11月13日）https://247wallst.com/investing/2026/11/13/intels-ceo-says-ai-is-now-buying-almost-as-many-cpus-as-gpus/\n・TIKR（Yahoo Finance のインタビューについて、2026年11月16日）https://www.tikr.com/blog/intels-ceo-says-ai-is-buying-almost-as-many-cpus-as-gpus-amd-and-arm-gain-too\n・StorageReview（SC26、2026年11月16日）https://www.storagereview.com/news/intel-diamond-rapids-1-6tb-s-memory-bandwidth-1-28gb-cache-gpu-d270-sc26\n・eWeek（2026年8月27日）https://www.eweek.com/news/intel-diamond-rapids-256-core-xeon-amd-venice/\n\n※本動画は企業の仕組みの解説です。特定の銘柄の売買をすすめるものではありません。投資の判断はご自身でお願いします。\n※数字は動画作成時点（2026年11月18日）の公開情報にもとづきます。金額は米ドル。\n\n音声：AivisSpeech（まい・コハク）\nキャラクター・スライド：AIを利用して制作\n\n#インテル #Intel #CPU #GPU #半導体 #AI #決算",
+  "tags": [
+    "インテル",
+    "Intel",
+    "CPU",
+    "GPU",
+    "半導体",
+    "データセンター",
+    "推論",
+    "AI",
+    "決算",
+    "企業分析",
+    "ミライ先生のAIマネー教室"
+  ],
+  "category_id": "27"
+}

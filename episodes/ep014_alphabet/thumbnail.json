@@ -1,0 +1,55 @@
+{
+  "main_text": "メガネが\n通訳に",
+  "sub_text": "グーグル",
+  "character": "mirai",
+  "expression": "ドヤ顔",
+  "accent": "#e5322d",
+  "lines": [
+    {
+      "segments": [
+        {
+          "text": "メガネが"
+        },
+        {
+          "text": "通訳",
+          "color": "#ff3d8b"
+        },
+        {
+          "text": "に!?"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "70超",
+          "color": "#ffe14a"
+        },
+        {
+          "text": "の言語をその場で"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "グーグルの"
+        },
+        {
+          "text": "次の一手",
+          "color": "#ffe14a"
+        }
+      ]
+    }
+  ],
+  "characters": [
+    {
+      "character": "mirai",
+      "expression": "ドヤ顔"
+    },
+    {
+      "character": "hinata",
+      "expression": "衝撃"
+    }
+  ]
+}

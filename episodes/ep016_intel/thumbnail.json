@@ -1,0 +1,66 @@
+{
+  "main_text": "AIは\nGPUだけじゃない",
+  "sub_text": "インテル",
+  "character": "mirai",
+  "expression": "ドヤ顔",
+  "accent": "#e5322d",
+  "lines": [
+    {
+      "segments": [
+        {
+          "text": "AIは"
+        },
+        {
+          "text": "GPU",
+          "color": "#ffe14a"
+        },
+        {
+          "text": "だけ"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "じゃない",
+          "color": "#ff3d8b"
+        },
+        {
+          "text": "!?"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "CPUの"
+        },
+        {
+          "text": "逆襲",
+          "color": "#ffe14a"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "インテル"
+        },
+        {
+          "text": "復活なるか",
+          "color": "#ffe14a"
+        }
+      ]
+    }
+  ],
+  "characters": [
+    {
+      "character": "mirai",
+      "expression": "ドヤ顔"
+    },
+    {
+      "character": "hinata",
+      "expression": "驚き"
+    }
+  ]
+}
