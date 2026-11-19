@@ -1,0 +1,63 @@
+{
+  "main_text": "AIが\n詐欺師に!?",
+  "sub_text": "パロアルト",
+  "character": "mirai",
+  "expression": "驚き",
+  "accent": "#e5322d",
+  "lines": [
+    {
+      "segments": [
+        {
+          "text": "AIが"
+        },
+        {
+          "text": "詐欺師",
+          "color": "#ff3d8b"
+        },
+        {
+          "text": "に!?"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "守る会社の"
+        },
+        {
+          "text": "売上",
+          "color": "#ffe14a"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "39%増",
+          "color": "#ffe14a"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "パロアルト"
+        },
+        {
+          "text": "の稼ぎ方",
+          "color": "#a8f04a"
+        }
+      ]
+    }
+  ],
+  "characters": [
+    {
+      "character": "mirai",
+      "expression": "ドヤ顔"
+    },
+    {
+      "character": "hinata",
+      "expression": "衝撃"
+    }
+  ]
+}
