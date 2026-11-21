@@ -1,0 +1,66 @@
+{
+  "main_text": "AIで仕事が\n消える？",
+  "sub_text": "マイクロソフト",
+  "character": "mirai",
+  "expression": "驚き",
+  "accent": "#e5322d",
+  "lines": [
+    {
+      "segments": [
+        {
+          "text": "AIで"
+        },
+        {
+          "text": "仕事が消える",
+          "color": "#ff3d8b"
+        },
+        {
+          "text": "？"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "6万人",
+          "color": "#ffe14a"
+        },
+        {
+          "text": "に退職の提案"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "たった11人",
+          "color": "#a8f04a"
+        },
+        {
+          "text": "で完成"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "マイクロソフト"
+        },
+        {
+          "text": "の狙い",
+          "color": "#ffa94a"
+        }
+      ]
+    }
+  ],
+  "characters": [
+    {
+      "character": "mirai",
+      "expression": "ドヤ顔"
+    },
+    {
+      "character": "hinata",
+      "expression": "衝撃"
+    }
+  ]
+}

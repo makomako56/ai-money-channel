@@ -1,0 +1,59 @@
+{
+  "main_text": "他人の会話が\n混ざる!?",
+  "sub_text": "メタ",
+  "character": "mirai",
+  "expression": "困り顔",
+  "accent": "#e5322d",
+  "lines": [
+    {
+      "segments": [
+        {
+          "text": "他人の会話が"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "混ざる",
+          "color": "#ff3d8b"
+        },
+        {
+          "text": "!?"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "無料",
+          "color": "#ffe14a"
+        },
+        {
+          "text": "の代わりに…"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "メタ"
+        },
+        {
+          "text": "の稼ぎ方",
+          "color": "#a8f04a"
+        }
+      ]
+    }
+  ],
+  "characters": [
+    {
+      "character": "mirai",
+      "expression": "困り顔"
+    },
+    {
+      "character": "hinata",
+      "expression": "衝撃"
+    }
+  ]
+}
