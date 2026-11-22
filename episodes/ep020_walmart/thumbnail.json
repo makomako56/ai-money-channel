@@ -1,0 +1,66 @@
+{
+  "main_text": "AIが\n買い物係に!?",
+  "sub_text": "ウォルマート",
+  "character": "mirai",
+  "expression": "ドヤ顔",
+  "accent": "#e5322d",
+  "lines": [
+    {
+      "segments": [
+        {
+          "text": "AIが"
+        },
+        {
+          "text": "買い物係",
+          "color": "#ff3d8b"
+        },
+        {
+          "text": "に!?"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "利用"
+        },
+        {
+          "text": "2倍超",
+          "color": "#ffe14a"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "献立",
+          "color": "#a8f04a"
+        },
+        {
+          "text": "もおまかせ"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "ウォルマート"
+        },
+        {
+          "text": "の稼ぎ方",
+          "color": "#ffa94a"
+        }
+      ]
+    }
+  ],
+  "characters": [
+    {
+      "character": "mirai",
+      "expression": "ドヤ顔"
+    },
+    {
+      "character": "hinata",
+      "expression": "キラキラ"
+    }
+  ]
+}
