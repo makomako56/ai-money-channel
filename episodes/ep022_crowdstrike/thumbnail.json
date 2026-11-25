@@ -1,0 +1,65 @@
+{
+  "main_text": "AIを\n守る会社",
+  "sub_text": "クラウドストライク",
+  "character": "mirai",
+  "expression": "ドヤ顔",
+  "accent": "#e5322d",
+  "lines": [
+    {
+      "segments": [
+        {
+          "text": "バイトで"
+        },
+        {
+          "text": "AI禁止",
+          "color": "#ff3d8b"
+        },
+        {
+          "text": "!?"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "439億ドル",
+          "color": "#ffe14a"
+        },
+        {
+          "text": "の買収"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "AIを"
+        },
+        {
+          "text": "守る",
+          "color": "#a8f04a"
+        },
+        {
+          "text": "会社"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "クラウドストライク"
+        }
+      ]
+    }
+  ],
+  "characters": [
+    {
+      "character": "mirai",
+      "expression": "ドヤ顔"
+    },
+    {
+      "character": "hinata",
+      "expression": "困り顔"
+    }
+  ]
+}
