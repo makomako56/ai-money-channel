@@ -1,0 +1,63 @@
+{
+  "main_text": "株価が\n1日で12%安",
+  "sub_text": "ブロードコム",
+  "character": "mirai",
+  "expression": "驚き",
+  "accent": "#e5322d",
+  "lines": [
+    {
+      "segments": [
+        {
+          "text": "株価が1日で"
+        },
+        {
+          "text": "12%安",
+          "color": "#ff3d8b"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "グーグルが"
+        },
+        {
+          "text": "注文減？",
+          "color": "#ffe14a"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "専用AIチップ",
+          "color": "#a8f04a"
+        },
+        {
+          "text": "の会社"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "ブロードコム"
+        },
+        {
+          "text": "の稼ぎ方",
+          "color": "#ffa94a"
+        }
+      ]
+    }
+  ],
+  "characters": [
+    {
+      "character": "mirai",
+      "expression": "驚き"
+    },
+    {
+      "character": "hinata",
+      "expression": "衝撃"
+    }
+  ]
+}
