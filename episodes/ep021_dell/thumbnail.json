@@ -1,0 +1,69 @@
+{
+  "main_text": "AIが\n混み合う理由",
+  "sub_text": "デル",
+  "character": "mirai",
+  "expression": "ドヤ顔",
+  "accent": "#e5322d",
+  "lines": [
+    {
+      "segments": [
+        {
+          "text": "AIが"
+        },
+        {
+          "text": "混雑",
+          "color": "#ff3d8b"
+        },
+        {
+          "text": "する理由"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "売上"
+        },
+        {
+          "text": "2倍",
+          "color": "#ffe14a"
+        },
+        {
+          "text": "に!?"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "注文",
+          "color": "#a8f04a"
+        },
+        {
+          "text": "が追いつかない"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "デル"
+        },
+        {
+          "text": "の稼ぎ方",
+          "color": "#ffa94a"
+        }
+      ]
+    }
+  ],
+  "characters": [
+    {
+      "character": "mirai",
+      "expression": "ドヤ顔"
+    },
+    {
+      "character": "hinata",
+      "expression": "驚き"
+    }
+  ]
+}
