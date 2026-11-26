@@ -1,0 +1,73 @@
+{
+  "main_text": "株価が\n1日で14%安",
+  "sub_text": "キオクシア",
+  "character": "mirai",
+  "expression": "驚き",
+  "accent": "#e5322d",
+  "lines": [
+    {
+      "segments": [
+        {
+          "text": "1日で"
+        },
+        {
+          "text": "14%安",
+          "color": "#ff3d8b"
+        },
+        {
+          "text": "→"
+        },
+        {
+          "text": "翌日12%高",
+          "color": "#a8f04a"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "スマホの"
+        },
+        {
+          "text": "記憶",
+          "color": "#ffe14a"
+        },
+        {
+          "text": "の部品"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "日本生まれ",
+          "color": "#ffa94a"
+        },
+        {
+          "text": "の会社"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "キオクシア"
+        },
+        {
+          "text": "の稼ぎ方",
+          "color": "#ffa94a"
+        }
+      ]
+    }
+  ],
+  "characters": [
+    {
+      "character": "mirai",
+      "expression": "驚き"
+    },
+    {
+      "character": "hinata",
+      "expression": "衝撃"
+    }
+  ]
+}
