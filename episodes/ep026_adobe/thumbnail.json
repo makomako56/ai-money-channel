@@ -1,0 +1,66 @@
+{
+  "main_text": "AIに聞いて\n買い物!?",
+  "sub_text": "アドビ",
+  "character": "mirai",
+  "expression": "驚き",
+  "accent": "#e5322d",
+  "lines": [
+    {
+      "segments": [
+        {
+          "text": "AIに聞いて"
+        },
+        {
+          "text": "買い物!?",
+          "color": "#ffe14a"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "AI経由の客が"
+        },
+        {
+          "text": "2倍超",
+          "color": "#ff3d8b"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "なぜ"
+        },
+        {
+          "text": "アドビ",
+          "color": "#ffa94a"
+        },
+        {
+          "text": "が知ってる？"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "アドビ"
+        },
+        {
+          "text": "の稼ぎ方",
+          "color": "#ffa94a"
+        }
+      ]
+    }
+  ],
+  "characters": [
+    {
+      "character": "mirai",
+      "expression": "ドヤ顔"
+    },
+    {
+      "character": "hinata",
+      "expression": "驚き"
+    }
+  ]
+}
