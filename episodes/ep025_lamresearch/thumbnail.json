@@ -1,0 +1,66 @@
+{
+  "main_text": "株価が\n一時10%安",
+  "sub_text": "ラムリサーチ",
+  "character": "mirai",
+  "expression": "驚き",
+  "accent": "#e5322d",
+  "lines": [
+    {
+      "segments": [
+        {
+          "text": "一時"
+        },
+        {
+          "text": "10%以上安",
+          "color": "#ff3d8b"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "チップを"
+        },
+        {
+          "text": "彫る",
+          "color": "#ffe14a"
+        },
+        {
+          "text": "機械"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "中国",
+          "color": "#ffa94a"
+        },
+        {
+          "text": "が心配？"
+        }
+      ]
+    },
+    {
+      "segments": [
+        {
+          "text": "ラムリサーチ"
+        },
+        {
+          "text": "の稼ぎ方",
+          "color": "#ffa94a"
+        }
+      ]
+    }
+  ],
+  "characters": [
+    {
+      "character": "mirai",
+      "expression": "驚き"
+    },
+    {
+      "character": "hinata",
+      "expression": "衝撃"
+    }
+  ]
+}
